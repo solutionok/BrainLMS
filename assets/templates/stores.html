@@ -1,0 +1,113 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.stores}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-show="$root.can('stores.add_store')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_store}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_stores}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.store_title}}</th>
+								<th>{{phrase.Description}}</th>
+								<th style="width:160px;" ng-show="$root.can('stores.edit_store') || $root.can('stores.del_store')" >{{phrase.Operations}}</th>
+							</tr>
+							<tr ng-repeat="stores_one in stores | filter:searchText">
+								<td>{{stores_one.store_title}}</td>
+								<td>{{stores_one.store_desc}}</td>
+								<td ng-show="$root.can('stores.edit_store') || $root.can('stores.del_store')">
+									<button ng-show="$root.can('stores.edit_store')" ng-click="edit(stores_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('stores.del_store')" ng-click="remove(stores_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!stores.length"><td class="noTableData" colspan="3">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+				<h4 class="card-title">{{phrase.add_store}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="stores_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': stores_add_form.store_title.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.store_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="store_title" ng-model="form.store_title" class="form-control" placeholder="{{phrase.store_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea name="store_desc" class="form-control" ng-model="form.store_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="stores_add_form.$invalid">{{phrase.add_store}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+				<h4 class="card-title">{{phrase.edit_store}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="stores_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': stores_edit_form.store_title.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.store_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="store_title" ng-model="form.store_title" class="form-control" placeholder="{{phrase.store_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea name="store_desc" class="form-control" ng-model="form.store_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="stores_edit_form.$invalid">{{phrase.edit_store}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

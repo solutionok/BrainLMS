@@ -1,0 +1,264 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.events}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('events.addEvent')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addEvent}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listEvents}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.eventTitle}}</th>
+                                <th>{{phrase.eventDescription}}</th>
+                                <th>{{phrase.eventPlace}}</th>
+                                <th>{{phrase.for}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th ng-show="$root.can('events.editEvent') || $root.can('events.delEvent')">{{phrase.visibleCMS}}</th>
+                                <th style="width:170px;" ng-show="$root.can('events.editEvent') || $root.can('events.delEvent')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="event in events | filter:searchText">
+                                <td><a href="portal#events/{{event.id}}">{{event.eventTitle}}</a></td>
+                                <td><div ng-bind-html="event.eventDescription"></div></td>
+                                <td>{{event.enentPlace}}</td>
+                                <td>{{event.eventFor}}</td>
+                                <td>{{event.eventDate}}</td>
+                                <td ng-show="$root.can('events.editEvent') || $root.can('events.delEvent')">
+                                    <i ng-class="{'color_red':event.fe_active != 1,'color_green':event.fe_active == 1}" class="fa fa-lightbulb-o"></i>
+                                </td>
+                                <td ng-show="$root.can('events.editEvent') || $root.can('events.delEvent')">
+                                    <button ng-show="$root.can('events.editEvent')" ng-click="fe_status(event.id,$index)" type="button" class="btn btn-warning btn-circle" title="{{phrase.toggleCMS}}" tooltip><i class="fa fa-lightbulb-o"></i></button>
+                                    <button ng-show="$root.can('events.editEvent')" ng-click="edit(event.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('events.delEvent')" ng-click="remove(event,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!events.length"><td class="noTableData" colspan="6">{{phrase.noEvents}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addEvent}}</h4>
+                <form class="form-horizontal" name="addEvent" role="form" ng-upload="saveAdd(content)" method="post" action="{{'index.php/events'}}" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': addEvent.eventTitle.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.eventTitle}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="eventTitle" ng-model="form.eventTitle" class="form-control" required placeholder="{{phrase.eventTitle}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.eventDescription}}</label>
+                        <div class="col-sm-10">
+                            <textarea ck-editor name="eventDescription" class="form-control" ng-model="form.eventDescription" placeholder="{{phrase.eventDescription}}"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.eventPlace}}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="enentPlace" ng-model="form.enentPlace" class="form-control" placeholder="{{phrase.eventPlace}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEvent.eventFor.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.for}} *</label>
+                        <div class="col-sm-10">
+
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="all" ng-model="form.eventFor" checked="checked" required>
+                                    {{phrase.all}}
+                                </label>
+                            </div>
+                            <!-- <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="student" ng-model="form.eventFor" required>
+                                    {{phrase.students}}
+                                </label>
+                            </div> -->
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="teacher" ng-model="form.eventFor" required>
+                                    {{phrase.teachers}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="parent" ng-model="form.eventFor" required>
+                                    {{phrase.parents}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEvent.eventDate.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Date}} *</label>
+                        <div class="col-sm-10">
+                            <input type="text" date-picker id="datemask" name="eventDate" ng-model="form.eventDate" required class="form-control datemask">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Image}} *</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="eventImage">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEvent.fe_active.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.visibleCMS}} *</label>
+                        <div class="col-sm-10">
+
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="fe_active" value="1" ng-model="form.fe_active" required>
+                                    {{phrase.Active}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="fe_active" value="0" ng-model="form.fe_active" required>
+                                    {{phrase.Inactive}}
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addEvent.$invalid">{{phrase.addEvent}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editEvent}}</h4>
+                <form class="form-horizontal" name="editEvent" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/events/'+form.id}}" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': editEvent.eventTitle.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.eventTitle}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="eventTitle" ng-model="form.eventTitle" class="form-control" required placeholder="{{phrase.eventTitle}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.eventDescription}}</label>
+                        <div class="col-sm-10">
+                            <textarea ck-editor name="eventDescription" class="form-control" ng-model="form.eventDescription" placeholder="{{phrase.eventDescription}}"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.eventPlace}}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="enentPlace" ng-model="form.enentPlace" class="form-control" placeholder="{{phrase.eventPlace}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEvent.eventFor.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.for}} *</label>
+                        <div class="col-sm-10">
+
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="all" ng-model="form.eventFor" checked="checked" required>
+                                    {{phrase.all}}
+                                </label>
+                            </div>
+                            <!-- <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="student" ng-model="form.eventFor" required>
+                                    {{phrase.students}}
+                                </label>
+                            </div> -->
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="teacher" ng-model="form.eventFor" required>
+                                    {{phrase.teachers}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="eventFor" value="parent" ng-model="form.eventFor" required>
+                                    {{phrase.parents}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEvent.eventDate.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Date}} *</label>
+                        <div class="col-sm-10">
+                            <input type="text" date-picker id="datemaskEdit" name="eventDate" ng-model="form.eventDate" required class="form-control datemask">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Image}} *</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="eventImage">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEvent.fe_active.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.visibleCMS}} *</label>
+                        <div class="col-sm-10">
+
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="fe_active" value="1" ng-model="form.fe_active" required>
+                                    {{phrase.Active}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="radio" name="fe_active" value="0" ng-model="form.fe_active" required>
+                                    {{phrase.Inactive}}
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editEvent.$invalid">{{phrase.editEvent}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.read">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{form.eventTitle}} - {{form.eventDate}}</h4>
+                <div class="table-responsive">
+                  <div ng-bind-html="eventDescription"></div>
+                  <br/>
+                  {{phrase.eventPlace}} : {{form.enentPlace}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

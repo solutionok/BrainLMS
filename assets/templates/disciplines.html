@@ -1,0 +1,229 @@
+<style type="text/css">
+	.filter-view {
+		border: 3px solid #009efb;
+		border-radius: 0 0 7px 7px;
+		padding: 10px;
+		margin-top: 10px;
+	}
+	.filter-view-arrow {
+		left: 47%;
+		content:"";
+		position: absolute;
+		top: 100%;
+		border-color: #009efb transparent;
+		border-style: solid;
+		border-width: 8px 8px 0px 8px;
+		height: 0px;
+		width: 0px;
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">Disciplines</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('Disciplines.add')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">Add discipline</button>
+                <h4 class="card-title">List Disciplines</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Created at</th>
+                                <th ng-show="$root.can('Disciplines.View') || $root.can('Disciplines.Download') || $root.can('Disciplines.edit') || $root.can('Disciplines.del')" style="width:200px;">
+	                                {{phrase.Operations}}
+	                              </th>
+                            </tr>
+                        </thead>
+                        <tbody dir-paginate="discipline in disciplines | itemsPerPage:20" total-items="totalItems">
+                            <tr>
+                                <td>{{discipline.id}}</td>
+                                <td>
+                                	<a href="" ng-click="viewDiscipline(discipline.id)">{{discipline.title}}</a>
+                                </td>
+                                <td>{{discipline.description}}</td>
+                                <td>{{discipline.status}}</td>
+                                <td>{{discipline.date}}</td>
+                                <td ng-show="$root.can('Disciplines.View') || $root.can('Disciplines.Download') || $root.can('Disciplines.edit') || $root.can('Disciplines.del')">
+                                  <button ng-show="$root.can('Disciplines.View')" ng-click="viewDiscipline(discipline.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.View}}" tooltip><i class="fa fa-eye"></i></button>
+                                  <!-- <a ng-show="$root.can('Disciplines.Download') && discipline.attachment_file != ''" target="_blank" href="{{'index.php/disciplines/download/' + discipline.id}}"><button type="button" class="btn btn-success btn-circle" title="{{phrase.Download}}" tooltip><i class="fa fa-cloud-download"></i></button></a> -->
+                                  <button ng-show="$root.can('Disciplines.edit')" ng-click="edit(discipline.id)" type="button" class="btn btn-warning btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                  <button ng-show="$root.can('Disciplines.del')" ng-click="remove(discipline,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-show="disciplines.length == '0'">
+                        	<tr><td class="noTableData" colspan="6">No disciplines available</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add" ng-controller="disciplinesFilterController">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">Add Discipline</h4>
+                <form class="form-horizontal" name="addDiscipline" role="form" ng-upload="saveAdd(content)" method="post" action="index.php/disciplines" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': addDiscipline.title.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Title *</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="title" ng-model="form.title" class="form-control" required placeholder="Title">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addDiscipline.description.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Description *</label>
+                        <div class="col-sm-10">
+                            <textarea name="description" class="form-control" ng-model="form.description" placeholder="Description" required></textarea>
+                        </div>
+                    </div>
+                    <div ng-include="'/assets/js/Angular/includes/discipline-filter.html?id=07058'" style="margin-top: -8px; margin-bottom: 25px;"></div>
+                    <div class="form-group row" ng-class="{'has-error': addDiscipline.trial_date.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Trial date *</label>
+                        <div class="col-sm-10">
+                            <input date-picker type="text" id="datemask" name="trial_date" ng-model="form.trial_date" required class="form-control datemask">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addDiscipline.status_id.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Discipline status *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.status_id" name="status_id" required>
+                                <option value="1">Pending</option>
+                                <option value="2">Solved</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Attachment}}</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="attachment_file" id="disciplineFile">
+                        </div>
+                    </div> -->
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addDiscipline.$invalid">Add Discipline</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel edit</button>
+                <h4 class="card-title">Edit Discipline</h4>
+                <form class="form-horizontal" name="editDiscipline" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/disciplines/' + form.id}}" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': editDiscipline.title.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Title *</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="title" ng-model="form.title" class="form-control" required placeholder="Title">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editDiscipline.description.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Description *</label>
+                        <div class="col-sm-10">
+                            <textarea name="description" class="form-control" ng-model="form.description" placeholder="Description" required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editDiscipline.trial_date.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Trial date *</label>
+                        <div class="col-sm-10">
+                            <input date-picker type="text" id="datemask2" name="trial_date" ng-model="form.trial_date" required class="form-control datemask">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editDiscipline.status_id.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Discipline status *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.status_id" name="status_id" required>
+                                <option value="1">Pending</option>
+                                <option value="2">Solved</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Attachment}}</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="attachment_file" id="disciplineFileEdit">
+                        </div>
+                    </div> -->
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editDiscipline.$invalid">Update Discipline</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="viewModal">
+  <div class="row">
+  	<div class="col-md-6">
+  		<div class="mb-3">
+	  		<b class="text-primary">Title:</b> {{ disciplinemodal_data.discipline.title }}
+  		</div>
+  		<div class="mb-3">
+	  		<b class="text-primary">Description:</b> {{ disciplinemodal_data.discipline.description }}
+  		</div>
+  		<div>
+	  		<b class="text-primary">Status:</b> {{ disciplinemodal_data.discipline.status }}
+  		</div>
+  		<hr>
+  		<div class="mb-3">
+	  		<b class="text-primary">Trial date:</b> {{ disciplinemodal_data.discipline.trial_date_formated }}
+  		</div>
+  		<div>
+	  		<b class="text-primary">Created at:</b> {{ disciplinemodal_data.discipline.date }}
+  		</div>
+  	</div>
+  	<div class="col-md-6">
+  		<div class="mb-3">
+	  		<b class="text-primary">Complained by:</b>
+	  		<div style="font-size: 12px" ng-repeat="user in disciplinemodal_data.complained_by_data">
+	  			{{ user.fullName }} - ID: {{ user.id }}
+	  		</div>
+  		</div>
+  		<div>
+	  		<b class="text-primary">Complained against:</b>
+	  		<div style="font-size: 12px" ng-repeat="user in disciplinemodal_data.complained_against_data">
+	  			{{ user.fullName }} - RollID: {{ user.studentRollId }}
+	  		</div>
+  		</div>
+  		<hr>
+  		<div class="mb-3">
+	  		<b class="text-primary">Jury:</b>
+	  		<div ng-if="disciplinemodal_data.jury_data.length" style="font-size: 12px" ng-repeat="user in disciplinemodal_data.jury_data">
+	  			{{ user.fullName }} - ID: {{ user.id }}
+	  		</div>
+	  		<div ng-if="!disciplinemodal_data.jury_data.length" style="font-size: 12px" class="text-danger">
+	  			No jury detected.
+	  		</div>
+  		</div>
+  		<div>
+	  		<b class="text-primary">Responsible officials:</b>
+	  		<div style="font-size: 12px" ng-repeat="user in disciplinemodal_data.responsible_officials_data">
+	  			{{ user.fullName }} - ID: {{ user.id }}
+	  		</div>
+  		</div>
+  	</div>
+  </div>
+</modal>

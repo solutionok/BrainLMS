@@ -1,0 +1,573 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.parents}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-0 hidden advSearch">
+        <div class="card card-outline-info">
+            <div class="card-header">
+                <a ng-click="toggleSearch(); resetSearch();" class="closeButt pull-right">x</a>
+                <h4 class="m-b-0 text-white">{{phrase.advSearch}}</h4>
+            </div>
+            <div class="card-block">
+                <form class="form-horizontal" name="searchForm" ng-submit="searchDB(1)" role="form" novalidate>
+                    <div class="form-group">
+                        <label>{{phrase.Search}}</label>
+                        <input type="text" class="form-control" ng-model="searchInput.text">
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.email}}</label>
+                        <input type="text" class="form-control" ng-model="searchInput.email">
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.Gender}}</label>
+                        <div class="radio-list">
+                            <label>
+                                <input type="radio" name="gender" value="male" ng-model="searchInput.gender">
+                                {{phrase.Male}}
+                            </label>
+                        </div>
+                        <div class="radio-list">
+                            <label>
+                                <input type="radio" name="gender" value="female" ng-model="searchInput.gender">
+                                {{phrase.Female}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-info waves-effect waves-light">{{phrase.advSearch}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 listContent">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('parents.AddParent')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.AddParent}}</button>
+                <button ng-click="toggleSearch()" class="btn pull-right btn-success card-block-input-item">{{phrase.advSearch}}</button>
+                <button ng-show="$root.can('parents.Approve')" ng-click="waitingApproval()" class="btn pull-right btn-success card-block-input-item">{{phrase.waitingApproval}}</button>
+                <div ng-show="$root.can('parents.Export')" class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" href="index.php/parents/export" target="_BLANK">{{phrase.ExportExcel}}</a>
+                            <a class="dropdown-item" href="index.php/parents/exportpdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="$root.can('parents.Import')" class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Import}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" ng-click="import('excel')">{{phrase.ImportExcel}}</a>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listParents}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    {{phrase.ID}}
+                                    <i ng-show="$root.dashboardData.sort.teachers != '' && $root.dashboardData.sort.teachers != 'id + 0 ASC' && $root.dashboardData.sort.teachers != 'id + 0 DESC'" ng-click="sortItems('id + 0 DESC')" class="ahref mdi mdi-sort"></i>
+                                    <i ng-show="$root.dashboardData.sort.teachers == '' || $root.dashboardData.sort.teachers == 'id + 0 ASC'" ng-click="sortItems('id + 0 DESC')" class="ahref mdi mdi-arrow-down-bold"></i>
+                                    <i ng-show="$root.dashboardData.sort.teachers == 'id + 0 DESC'" ng-click="sortItems('id + 0 ASC')" class="ahref mdi mdi-arrow-up-bold"></i>
+                                </th>
+                                <th>
+                                    {{phrase.FullName}}
+                                    <i ng-show="$root.dashboardData.sort.teachers != 'fullName ASC' && $root.dashboardData.sort.teachers != 'fullName DESC'" ng-click="sortItems('fullName DESC')" class="ahref mdi mdi-sort"></i>
+                                    <i ng-show="$root.dashboardData.sort.teachers == 'fullName ASC'" ng-click="sortItems('fullName DESC')" class="ahref mdi mdi-arrow-down-bold"></i>
+                                    <i ng-show="$root.dashboardData.sort.teachers == 'fullName DESC'" ng-click="sortItems('fullName ASC')" class="ahref mdi mdi-arrow-up-bold"></i>
+                                </th>
+                                <th>
+                                    {{phrase.username}}
+                                    <i ng-show="$root.dashboardData.sort.teachers != 'username ASC' && $root.dashboardData.sort.teachers != 'username DESC'" ng-click="sortItems('username DESC')" class="ahref mdi mdi-sort"></i>
+                                    <i ng-show="$root.dashboardData.sort.teachers == 'username ASC'" ng-click="sortItems('username DESC')" class="ahref mdi mdi-arrow-down-bold"></i>
+                                    <i ng-show="$root.dashboardData.sort.teachers == 'username DESC'" ng-click="sortItems('username ASC')" class="ahref mdi mdi-arrow-up-bold"></i>
+                                </th>
+                                <th>{{phrase.email}}</th>
+                                <th class="no-print" ng-show="$root.can('parents.editParent') || $root.can('parents.delParent')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr dir-paginate="parent in stparents | itemsPerPage:20" total-items="totalItems">
+                                <td>{{parent.id}}</td>
+                                <td>
+                                    <img alt="{{parent.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+parent.id}}">
+                                    <a href="" ng-click="parentProfile( parent.id )">{{parent.fullName}}</a>
+                                    <i ng-show="$root.can('parents.delParent')" ng-class="{'color_red':parent.account_active==0,'color_green':parent.account_active==1}" class="fa fa-lightbulb-o"></i>
+                                </td>
+                                <td>{{parent.username}}</td>
+                                <td>{{parent.email}}</td>
+                                <td class="no-print" ng-show="$root.can('parents.editParent') || $root.can('parents.delParent')">
+                                    <button ng-show="$root.can('parents.editParent')" ng-click="account_status(parent.id,$index)" type="button" class="btn btn-warning btn-circle" title="{{phrase.toggleStatus}}" tooltip><i class="fa fa-lightbulb-o"></i></button>
+                                    <button ng-show="$root.can('parents.editParent')" ng-click="edit(parent.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('parents.delParent')" ng-click="remove(parent,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!stparents.length"><td class="noTableData" colspan="5">{{phrase.noParents}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="getResultsPage(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.approval">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.Return}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.waitingApproval}}</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="parent in stparentsApproval | filter:searchText">
+                                <td>{{parent.id}}</td>
+                                <td><a href="" ng-click="parentProfile( parent.id )">{{parent.fullName}}</a></td>
+                                <td>{{parent.username}}</td>
+                                <td>{{parent.email}}</td>
+                                <td>
+                                    <button ng-click="approve(parent.id)" type="button" class="btn btn-success btn-circle" title="Approve" tooltip><i class="fa fa-check-square-o"></i></button>
+                                    <button ng-click="edit(parent.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-click="remove(parent,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.AddParent}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-upload="saveAdd(content)" method="post" action="index.php/parents" name="addAdmin" role="form" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.fullName.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.username.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.username}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" ng-model="form.username" autocomplete="off" class="form-control" required placeholder="{{phrase.username}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.email.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} *</label>
+                            <div class="col-sm-10">
+                                <input type="email" name="email" ng-model="form.email" autocomplete="off" class="form-control" placeholder="{{phrase.email}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.password.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.password}} *</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="password" autocomplete="off" ng-model="form.password" required class="form-control" placeholder="{{phrase.password}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Gender}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="male" ng-model="form.gender">
+                                        {{phrase.Male}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="female" ng-model="form.gender">
+                                        {{phrase.Female}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Birthday}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker id="datemask" name="birthday" ng-model="form.birthday" class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Address}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="address" class="form-control" ng-model="form.address" placeholder="{{phrase.Address}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.phoneNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="phoneNo" class="form-control" ng-model="form.phoneNo" placeholder="{{phrase.phoneNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.mobileNo.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mobileNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" mobile-number name="mobileNo" class="form-control" ng-model="form.mobileNo" placeholder="{{phrase.mobileNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Profession}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="parentProfession" class="form-control" ng-model="form.parentProfession" placeholder="{{phrase.Profession}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="photo">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Communication}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.studentDetails}}</label>
+                            <div class="col-sm-10">
+                                <button type="button" ng-click="linkStudent()" class="btn btn-danger btn-flat">{{phrase.linkStudentParent}}</button>
+                                <input type="text" name="linkedStudentsSer" ng-model="form.studentInfoSer" style="display:none;">
+                                <div class="row" ng-repeat="studentOne in form.studentInfo track by $index">
+                                    <div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="studentOne.student"></div>
+                                    <div class="col-md-4"><input type="text" class="form-control" ng-model="studentOne.relation" name="relationR[]" placeholder="{{phrase.Relation}}" ng-change="monitorParentChange()"></div>
+                                    <button type="button" ng-click="removeStudent(studentOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+                                </div>
+                            </div>
+                        </div>
+                        <div lass="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-info btn-default" ng-disabled="addAdmin.$invalid || $isUploading">{{phrase.AddParent}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editParent}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="editDorm" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/parents/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.fullName.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.username.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.username}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" ng-model="form.username" autocomplete="off" class="form-control" required placeholder="{{phrase.username}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.email.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} *</label>
+                            <div class="col-sm-10">
+                                <input type="email" name="email" ng-model="form.email" autocomplete="off" class="form-control" placeholder="{{phrase.email}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.password}} *</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="password" ng-model="form.password" autocomplete="off" class="form-control" placeholder="{{phrase.password}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Gender}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="male" ng-model="form.gender">
+                                        {{phrase.Male}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="female" ng-model="form.gender">
+                                        {{phrase.Female}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Birthday}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker id="datemaskEdit" name="birthday" ng-model="form.birthday" class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Address}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="address" class="form-control" ng-model="form.address" placeholder="{{phrase.Address}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.phoneNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="phoneNo" class="form-control" ng-model="form.phoneNo" placeholder="{{phrase.phoneNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.mobileNo.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mobileNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" mobile-number name="mobileNo" class="form-control" ng-model="form.mobileNo" value="{{phrase.mobileNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Profession}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="parentProfession" class="form-control" ng-model="form.parentProfession" placeholder="{{phrase.Profession}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                            		<img alt="{{form.fullName}}"
+                            			ng-if="form.photo.length"
+                            			class="user-image img-circle" style="width:45px; height:45px; margin-right: 10px"
+                            			ng-src="{{'index.php/dashboard/profileImage/'+form.id}}"
+                            		>
+                                <input type="file" name="photo">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Communication}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.studentDetails}}</label>
+                            <div class="col-sm-10">
+                                <button type="button" ng-click="linkStudent()" class="btn btn-danger btn-flat">{{phrase.linkStudentParent}}</button>
+                                <input type="text" name="linkedStudentsSer" ng-model="form.studentInfoSer" style="display:none;">
+                                <div class="row" ng-repeat="studentOne in form.studentInfo track by $index">
+                                    <div class="col-md-4"><input type="text" class="form-control" disabled="disabled" ng-model="studentOne.student"></div>
+                                    <div class="col-md-4"><input type="text" class="form-control" ng-model="studentOne.relation" placeholder="{{phrase.Relation}}" ng-change="monitorParentChange()"></div>
+                                    <button type="button" ng-click="removeStudent(studentOne.id)" class="btn btn-danger btn-flat"><i class="fa fa-trash-o"></i></button></li>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-info btn-default" ng-disabled="editDorm.$invalid || $isUploading">{{phrase.editParent}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.import">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <a ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</a>
+                <h4 class="card-title">{{phrase.Import}} {{importType}}</h4>
+                <div>
+
+                    <form class="form-horizontal" ng-upload="saveImported(content)" method="post" action="{{'index.php/parents/import/'+importType}}" name="importData" role="form" novalidate>
+                        <div class="form-group row" style="margin: 30px 0px; border: 1px solid #EEE; padding: 10px;">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fileToImport}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="excelcsv">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-info btn-default" ng-disabled="importData.$invalid || $isUploading">{{phrase.Import}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.reviewImport">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <h4 class="card-title">{{phrase.Import}} {{importType}}</h4>
+                <div>
+
+                    <form class="form-horizontal" ng-submit="reviewImportData()" name="importData" role="form" novalidate>
+
+                        <h4>{{phrase.failedImport}}</h4>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody>
+                                    <tr>
+                                        <th>{{phrase.FullName}}</th>
+                                        <th>{{phrase.username}}</th>
+                                        <th>{{phrase.email}}</th>
+                                        <th>{{phrase.password}}</th>
+                                        <th> </th>
+                                    </tr>
+                                    <tr ng-repeat="student in importReview.revise">
+                                        <td>{{student.fullName}}</td>
+                                        <td ng-class="{'has-error': student.error.indexOf('username',0) != -1}"><input type="text" name="username" class="form-control mobilenumber" ng-model="student.username"></td>
+                                        <td ng-class="{'has-error': student.error.indexOf('email',0) != -1}"><input type="text" name="email" class="form-control mobilenumber" ng-model="student.email"></td>
+                                        <td><input type="password" name="password" class="form-control mobilenumber" ng-model="student.password"></td>
+                                        <th><button ng-click="removeImport(student,$index,'revise')" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button></th>
+                                    </tr>
+                                    <tr ng-show="!importReview.revise.length"><td class="noTableData" colspan="6">No parents</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>{{phrase.readyImport}}</h4>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody>
+                                    <tr>
+                                        <th>{{phrase.FullName}}</th>
+                                        <th>{{phrase.username}}</th>
+                                        <th>{{phrase.email}}</th>
+                                        <th>{{phrase.password}}</th>
+                                        <th> </th>
+                                    </tr>
+                                    <tr ng-repeat="student in importReview.ready">
+                                        <td>{{student.fullName}}</td>
+                                        <td><input type="text" name="username" class="form-control mobilenumber" ng-model="student.username"></td>
+                                        <td><input type="text" name="email" class="form-control mobilenumber" ng-model="student.email"></td>
+                                        <td><input type="password" name="password" class="form-control mobilenumber" ng-model="student.password"></td>
+                                        <th><a ng-click="removeImport(student,$index,'ready')" type="button" class="btn btn-danger btn-flat" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></a></th>
+                                    </tr>
+                                    <tr ng-show="!importReview.ready.length"><td class="noTableData" colspan="6">No parents</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default">{{phrase.Import}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="showModal"><div ng-bind-html="modalContent"></div></modal>
+<modal visible="showModalLink">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink" placeholder="Type student name / username / E-mail address">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="linkStudentButton()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="studentOne in searchResults">
+                            <td>{{studentOne.name}}</td>
+                            <td>{{studentOne.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="linkStudentFinish(studentOne)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>

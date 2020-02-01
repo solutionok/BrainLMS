@@ -1,0 +1,44 @@
+#parentDBArea .page-titles {
+	padding-bottom: 10px !important;
+  margin-top: -10px !important;
+}
+#parentDBArea .card-block h4.card-title {
+	margin-top: 5px;
+}
+
+body:not(.mini-sidebar) .left-sidebar {
+	overflow-y: scroll !important;
+}
+body:not(.mini-sidebar) .left-sidebar .scroll-sidebar {
+	overflow: inherit !important;
+	height: inherit !important;
+}
+body:not(.mini-sidebar) .slimScrollDiv {
+	height: auto !important;
+}
+
+.select-checkbox {
+	padding: 5px !important;
+	height: 170px;
+	margin-top: -10px;
+}
+.select-checkbox option.all:not(.select-all) {
+  color: blue;
+}
+.select-checkbox option:not(.select-all)::before {
+  content: "\2610";
+  width: 1.3em;
+  text-align: center;
+  display: inline-block;
+}
+.select-checkbox option:not(.select-all):checked::before {
+  content: "\2611";
+}
+
+.custom-module-action-loader {
+	margin-right: -4px;
+	margin-left: 5px;
+	width: 33px;
+	margin-bottom: -10px;
+	margin-top: -10px;
+}

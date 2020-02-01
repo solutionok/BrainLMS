@@ -1,0 +1,9 @@
+.bg-info{
+  background-color: #986dbd !important;
+}
+.bg-info-gradiant{
+  background:linear-gradient(to right, #986dbd 0%, #ae84d6 100%);
+}
+h2,h5,.font-medium a,.text-themecolor{
+  color: #986dbd !important;
+}

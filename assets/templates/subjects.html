@@ -1,0 +1,140 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Subjects}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('Subjects.addSubject')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addSubject}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.Subjects}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.subjectName}}</th>
+                                <th>{{phrase.teacher}}</th>
+                                <th>{{phrase.passGrade}} / {{phrase.finalGrade}}</th>
+                                <th ng-show="$root.can('Subjects.editSubject') || $root.can('Subjects.delSubject')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="subject in subjects | filter:searchText">
+                                <td>{{subject.subjectTitle}}</td>
+                                <td>
+                                	<div style="max-height: 120px; overflow-y: scroll;">
+                                    <span ng-repeat="teacher in subject.teacherId">{{teachers[teacher].fullName}}<br/></span>
+                                	</div>
+                                </td>
+                                <td>
+                                    {{subject.passGrade}} / {{subject.finalGrade}}
+                                </td>
+                                <td ng-show="$root.can('Subjects.editSubject') || $root.can('Subjects.delSubject')">
+                                    <button ng-show="$root.can('Subjects.editSubject')" ng-click="edit(subject.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Subjects.delSubject')" ng-click="remove(subject,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!subjects.length"><td class="noTableData" colspan="5">{{phrase.noSubjects}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addSubject}}</h4>
+                <form class="form-horizontal" name="addSubject" role="form" ng-submit="saveAdd()" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': addSubject.subjectTitle.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.subjectName}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="subjectTitle" ng-model="form.subjectTitle" class="form-control" required placeholder="{{phrase.subjectName}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addSubject.teacherId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.teacher}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.teacherId" name="teacherId" multiple required>
+                                <option ng-repeat="teacher in teachers" value="{{teacher.id}}">{{teacher.fullName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addSubject.passGrade.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.passGrade}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="passGrade" ng-model="form.passGrade" class="form-control" required placeholder="{{phrase.passGrade}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addSubject.finalGrade.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.finalGrade}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="finalGrade" ng-model="form.finalGrade" class="form-control" required placeholder="{{phrase.finalGrade}}">
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addSubject.$invalid">{{phrase.addSubject}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editSubject}}</h4>
+                <form class="form-horizontal" name="editSubject" role="form" ng-submit="saveEdit()" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': editSubject.subjectTitle.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.subjectName}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="subjectTitle" ng-model="form.subjectTitle" class="form-control" required placeholder="{{phrase.subjectName}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editSubject.teacherId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.teacher}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.teacherId" name="teacherId" multiple required>
+                                <option ng-repeat="teacher in teachers" value="{{teacher.id}}">{{teacher.fullName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editSubject.passGrade.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.passGrade}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="passGrade" ng-model="form.passGrade" class="form-control" required placeholder="{{phrase.passGrade}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editSubject.finalGrade.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.finalGrade}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="finalGrade" ng-model="form.finalGrade" class="form-control" required placeholder="{{phrase.finalGrade}}">
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editSubject.$invalid">{{phrase.editSubject}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,232 @@
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/redmond/jquery-ui.css" />
+
+<style type="text/css">
+	.days-of-week-tabs .tab-pane {
+		padding: 10px;
+		background: #FFF;
+	}
+
+	.scroll-style::-webkit-scrollbar-track {
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		background-color: #F5F5F5;
+	}
+	.scroll-style::-webkit-scrollbar {
+		height: 8px;
+		background-color: #F5F5F5;
+	}
+	.scroll-style::-webkit-scrollbar-thumb {
+		background-color: #888;
+	}
+
+	.timetables {
+		align-items: stretch;
+	  display: flex;
+	  flex-direction: row;
+	  flex-wrap: wrap;
+	  overflow-x: visible;
+	  /*overflow-y: overlay;*/
+	}
+	.timetables .card {
+		max-width: 127px;
+	  border: 2px solid #999;
+	  padding: 4px;
+	  flex-basis: 127px;
+	  flex-grow: 0;
+	  flex-shrink: 0;
+	  margin-bottom: 5px;
+	}
+	.timetables input {
+		text-align: center;
+	}
+
+	.add-new-period-card {
+		max-width: 127px;
+	  border: 2px dashed green !important;
+	  padding: 4px;
+	  flex-basis: 127px;
+	  flex-grow: 0;
+	  flex-shrink: 0;
+	  font-size: 60px;
+	  cursor: pointer;
+	  margin-bottom: 5px;
+	  opacity: 0.7;
+	  -webkit-transition: all 0.5s;
+		transition: all 0.5s;
+	}
+	.add-new-period-card:hover {
+		opacity: 1;
+	}
+	input[type="text"]:disabled{
+		background-color: #EEE;
+	}
+
+	.search-typeahead .dropdown-item {
+		padding: 5px !important;
+	}
+	.timetable-searcher .dropdown {
+		float: left;
+		margin-top: 40px;
+		position: relative;
+		left: 55px;
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-12 align-self-center">
+      	<h3 class="text-themecolor">Institution Timetable (class-wise)</h3>
+      	<hr style="margin-top: 15px; margin-bottom: 5px">
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="card" style="background: transparent;">
+			<div class="card-block">
+				<ul class="nav nav-tabs justify-content-around" role="tablist">
+				  <li class="nav-item" ng-repeat="day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']">
+				    <a class="nav-link"
+				    	data-toggle="tab"
+				    	ng-class="{'active': currentDisplayDay == day}"
+				    	aria-controls="{{ day }}"
+				    	ng-click="changeDisplayDay(day)"
+				    	href="#{{ day }}" role="tab"
+				    	aria-selected="true">{{ day }}</a>
+				  </li>
+				</ul>
+				<div class="tab-content days-of-week-tabs" style="background: #FFF">
+				  <div class="tab-pane pt-3 fade"
+				  	ng-repeat="day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']"
+				  	ng-class="{'show active': day == 'Monday'}"
+				  	id="{{ day }}" role="tabpanel" aria-labelledby="{{ day }}-tab">
+					  	<div ng-if="!loading">
+					  		<div class="row">
+					  			<div class="col-12 timetable-searcher">
+					  				<div class="form-inline">
+						  				<label>Filter by</label>
+						  				<select class="form-control ml-2" ng-model="search.class_id" ng-change="updateFilteredSections(search.class_id)">
+						  					<option value="0" disabled selected>-- Select class --</option>
+						  					<option ng-repeat="class in all_classes" value="{{ class.id }}">
+						  						{{ class.name }}
+						  					</option>
+						  				</select>
+						  				<select class="form-control ml-2 mr-2" ng-model="search.section_id" ng-disabled="filtered_sections.length <= 0">
+						  					<option value="0" selected>All sections</option>
+						  					<option ng-repeat="section in filtered_sections" value="{{ section.id }}">
+						  						{{ section.name }}
+						  					</option>
+						  				</select>
+						  				<button
+						  					class="btn btn-primary"
+						  					style="padding: 10px 20px 9px 20px;"
+						  					ng-disabled="!searchStatus"
+						  					title="Filter" tooltip
+						  					ng-click="searchFor()">
+						  					<i class="fa fa-search"></i>
+						  				</button>
+						  				<button
+						  					class="btn btn-primary ml-2"
+						  					style="padding: 10px 20px 9px 20px;"
+						  					ng-disabled="!searchStatus"
+						  					ng-click="resetFilter()"
+						  					title="Reset filter" tooltip>
+						  					<i class="fa fa-refresh"></i>&nbsp; reset filter
+						  				</button>
+					  				</div>
+					  				<hr>
+					  			</div>
+					  		</div>
+					  		<div ng-if="timetable.length > 0">
+							  	<div class="item-row row mb-2 pb-1"
+							  		dir-paginate="(_key,_item) in timetable | itemsPerPage:8"
+							  		total-items="totalItems * 2"
+							  		style="margin: auto 0px; border-bottom: 2px solid #2d2d2d;">
+							  		<div class="col-2" style="padding-right: 0; padding-left: 0">
+								  		<div class="section">
+								  			<b>
+								  				{{ __filterClassBySectionId(_item[0]).name }} /
+								  				{{ __filterSectionById(_item[0]).name }}
+								  			</b><br>
+								  			<button class="btn btn-outline-success btn-sm mt-2" ng-click="addNewPeriod(_key)" title="Add new period" tooltip>
+								  				<i class="fa fa-plus"></i>
+								  			</button>
+								  		</div>
+							  		</div>
+							  		<div class="col-10" style="padding-right: 0">
+								  		<div class="timetables scroll-style mr-2">
+										  			<div class="card mr-1" ng-repeat="period in _item[1] | toArray | orderBy:'_startTime':false">
+											  				<div class="times justify-content-between mb-1" style="display: flex;">
+										  						<input type="text" name="startTime"
+										  							ng-model="period.startTime"
+										  							data-period-id="{{period.id}}"
+										  							data-period-rand-id="{{period.rand_id}}"
+										  							data-time-type="startTime"
+										  							placeholder="Start at"
+										  							class="form-control form-control-sm pickup-time"
+										  							ng-disabled="period.disabled_status" style="width: 49%; padding: 4px 0">
+										  						<input type="text" name="endTime"
+										  							ng-model="period.endTime"
+										  							data-period-id="{{period.id}}"
+										  							data-period-rand-id="{{period.rand_id}}"
+										  							data-time-type="endTime"
+										  							placeholder="End at"
+										  							class="form-control form-control-sm pickup-time"
+										  							ng-disabled="period.disabled_status" style="width: 49%; padding: 4px 0">
+											  				</div>
+											  				<div class="times justify-content-between mb-1" style="display: flex;">
+										  						<input type="text" name="teacher_name"
+										  							ng-model="period.teacher_name" placeholder="Teacher"
+										  							class="form-control form-control-sm"
+										  							typeahead="all_teachers" typeahead-callback="callbackTeachers"
+										  							ng-disabled="period.disabled_status">
+											  				</div>
+											  				<input type="text" name="subject_name"
+											  					ng-model="period.subject_name" placeholder="Subject"
+											  					typeahead="all_subjects" typeahead-callback="callbackSubjects"
+											  					ng-disabled="period.disabled_status"
+											  					class="form-control form-control-sm">
+											  				<div class="mt-1 justify-content-between" style="display: flex;">
+												  				<button class="btn btn-sm"
+												  					ng-class="{
+												  						'btn-outline-info': period.disabled_status,
+												  						'btn-info': !period.disabled_status,
+												  					}"
+												  					ng-click="updatePeriod(period.id)"
+												  					title="Update" tooltip style="width: 49%">
+													  				<i class="fa fa-edit"></i>
+													  			</button>
+													  			<button class="btn btn-outline-danger btn-sm" ng-click="removePeriod(period.id)" title="Remove" tooltip style="width: 49%">
+													  				<i class="fa fa-minus"></i>
+													  			</button>
+											  				</div>
+										  			</div>
+										  			<div class="card mr-1 d-flex justify-content-center align-items-center add-new-period-card"
+										  				ng-click="addNewPeriod(_key)"
+										  				style="height: 130px;"
+										  				title="Add new period" tooltip>
+														  <i class="fa fa-plus text-success"></i>
+										  			</div>
+								  		</div>
+							  		</div>
+							  	</div>
+							  </div>
+							  <div ng-if="timetable.length <= 0" class="text-center pb-1">
+					  			There's no assigned classes / sections
+					  		</div>
+						  	<button class="btn btn-primary pull-left"
+						  		ng-click="saveAllChanges()"
+						  		ng-if="timetable.length > 0"
+						  		style="margin-top: 6px">Save all changes</button>
+						  	<dir-pagination-controls
+						  		class="pull-right"
+						  		ng-if="timetable.length > 0 && !searchStatus"
+						  		on-page-change="pageChanged(newPageNumber)"
+						  		template-url="assets/templates/dirPagination.html"></dir-pagination-controls>
+						  	<div style="clear: both;"></div>
+					  	</div>
+					  	<div ng-if="loading">Loading...</div>
+				  </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

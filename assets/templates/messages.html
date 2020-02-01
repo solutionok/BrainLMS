@@ -1,0 +1,214 @@
+<style type="text/css">
+	.selected-data-list .remove-all,
+	.selected-data-list .remove-item {
+		cursor: pointer;
+	}
+	ul.list-group > li.list-group-item {
+		padding: 7px !important;
+	}
+	ul.list-group > li.list-group-item small {
+		width: 80%;
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Messages}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="row">
+                <div class="col-xlg-2 col-lg-4 col-md-4">
+                    <div class="card-block inbox-panel">
+                    	<button ng-click="changeView('create')"
+                    		ng-if="userRole == 'admin' || userRole == 'teacher'"
+	                    	class="btn btn-danger m-b-20 p-10 btn-block waves-effect waves-light">
+		                    {{phrase.composeMessage}}
+		                  </button>
+                    </div>
+                </div>
+                <div class="col-xlg-10 col-lg-8 col-md-8">
+                    <div class="card-block">
+                        <div class="btn-group m-b-10 m-r-10" role="group" aria-label="Button group with nested dropdown">
+                            <button ng-click="checkAll()" type="button" class="btn btn-secondary font-18 text-dark"><i class="mdi mdi-check"></i></button>
+                        </div>
+                        <div class="btn-group m-b-10 m-r-10" role="group" aria-label="Button group with nested dropdown">
+                            <button type="button" tooltip title="{{phrase.markRead}}" ng-click="markRead()" class="btn btn-secondary font-18 text-dark"><i class="mdi mdi-eye"></i></button>
+                            <button type="button" tooltip title="{{phrase.markUnread}}" ng-click="markUnRead()" class="btn btn-secondary font-18 text-dark"><i class="mdi mdi-eye-off"></i></button>
+                            <button type="button" tooltip title="{{phrase.Remove}}" ng-click="markDelete()" class="btn btn-secondary font-18 text-dark"><i class="mdi mdi-delete"></i></button>
+                        </div>
+
+                        <div class="pull-right card-block-input-group card-block-input-item">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xlg-12 col-lg-12 col-md-12">
+                    <div class="card-block p-t-0">
+                        <div class="card b-all shadow-none">
+                            <div class="inbox-center b-all table-responsive">
+                                <table class="table table-hover no-wrap table-bordered" style="margin-bottom:0px !important;">
+                                    <tbody>
+                                        <tr ng-class="{'unread': message.messageStatus == '1'}" "message.messageStatus" dir-paginate="message in messages | filter:searchText | itemsPerPage:20" total-items="totalItems">
+                                            <td style="width:40px">
+                                                <div class="checkbox">
+                                                    <input type="checkbox" name="checked[]" id="checkbox{{message.id}}" ng-model="message.selected">
+                                                    <label for="checkbox{{message.id}}"></label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <img
+                                                	alt="{{message.user.fullName}}"
+                                                	class="user-image img-circle"
+                                                	style="width:40px; height:40px;"
+                                                	ng-src="{{'index.php/dashboard/profileImage/'+message.toId}}">
+                                                <span class="text-primary">
+	                                                {{message.sender_receiver_data.fullName}}
+	                                              </span>
+	                                              <div ng-if="message.receiver_role == 'parent' && message.students.length > 0"">
+	                                              	students:
+	                                              	<small ng-repeat="student in message.students" class="text-danger">
+	                                              		({{ student.fullName }})&nbsp;
+	                                              	</small>
+	                                              </div>
+                                            </td>
+                                            <td class="max-texts">
+                                            	<a href="portal#messages/{{message.id}}">{{message.lastMessage}}</a>
+                                            	<br><small>{{ message.send_status }}</small>
+                                            </td>
+                                            <td class="text-right"> {{message.lastMessageDate}} </td>
+                                        </tr>
+                                        <tr ng-show="!messages.length"><td class="noTableData" colspan="4">{{phrase.noMessages}}</td></tr>
+                                    </tbody>
+                                </table>
+                                <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card" ng-show="views.read">
+    <div class="card-block">
+        <a href="portal#/messages" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.Return}}</a>
+        <h4 class="card-title">{{messageDet.fullName}}</h4>
+        <div class="chat-box">
+            <!--chat Row -->
+            <ul class="chat-list" id="chat-box" chat-box>
+                <p id="loadOld" class="text-muted well well-sm no-shadow text-center" ng-click="loadOld()">{{phrase.loadOldMessages}}</p>
+                <!--chat Row -->
+                <li ng-repeat="messageOne in message"  ng-class="{'reverse': messageOne.userId == $root.dashboardData.baseUser.id}">
+                    <div ng-show="messageOne.userId == $root.dashboardData.baseUser.id">
+                        <div class="chat-content">
+                            <h5>{{messageOne.fullName}}</h5>
+                            <div class="box" ng-class="{'bg-light-inverse': messageOne.userId == $root.dashboardData.baseUser.id,'bg-light-info': messageOne.userId != $root.dashboardData.baseUser.id}">{{messageOne.messageText}}</div>
+                        </div>
+                        <div class="chat-img"><img ng-src="{{'index.php/dashboard/profileImage/'+messageOne.userId}}" style="width: 45px;height: 45px;" alt="{{messageOne.fullName}}" /></div>
+                        <div style="clear: both;"></div>
+                        <div class="chat-time pull-right">{{messageOne.dateSentH}}</div>
+                    </div>
+                    <div ng-show="messageOne.userId != $root.dashboardData.baseUser.id">
+                        <div class="chat-img"><img ng-src="{{'index.php/dashboard/profileImage/'+messageOne.userId}}" alt="{{messageOne.fullName}}" /></div>
+                        <div class="chat-content">
+                            <h5>{{messageOne.fullName}}</h5>
+                            <div class="box" ng-class="{'bg-light-inverse': messageOne.userId == $root.dashboardData.baseUser.id,'bg-light-info': messageOne.userId != $root.dashboardData.baseUser.id}">{{messageOne.messageText}}</div>
+                        </div>
+                        <div class="chat-time">{{messageOne.dateSentH}}</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-block b-t">
+        <div class="row" ng-if="message[message.length-1].enableReply || userRole == 'admin'">
+            <div class="col-8">
+              	<textarea class="form-control b-0" ng-enter="replyMessage()" ng-disabled="form.disable" ng-model="form.reply" placeholder="{{phrase.typeReply}}"></textarea>
+            </div>
+            <div class="col-4 text-right">
+                <button type="button" ng-click="replyMessage()" class="btn btn-info btn-circle btn-lg"><i class="fa fa-paper-plane-o"></i> </button>
+            </div>
+        </div>
+        <div class="row" ng-if="!message[message.length-1].enableReply && userRole != 'admin'">
+        	<p class="pl-3 pt-2">Sorry, you can't reply for this message.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.create" ng-controller="communicationsFilterController">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <button type="button" ng-click="linkUser()" class="btn btn-success btn-flat pull-right mr-2">{{phrase.searchUsers}}</button>
+                <h4 class="card-title">{{phrase.sendMessage}}</h4>
+                <hr>
+                <div class="form">
+                    <form class="form-horizontal" name="sendMessage" role="form" ng-submit="sendMessageNow()" novalidate>
+                        <div ng-include="'/assets/js/Angular/includes/communications-filter.html?id=5459'"></div>
+                        <hr>
+                        <div class="form-group row" ng-class="{'has-error': sendMessage.messageText.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.message}} *</label>
+                            <div class="col-sm-10">
+                                <textarea name="messageText" class="form-control" ng-model="form.messageText" placeholder="{{phrase.message}}" style="height:250px"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                        	<div class="offset-sm-2 col-sm-10">
+													  <div class="form-group">
+				                        <label class="form-check-label">
+			                        	<input type="checkbox" class="form-check-input" ng-model="form.is_enable_reply">
+			                        		Enable reply for this message?
+			                        	</label>
+				                    </div>
+													</div>
+												</div>
+                        <div class="form-group m-b-0 row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="sendMessage.$invalid">{{phrase.sendMessage}}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+		<modal visible="searchUsers">
+		    <div class="row">
+		        <div class="col-md-8">
+		            <input type="text" class="form-control" id="searchKeyword" placeholder="{{phrase.typeNameUserMail}}">
+		        </div>
+		        <div class="col-md-3">
+		            <button type="button" ng-click="searchUserButton()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+		        </div>
+		    </div>
+		    <div class="row">
+		        <div class="col-md-12" style="padding-top:10px;">
+		            <div class="box-body table-responsive">
+		                <table class="table table-bordered">
+		                    <tbody>
+		                        <tr ng-repeat="user in searchResults">
+		                            <td>{{user.name}} - {{user.role}}</td>
+		                            <td>{{user.email}}</td>
+		                            <td class="no-print">
+		                                <button type="button" ng-click="linkStudentFinish(user)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+		                            </td>
+		                        </tr>
+		                    </tbody>
+		                </table>
+		            </div>
+		        </div>
+		    </div>
+		</modal>
+</div>

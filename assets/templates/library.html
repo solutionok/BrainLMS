@@ -1,0 +1,453 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Library}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+            		<div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" tooltip title="{{phrase.minCharLength3}}" name="table_search" ng-model="searchText" ng-change="searchDB()" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <button ng-show="$root.can('Library.addBook')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addBook}}</button>
+            		<div ng-show="$root.can('Library.Export')" class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" href="index.php/library/export">{{phrase.ExportExcel}}</a>
+                            <a class="dropdown-item" href="index.php/library/exportpdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="$root.can('Library.Import')" class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Import}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" ng-click="import('excel')">{{phrase.ImportExcel}}</a>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listBooks}}</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.bookTitle}}</th>
+                                <th>{{phrase.bookAuthor}}</th>
+                                <th>{{phrase.bookPriceState}}</th>
+                                <th ng-show="$root.can('Library.Download') || $root.can('Library.editBook') || $root.can('Library.delLibrary')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr dir-paginate="book in library | itemsPerPage:20" total-items="totalItems">
+                                <td>{{book.id}}</td>
+                                <td>{{book.bookName}}</td>
+                                <td>{{book.bookAuthor}}</td>
+                                <td><span ng-if="book.bookType == 'traditional'">{{book.bookPrice}} / </span><span ng-if="book.bookState == 1">{{phrase.available}}</span><span ng-if="book.bookState == 0">{{phrase.unavailable}}</span>
+                                </td>
+                                <td ng-show="$root.can('Library.Download') || $root.can('Library.editBook') || $root.can('Library.delLibrary')">
+                                    <a ng-show="$root.can('Library.Download')" target="_blank" href="{{'index.php/library/download/'+book.id}}"><button ng-show="book.bookType == 'electronic'" type="button" class="btn btn-info btn-circle" title="{{phrase.Download}}" tooltip><i class="fa fa-cloud-download"></i></button></a>
+                                    <button ng-show="$root.can('Library.editBook')" ng-click="edit(book.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Library.delLibrary')" ng-click="remove(book,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!library.length"><td class="noTableData" colspan="5">{{phrase.noBooks}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addBook}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addDorm" role="form" ng-upload="saveAdd(content)" role="form" method="post" action="index.php/library" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addDorm.bookName.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookName" ng-model="form.bookName" class="form-control" required placeholder="{{phrase.bookTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookDescription}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="bookDescription" class="form-control" ng-model="form.bookDescription" placeholder="{{phrase.bookDescription}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookAuthor}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookAuthor" ng-model="form.bookAuthor" class="form-control" placeholder="{{phrase.bookAuthor}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookPub}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookPublisher" ng-model="form.bookPublisher" class="form-control" placeholder="{{phrase.bookPub}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookISBN}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookISBN" ng-model="form.bookISBN" class="form-control" placeholder="{{phrase.bookISBN}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addDorm.bookType.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookType}} *</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="bookType" value="traditional" ng-model="form.bookType" required checked="checked">
+                                        {{phrase.traditionalBook}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="bookType" value="electronic" ng-model="form.bookType" required>
+                                        {{phrase.electronicBook}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookPrice}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookPrice" ng-model="form.bookPrice" class="form-control" placeholder="{{phrase.bookPrice}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.quantity}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookQuantity" ng-model="form.bookQuantity" class="form-control" placeholder="{{phrase.quantity}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookShelf}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookShelf" ng-model="form.bookShelf" class="form-control" placeholder="{{phrase.bookShelf}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'electronic'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.uploadBook}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="bookFile">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.State}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="bookState" ng-model="form.bookState" >
+                                    <option value="1">{{phrase.available}}</option>
+                                    <option value="0">{{phrase.unavailable}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addSection.$invalid">{{phrase.addBook}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editBook}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editBook" ng-upload="saveEdit(content)" role="form" method="post" action="{{'index.php/library/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editBook.bookName.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookName" ng-model="form.bookName" class="form-control" required placeholder="{{phrase.bookTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookDescription}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="bookDescription" class="form-control" ng-model="form.bookDescription" placeholder="{{phrase.bookDescription}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookAuthor}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookAuthor" ng-model="form.bookAuthor" class="form-control" placeholder="{{phrase.bookAuthor}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookPub}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookPublisher" ng-model="form.bookPublisher" class="form-control" placeholder="{{phrase.bookPub}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookISBN}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookISBN" ng-model="form.bookISBN" class="form-control" placeholder="{{phrase.bookISBN}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editBook.bookType.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookType}} *</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="bookType" value="traditional" ng-model="form.bookType" required checked="checked">
+                                        {{phrase.traditionalBook}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="bookType" value="electronic" ng-model="form.bookType" required>
+                                        {{phrase.electronicBook}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookPrice}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookPrice" ng-model="form.bookPrice" class="form-control" placeholder="{{phrase.bookPrice}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.quantity}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookQuantity" ng-model="form.bookQuantity" class="form-control" placeholder="{{phrase.quantity}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bookShelf}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookShelf" ng-model="form.bookShelf" class="form-control" placeholder="{{phrase.bookShelf}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'electronic'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.uploadBook}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="bookFile">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.State}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="bookState" ng-model="form.bookState" >
+                                    <option value="1">{{phrase.available}}</option>
+                                    <option value="0">{{phrase.unavailable}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editBook.$invalid">{{phrase.editBook}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.subscription">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.mngSub}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="search_subscription()" name="search_users_form" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': search_users_form.user_search.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.selUsers}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="user_search" ng-model="form.user_search" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light m-t-10" ng-disabled="search_users_form.$invalid">{{phrase.searchUsers}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card" ng-show="subscription_members.users">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.usrSelect}}</h4>
+                <div class="form">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.role}}</th>
+                                <th>{{phrase.subId}}</th>
+                                <th class="no-print">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="user in subscription_members.users">
+                                <td>
+                                    <img alt="{{user.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+user.id}}">
+                                    <a href="" ng-click="teacherProfile( user.id )">{{user.fullName}}</a>
+                                </td>
+                                <td>{{user.email}}</td>
+                                <td>{{subscription_members.prems[user.role_perm]}}</td>
+                                <td>{{user.library_id}}</td>
+                                <td class="no-print">
+                                    <button ng-click="edit_subscription(user)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!subscription_members.users.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.import">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <h4 class="card-title">{{phrase.Import}} {{importType}}</h4>
+                <div>
+                    <form class="form" ng-upload="saveImported(content)" method="post" action="{{'index.php/library/import/'+importType}}" name="importData" role="form" novalidate>
+                        <div class="form-group row" style="margin: 30px 0px; border: 1px solid #EEE; padding: 10px;">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fileToImport}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="excelcsv">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default" ng-disabled="importData.$invalid || $isUploading">{{phrase.Import}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.reviewImport">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <h4 class="card-title">{{phrase.Import}} {{importType}}</h4>
+                <div>
+                    <form class="form-horizontal" ng-submit="reviewImportData()" name="importData" role="form" novalidate>
+                        <h4>{{phrase.failedImport}}</h4>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody>
+                                	<tr>
+                                    <th>Book name</th>
+                                    <th>Book ISBN</th>
+                                    <th>Author</th>
+                                    <th>Publisher</th>
+                                    <th>Type</th>
+                                    <th>Price</th>
+                                </tr>
+                                <tr ng-repeat="library in importReview.revise">
+                                    <td>{{library.book_name}}</td>
+                                    <td>{{library.book_isbn}}</td>
+                                    <td>{{library.author}}</td>
+                                    <td>{{library.publisher}}</td>
+                                    <td>{{library.type}}</td>
+                                    <td>{{library.price}}</td>
+                                    <td><button ng-click="removeImport(library,$index,'revise')" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button></td>
+                                </tr>
+                                <tr ng-show="!importReview.revise.length"><td class="noTableData" colspan="6">No libraries</td></tr>
+                            </tbody></table>
+                        </div>
+
+                        <h4>{{phrase.readyImport}}</h4>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody><tr>
+                                    <th>Book name</th>
+                                    <th>Book ISBN</th>
+                                    <th>Author</th>
+                                    <th>Publisher</th>
+                                    <th>Type</th>
+                                    <th>Price</th>
+                                    <td> </td>
+                                </tr>
+                                <tr ng-repeat="library in importReview.ready">
+                                    <td><input type="text" name="book_name" class="form-control" ng-model="library.book_name"></td>
+                                    <td><input type="text" name="book_isbn" class="form-control" ng-model="library.book_isbn"></td>
+                                    <td><input type="text" name="author" class="form-control" ng-model="library.author"></td>
+                                    <td><input type="text" name="publisher" class="form-control" ng-model="library.publisher"></td>
+                                    <td><input type="text" name="type" class="form-control" ng-model="library.type"></td>
+                                    <td><input type="text" name="price" class="form-control" ng-model="library.price"></td>
+                                    <td><a ng-click="removeImport(library,$index,'ready')" type="button" class="btn btn-danger btn-flat" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></a></td>
+                                </tr>
+                                <tr ng-show="!importReview.ready.length"><td class="noTableData" colspan="6">No libraries</td></tr>
+                            </tbody></table>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default">{{phrase.Import}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="addSubsModal">
+    <form class="form-horizontal" name="addSubId" role="form" ng-submit="saveUsrSubscription()" role="form" novalidate>
+        <div class="form-group row" ng-class="{'has-error': addSubId.library_id.$invalid}">
+            <label class="col-sm-4 text-right control-label col-form-label">{{phrase.subId}} * </label>
+            <div class="col-sm-8">
+                <input type="text" name="library_id" ng-model="form.library_id" class="form-control" required>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addSubId.$invalid">{{phrase.chgSub}}</button>
+            </div>
+        </div>
+    </form>
+</modal>

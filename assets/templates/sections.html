@@ -1,0 +1,164 @@
+<style type="text/css">
+	.select-checkbox {
+		padding: 5px !important;
+		height: 170px;
+		margin-top: -10px;
+	}
+	.select-checkbox option.all {
+	  color: blue;
+	}
+	.select-checkbox option::before {
+	  content: "\2610";
+	  width: 1.3em;
+	  text-align: center;
+	  display: inline-block;
+	}
+	.select-checkbox option:checked::before {
+	  content: "\2611";
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.sections}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('sections.addSection')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addSection}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listSections}}</h4>
+                <div class="table-responsive">
+
+                    <div ng-repeat="(key,value) in sections | filter:searchText">
+                        <h4>{{key}}</h4>
+                        <table class="table table-bordered table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>{{phrase.section}} </th>
+                                    <th>Class teachers</th>
+                                    <th ng-show="$root.can('sections.editSection') || $root.can('sections.delSection')">{{phrase.Operations}}</th>
+                                </tr>
+                                <tr ng-repeat="section in value | filter:searchText">
+                                    <td class="text-danger"><b>{{section.sectionName}}</b></td>
+                                    <td>
+		                                		<div style="max-height: 100px; overflow-y: scroll;" ng-if="section.classTeacherId.length">
+			                                    <small ng-repeat="id in section.classTeacherId">{{teachers[id]}}<br/></small>
+			                                  </div>
+			                                  <small class="text-warning" ng-if="!section.classTeacherId.length">
+			                                  	<i>There's no teachers assigned.</i>
+			                                  </small>
+		                                </td>
+                                    <td>
+                                        <button ng-show="$root.can('sections.editSection')" ng-click="edit(section.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                        <button ng-show="$root.can('sections.delSection')" ng-click="remove(section,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addSection}}</h4>
+                <hr>
+                <form class="form-horizontal" name="addSection" role="form" ng-submit="saveAdd()" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': addSection.sectionName.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.section}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sectionName" ng-model="form.sectionName" class="form-control" required placeholder="{{phrase.section}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addSection.classId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.classId" name="classId" required ng-change="getClassTeacherByClassId('create', [])">
+                                <option ng-repeat="(key,value) in classes" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+										<div class="form-group row" ng-class="{'has-error': addSection.classTeacherId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Class Teachers *</label>
+                        <div class="col-sm-10" ng-if="form.classId > 0">
+                            <select class="form-control select-checkbox" ng-model="form.classTeacherId" name="classTeacherId" required multiple style="height: 250px">
+                                <option ng-repeat="teacher in classTeachers" value="{{ teacher.id }}">{{ teacher.fullName }}</option>
+                            </select>
+		                        <small>Press <code>ctrl</code> for multi select</small><br>
+												    <small>Press <code>shift</code> for group select</small>
+                        </div>
+                        <div class="col-sm-10" ng-if="form.classId == null">
+                        		<select class="form-control" disabled>
+                                <option value="0">Please select class first</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addSection.$invalid">{{phrase.addSection}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editSection}}</h4>
+                <hr>
+                <form class="form-horizontal" name="editSection" role="form" ng-submit="saveEdit()" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': editSection.sectionName.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.section}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sectionName" ng-model="form.sectionName" class="form-control" required placeholder="{{phrase.section}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editSection.classId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.classId" name="classId" required ng-change="getClassTeacherByClassId('edit2', [])">
+                                <option ng-repeat="(key,value) in classes" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editSection.classTeacherId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">Class Teachers *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control select-checkbox" ng-model="form.classTeacherId" name="classTeacherId" required multiple style="height: 250px">
+                                <option ng-repeat="teacher in classTeachers" value="{{ teacher.id }}">{{ teacher.fullName }}</option>
+                            </select>
+		                        <small>Press <code>ctrl</code> for multi select</small><br>
+												    <small>Press <code>shift</code> for group select</small>
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editSection.$invalid">{{phrase.editSection}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

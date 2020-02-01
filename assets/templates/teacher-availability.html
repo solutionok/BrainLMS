@@ -1,0 +1,70 @@
+<style type="text/css">
+	table * {
+		font-size: 14px;
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">Teacher availability</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12 listContent">
+        <div class="card" ng-show="!loading">
+            <div class="card-block">
+                <h4 class="card-title">{{ main_title }}</h4>
+                <div class="card-title">
+		                <form class="form-inline" name="searchForm" ng-submit="searchDB(1)" role="form" novalidate>
+                        <input type="text" class="form-control mr-2" ng-model="searchInput.date" placeholder="Select date" date-picker id="search1">
+                        <select class="form-control mr-2" ng-model="searchInput.time_slot">
+                        	<option value="0">All time slots</option>
+                        	<option ng-repeat="t_slot in time_slots" value="{{ t_slot }}">{{ t_slot }}</option>
+                        </select>
+                        <select class="form-control mr-2" ng-model="searchInput.class">
+                        	<option value="0">All classes</option>
+                        	<option ng-repeat="class in classes" value="{{ class.id }}">{{ class.className }}</option>
+                        </select>
+                        <select class="form-control mr-2" ng-model="searchInput.subject">
+                        	<option value="0">All subjects</option>
+                        	<option ng-repeat="(id, subject_name) in subjects" value="{{ id }}">{{ subject_name }}</option>
+                        </select>
+                        <button class="btn btn-primary" style="padding: 9px 15px 10px 15px;">
+                        	<i class="fa fa-search"></i>
+                        </button>
+		                </form>
+		            </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                            		<th>#</th>
+                                <th style="min-width: 120px">Time slots</th>
+                                <th style="min-width: 220px">Teachers</th>
+                                <th>Subjects</th>
+                                <th>Classes</th>
+                            </tr>
+                        </thead>
+                        <tbody dir-paginate="item in availabilities | itemsPerPage:500" total-items="totalItems">
+                            <tr>
+                            		<td>{{$index + 1}}</td>
+                                <td>{{item.time_slot}}</td>
+                                <td ng-bind-html="item.teacher_info"></td>
+                                <td>{{item.subjects}}</td>
+                                <td>{{item.classes}}</td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-show="availabilities.length == '0'">
+                        	<tr><td class="noTableData" colspan="5">No data to display</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div ng-show="loading">
+        	loading...
+        </div>
+    </div>
+</div>

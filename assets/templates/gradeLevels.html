@@ -1,0 +1,152 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.gradeLevels}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('gradeLevels.addLevel')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addLevel}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listPages}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.gradeName}}</th>
+                                <th>{{phrase.gradeDesc}}</th>
+                                <th>{{phrase.gradePoint}}</th>
+                                <th>{{phrase.from}} -> {{phrase.to}}</th>
+                                <th ng-show="$root.can('gradeLevels.editGrade') || $root.can('gradeLevels.delGradeLevel')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="level in gradeLevels | filter:searchText">
+                                <td>{{level.gradeName}}</td>
+                                <td>{{level.gradeDescription}}</td>
+                                <td>{{level.gradePoints}}</td>
+                                <td>{{level.gradeFrom}} -> {{level.gradeTo}}</td>
+                                <td ng-show="$root.can('gradeLevels.editGrade') || $root.can('gradeLevels.delGradeLevel')">
+                                    <button ng-show="$root.can('gradeLevels.editGrade')" ng-click="edit(level.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('gradeLevels.delGradeLevel')" ng-click="remove(level,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!gradeLevels.length"><td class="noTableData" colspan="6">{{phrase.noGrades}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addLevel}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addGrade" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.gradeName.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradeName" ng-model="form.gradeName" class="form-control" required placeholder="{{phrase.gradeName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="gradeDescription" class="form-control" ng-model="form.gradeDescription" placeholder="{{phrase.gradeDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.gradePoints.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradePoint}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradePoints" ng-model="form.gradePoints" class="form-control" required placeholder="{{phrase.gradePoint}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.gradeFrom.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeFrom}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradeFrom" ng-model="form.gradeFrom" class="form-control" required placeholder="{{phrase.gradeFrom}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.gradeTo.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeTo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradeTo" ng-model="form.gradeTo" class="form-control" required placeholder="{{phrase.gradeTo}}">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addGrade.$invalid">{{phrase.addLevel}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.editGrade}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editGrade" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.gradeName.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradeName" ng-model="form.gradeName" class="form-control" required placeholder="{{phrase.gradeName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="gradeDescription" class="form-control" ng-model="form.gradeDescription" placeholder="{{phrase.gradeDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.gradePoints.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradePoint}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradePoints" ng-model="form.gradePoints" class="form-control" required placeholder="{{phrase.gradePoint}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.gradeFrom.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeFrom}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradeFrom" ng-model="form.gradeFrom" class="form-control" required placeholder="{{phrase.gradeFrom}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.gradeTo.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.gradeTo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="gradeTo" ng-model="form.gradeTo" class="form-control" required placeholder="{{phrase.gradeTo}}">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editGrade.$invalid">{{phrase.editGrade}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

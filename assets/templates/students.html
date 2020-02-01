@@ -1,0 +1,1572 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.students}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-0 hidden advSearch">
+        <div class="card card-outline-info">
+            <div class="card-header">
+                <a ng-click="toggleSearch(); resetSearch();" class="closeButt pull-right">x</a>
+                <h4 class="m-b-0 text-white">{{phrase.advSearch}}</h4>
+            </div>
+            <div class="card-block">
+                <form class="form-horizontal" name="searchForm" ng-submit="searchDB(1)" role="form" novalidate>
+                    <div class="form-group">
+                        <label>{{phrase.Search}}</label>
+                        <input type="text" class="form-control" ng-model="searchInput.text">
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.email}}</label>
+                        <input type="text" class="form-control" ng-model="searchInput.email">
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.Gender}}</label>
+                        <div class="radio-list">
+                            <label>
+                                <input type="radio" name="gender" value="male" ng-model="searchInput.gender">
+                                {{phrase.Male}}
+                            </label>
+                        </div>
+                        <div class="radio-list">
+                            <label>
+                                <input type="radio" name="gender" value="female" ng-model="searchInput.gender">
+                                {{phrase.Female}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.class}}</label>
+                        <select class="form-control input-sm" name="searchClass" multiple ng-model="searchInput.class" ng-change="searchSubjectList()">
+                            <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" ng-show="$root.dashboardData.enableSections == '1'">
+                        <label>{{phrase.section}}</label>
+                        <select class="form-control" ng-model="searchInput.section" multiple ng-required="$root.dashboardData.enableSections == '1'" name="studentSection">
+                            <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.std_cat}}</label>
+                        <select class="form-control input-sm" name="searchClass" multiple ng-model="searchInput.student_categories">
+                            <option ng-repeat="cat in student_categories" value="{{cat.id}}">{{cat.cat_title}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-info waves-effect waves-light">{{phrase.advSearch}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 listContent">
+        <div class="card">
+            <div class="card-block">
+                <a ng-show="$root.can('students.admission')"
+                	href="/portal#/students/admission"
+                	class="btn pull-right btn-success card-block-input-item">{{phrase.admission}}</a>
+                <button ng-click="toggleSearch()" class="btn pull-right btn-success card-block-input-item">{{phrase.advSearch}}</button>
+                <button ng-show="$root.can('students.Approve')" ng-click="waitingApproval()" class="btn pull-right btn-success card-block-input-item">{{phrase.waitingApproval}}</button>
+                <button ng-show="$root.can('students.listGradStd')" ng-click="gradStdList()" class="btn pull-right btn-success card-block-input-item">{{phrase.listGradStd}}</button>
+                <div ng-show="$root.can('students.Export')" class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" href="index.php/students/export">{{phrase.ExportExcel}}</a>
+                            <a class="dropdown-item" href="index.php/students/exportpdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="$root.can('students.Import')" class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Import}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" ng-click="import('excel')">{{phrase.ImportExcel}}</a>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listStudents}}</h4>
+                <div class="table-responsive" style="min-height: 300px;">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    Roll No.
+                                    <i ng-show="$root.dashboardData.sort.students != '' && $root.dashboardData.sort.students != 'studentRollId + 0 ASC' && $root.dashboardData.sort.students != 'studentRollId + 0 DESC'" ng-click="sortItems('studentRollId + 0 DESC')" class="ahref mdi mdi-sort"></i>
+                                    <i ng-show="$root.dashboardData.sort.students == '' || $root.dashboardData.sort.students == 'studentRollId + 0 ASC'" ng-click="sortItems('studentRollId + 0 DESC')" class="ahref mdi mdi-arrow-down-bold"></i>
+                                    <i ng-show="$root.dashboardData.sort.students == 'studentRollId + 0 DESC'" ng-click="sortItems('studentRollId + 0 ASC')" class="ahref mdi mdi-arrow-up-bold"></i>
+                                </th>
+                                <th>
+                                    {{phrase.FullName}}
+                                    <i ng-show="$root.dashboardData.sort.students != 'fullName ASC' && $root.dashboardData.sort.students != 'fullName DESC'" ng-click="sortItems('fullName DESC')" class="ahref mdi mdi-sort"></i>
+                                    <i ng-show="$root.dashboardData.sort.students == 'fullName ASC'" ng-click="sortItems('fullName DESC')" class="ahref mdi mdi-arrow-down-bold"></i>
+                                    <i ng-show="$root.dashboardData.sort.students == 'fullName DESC'" ng-click="sortItems('fullName ASC')" class="ahref mdi mdi-arrow-up-bold"></i>
+                                </th>
+                                <th>
+                                   	Admission No.
+                                    <i ng-show="$root.dashboardData.sort.students != 'admission_number ASC' && $root.dashboardData.sort.students != 'admission_number DESC'" ng-click="sortItems('admission_number DESC')" class="ahref mdi mdi-sort"></i>
+                                    <i ng-show="$root.dashboardData.sort.students == 'admission_number ASC'" ng-click="sortItems('admission_number DESC')" class="ahref mdi mdi-arrow-down-bold"></i>
+                                    <i ng-show="$root.dashboardData.sort.students == 'admission_number DESC'" ng-click="sortItems('admission_number ASC')" class="ahref mdi mdi-arrow-up-bold"></i>
+                                </th>
+                                <th>Phone No.</th>
+                                <th>{{phrase.class}} / {{phrase.sections}}</th>
+                                <th class='no-print' ng-show="$root.can('students.Attendance') || $root.can('students.Marksheet') || $root.can('students.stdLeaderBoard') || $root.can('students.medHistory') || $root.can('students.editStudent') || $root.can('students.delStudent')">Act.</th>
+                            </tr>
+                            <tr dir-paginate="student in students | itemsPerPage:20" total-items="totalItems">
+                                <td>{{student.studentRollId}}</td>
+                                <td>
+                                    <img alt="{{student.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+student.id}}">
+                                    <a href="" ng-click="studentProfile( student.id )">{{student.fullName}}</a>
+                                    <i ng-show="$root.can('students.editStudent')" ng-class="{'color_red':student.account_active==0,'color_green':student.account_active==1}" class="fa fa-lightbulb-o"></i>
+                                    <span ng-if="$root.can('students.stdLeaderBoard') && student.isLeaderBoard != '' && student.isLeaderBoard != null"><br/><i class="fa fa-trophy"></i> {{phrase.leaderboard}} <a ng-show="userRole == 'admin'" ng-click="removeLeaderBoard(student.id,$index)"><i class="fa fa-trash-o"></i></a></span>
+                                </td>
+                                <td>{{student.admission_number}}</td>
+                                <td>{{student.phoneNo}}</td>
+                                <td>{{student.studentClass}} <br/> {{student.studentSection}}</td>
+                                <td class='no-print' ng-show="$root.can('students.Attendance') || $root.can('students.Marksheet') || $root.can('students.stdLeaderBoard') || $root.can('students.medHistory') || $root.can('students.editStudent') || $root.can('students.delStudent')">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a ng-show="$root.can('students.Attendance')" class="dropdown-item" ng-click="attendance(student.id)"><i class="fa fa-eye"></i> {{phrase.Attendance}}</a>
+                                            <a ng-show="$root.can('students.Marksheet')" class="dropdown-item" ng-click="marksheet(student.id)"><i class="fa fa-table"></i> {{phrase.Marksheet}}</a>
+                                            <a ng-show="$root.can('students.stdLeaderBoard') && (student.isLeaderBoard == '' || student.isLeaderBoard == null)" class="dropdown-item" ng-click="leaderBoard(student.id,$index)"><i class="fa fa-trophy"></i> {{phrase.leaderboard}}</a>
+                                            <a ng-show="$root.can('students.medHistory')" class="dropdown-item" ng-click="medicalRead(student.id)"><i class="fa fa-stethoscope"></i> {{phrase.medHistory}}</a>
+                                            <a
+                                            	ng-show="$root.can('students.TrackBus')"
+                                            	class="dropdown-item"
+                                            	ng-click="trackBus(student.id)">
+                                            		<i class="fa fa-bus"></i> Track Bus
+                                            </a>
+                                            <a ng-show="$root.can('students.editStudent')" class="dropdown-item" ng-click="account_status(student.id,$index)"><i class="fa fa-lightbulb-o"></i> {{phrase.toggleStatus}}</a>
+                                            <a ng-show="$root.can('students.editStudent')" class="dropdown-item" ng-click="edit(student.id)"><i class="fa fa-pencil"></i> {{phrase.Edit}}</a>
+                                            <a ng-show="$root.can('students.delStudent')" class="dropdown-item" ng-click="remove(student,$index)"><i class="fa fa-trash-o"></i> {{phrase.Remove}}</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-show="!students.length"><td class="noTableData" colspan="6">{{phrase.noStudents}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="getResultsPage(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.marksheet">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <h4 class="card-title">{{phrase.Marksheet}}</h4>
+                <div class="table-responsive">
+
+                    <div ng-show="noMarksheet" class="box col-xs-12">
+                        <div class="box-header">
+                            <h3 class="box-title">{{phrase.Marksheet}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            {{phrase.studentHaveNoMarks}}
+                        </div>
+                    </div>
+
+                    <div class="box col-xs-12" ng-repeat="exam in studentMarksheet">
+                        <div class="box-header">
+                            <h3 class="box-title">{{exam.title}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody><tr>
+                                    <th>{{phrase.Subject}}</th>
+                                    <th ng-repeat="head in exam.examMarksheetColumns">{{head.title}}</th>
+                                    <th>{{phrase.totalMarks}}</th>
+                                    <th>{{phrase.gradeLevels}}</th>
+                                    <th>{{phrase.passGrade}}</th>
+                                    <th>{{phrase.finalGrade}}</th>
+                                    <th>{{phrase.Status}}</th>
+                                    <th>{{phrase.Comments}}</th>
+                                </tr>
+                                <tr ng-repeat="dataOne in exam.data">
+                                    <td>{{dataOne.subjectName}}</td>
+                                    <td ng-repeat="head in exam.examMarksheetColumns">{{dataOne.examMark[head.id]}}</td>
+                                    <td>{{dataOne.totalMarks}}</td>
+                                    <td>{{dataOne.grade}} ( {{dataOne.points}} )</td>
+                                    <td>{{dataOne.passGrade}}</td>
+                                    <td>{{dataOne.finalGrade}}</td>
+                                    <td>{{dataOne.examState}}</td>
+                                    <td>{{dataOne.markComments}}</td>
+                                </tr>
+                            </tbody></table>
+                            <br/>
+                            <a href="index.php/students/print/marksheet/{{exam.studentId}}/{{exam.examId}}" target="_BLANK"><button class="btn btn-info btn-flat pull-left marginBottom15">{{phrase.Print}}</button></a>
+                            <button class="btn btn-success btn-flat pull-right marginBottom15">{{phrase.examMarks}} : {{exam.totalMarks}}</button>
+                            <button class="btn btn-success btn-flat pull-right marginBottom15">{{phrase.AveragePoints}} : {{exam.pointsAvg}}</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.approval">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <select class="form-control input-sm pull-right" ng-model="searchText.studentClass" style="width:150px;" >
+                        <option value="">{{phrase.all}}</option>
+                        <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                    </select>
+                    <input type="text" name="table_search" ng-model="searchText" class="form-control input-sm pull-right" style="width: 150px;" placeholder="{{phrase.Search}}">
+                </div>
+                <h4 class="card-title">{{phrase.waitingApproval}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.class}}</th>
+                                <th>{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="student in studentsApproval | filter:searchText">
+                                <td>{{student.studentRollId}}</td>
+                                <td>
+                                    <img alt="{{student.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+student.id}}">
+                                    <a href="" ng-click="studentProfile( student.id )">{{student.fullName}}</a>
+                                </td>
+                                <td>{{student.username}}</td>
+                                <td>{{student.email}}</td>
+                                <td>{{student.studentClass}} <br/> {{student.studentSection}}</td>
+                                <td>
+                                    <button ng-click="approve(student.id)" type="button" class="btn btn-success btn-circle" title="{{phrase.Approve}}" tooltip><i class="fa fa-check-square-o"></i></button>
+                                    <button ng-click="edit(student.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-click="remove(student,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.grad">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <select class="form-control input-sm pull-right" ng-model="searchText.studentClass" style="width:150px;" >
+                        <option value="">{{phrase.all}}</option>
+                        <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                    </select>
+                    <input type="text" name="table_search" ng-model="searchText" class="form-control input-sm pull-right" style="width: 150px;" placeholder="{{phrase.Search}}">
+                </div>
+                <h4 class="card-title">{{phrase.listGradStd}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="student in gradStdList | filter:searchText">
+                                <td>{{student.studentRollId}}</td>
+                                <td>
+                                    <img alt="{{student.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+student.id}}">
+                                    <a href="" ng-click="studentProfile( student.id )">{{student.fullName}}</a>
+                                </td>
+                                <td>{{student.username}}</td>
+                                <td>{{student.email}}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"> {{phrase.Operations}} <span class="caret"></span></button>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a class="dropdown-item" ng-click="attendance(student.id)"><i class="fa fa-eye"></i> {{phrase.Attendance}}</a>
+                                            <a class="dropdown-item" ng-click="marksheet(student.id)"><i class="fa fa-table"></i> {{phrase.Marksheet}}</a>
+                                            <a class="dropdown-item" ng-if="userRole == 'admin'" ng-click="medicalRead(student.id)"><i class="fa fa-stethoscope"></i> {{phrase.medHistory}}</a>
+                                            <a class="dropdown-item" ng-if="userRole == 'admin'" ng-click="edit(student.id)"><i class="fa fa-pencil"></i> {{phrase.Edit}}</a>
+                                            <a class="dropdown-item" ng-if="userRole == 'admin'" ng-click="remove(student,$index)"><i class="fa fa-trash-o"></i> {{phrase.Remove}}</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-show="views.edit">
+    <form ng-upload="saveEdit(content)" method="post" action="{{'index.php/students/'+form.id}}" name="editDorm" role="form" novalidate>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <button type="button" ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.cancelEdit}}</button>
+                        <h4 class="card-title">{{phrase.editStudent}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} * </label>
+                                <div class="col-sm-4" ng-class="{'has-error': editDorm.fullName.$invalid}">
+                                    <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Gender}}</label>
+                                <div class="col-sm-4 control-label">
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="radio" name="gender" value="male" ng-model="form.gender" checked="checked">
+                                            {{phrase.Male}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="radio" name="gender" value="female" ng-model="form.gender">
+                                            {{phrase.Female}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Birthday}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" date-picker id="datemask_admi" name="birthday" ng-model="form.birthday" class="form-control datemask_admi">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Address}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="address" class="form-control" ng-model="form.address" placeholder="{{phrase.Address}}">
+                                </div>
+                            </div>
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.phoneNo}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="phoneNo" class="form-control" ng-model="form.phoneNo" placeholder="{{phrase.phoneNo}}" international-phone-number>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mobileNo}}</label>
+                                <div class="col-sm-4" ng-class="{'has-error': editDorm.mobileNo.$invalid}">
+                                    <input type="text" mobile-number name="mobileNo" class="form-control mobilenumber" ng-model="form.mobileNo" >
+                                </div>
+                            </div>
+
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.religion}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="religion" class="form-control" ng-model="form.religion" placeholder="{{phrase.religion}}">
+                                </div>
+                                <div class="col-md-6"></div>
+                                <br><br><br>
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                                <div class="col-sm-10">
+                                		<img alt="{{form.fullName}}"
+		                            			ng-if="form.photo.length"
+		                            			class="user-image img-circle" style="width:45px; height:45px; margin-right: 10px"
+		                            			ng-src="{{'index.php/dashboard/profileImage/'+form.id}}"
+		                            		>
+                                    <input type="file" name="photo">
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="editDorm.$invalid">{{phrase.editStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.admissionInfo}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.admNumber}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="admission_number" ng-model="form.admission_number" class="form-control" placeholder="{{phrase.admNumber}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.admDate}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" date-picker id="admission_date_new" name="admission_date" ng-model="form.admission_date" placeholder="{{phrase.admDate}}" class="form-control admission_date_new">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.rollid}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="studentRollId" ng-model="form.studentRollId" class="form-control" placeholder="{{phrase.rollid}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} <span ng-show="$root.dashboardData.emailIsMandatory == 1">*</span></label>
+                                <div class="col-sm-4" ng-class="{'has-error': editDorm.email.$invalid}">
+                                    <input type="email" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" ng-required="$root.dashboardData.emailIsMandatory == 1">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.username}} * </label>
+                                <div class="col-sm-4" ng-class="{'has-error': editDorm.username.$invalid}">
+                                    <input type="text" name="username" ng-model="form.username" class="form-control" required placeholder="{{phrase.username}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.password}} *</label>
+                                <div class="col-sm-4" ng-class="{'has-error': editDorm.password.$invalid}">
+                                    <input type="password" name="password" ng-model="form.password" class="form-control" placeholder="{{phrase.password}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <!-- <label class="col-sm-2 text-right control-label col-form-label">{{phrase.std_cat}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="std_category" ng-model="form.std_category">
+                                        <option ng-repeat="cat in student_categories" value="{{cat.id}}">{{cat.cat_title}}</option>
+                                    </select>
+                                </div> -->
+                                <label class="col-sm-2 text-right control-label col-form-label">Student type</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="std_type" ng-model="form.std_type">
+                                        <option ng-repeat="type in student_types" value="{{type.id}}">{{type.title}}</option>
+                                    </select>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bioId}}</label>
+                                <div class="col-sm-4" ng-class="{'has-error': editDorm.biometric_id.$invalid}">
+                                    <input type="text" name="biometric_id" class="form-control" ng-model="form.biometric_id" >
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}}</label>
+                                <div class="col-sm-10">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th>{{phrase.academicyears}}</th>
+                                            <th>{{phrase.class}}</th>
+                                            <th ng-show="$root.dashboardData.enableSections == '1'">{{phrase.section}}</th>
+                                            <th>{{phrase.Remove}}</th>
+                                        </tr>
+                                        <tr ng-repeat="(key,value) in form.studentAcademicYears">
+                                            <td>
+                                                {{form.academicYear[value.id]}}
+                                                <span ng-show="value.default == form.studentClass">*</span>
+                                            </td>
+                                            <td ng-show="value.id != '0'">
+                                                <select class="form-control" name="academicYear[{{value.id}}]" ng-model="selectedClass" ng-init="selectedClass = value.default" required>
+                                                    <option ng-repeat="class in value.classSections.classes" value="{{class.id}}" ng-selected="class.id == value.default">{{class.className}}</option>
+                                                </select>
+                                            </td>
+                                            <td ng-show="$root.dashboardData.enableSections == '1' && value.id != '0'">
+                                                <select class="form-control" name="userSection[{{value.id}}]" required>
+                                                    <option ng-repeat="section in value.classSections.sections[selectedClass]" value="{{section.id}}" ng-selected="section.id == value.defSection"> {{section.sectionName}}</option>
+                                                </select>
+                                            </td>
+                                            <td ng-show="value.id != '0'">
+                                                <a ng-show="value.default == form.studentClass" ng-disabled="true" ng-click="alert('You cannot delete current default academic year')" type="button" class="btn btn-danger btn-flat" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></a>
+                                                <a ng-show="value.default != form.studentClass" ng-click="removeStAcYear(form.id,value.id,$index)" type="button" class="btn btn-danger btn-flat" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></a>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="form.studentClass == '-1'">
+                                            <td colspan="4">
+                                                Graduated
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="editDorm.$invalid">{{phrase.editStudent}}</button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12" id="additional-services-section">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">Additional services</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Transportation}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="transport" ng-model="form.transport" >
+                                        <option ng-repeat="transport in transports" value="{{transport.id}}">{{transport.transportTitle}}</option>
+                                    </select>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.trans_vehicles}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="transport_vehicle" ng-model="form.transport_vehicle">
+                                        <option ng-repeat="(key,item) in transports[form.transport].vehicles" value="{{key}}">{{item}}</option>
+                                    </select>
+                                </div>
+																<label class="col-sm-2 text-right control-label col-form-label">Transport Invoices</label>
+                                <div class="col-sm-4">
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="radio" name="generate_invoice" value="1" ng-model="form.generate_invoice" >
+                                            Generate Invoices now ( Please choose only if you changed/added transport )
+                                        </label>
+                                    </div>
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="radio" name="generate_invoice" value="0" ng-model="form.generate_invoice" checked="checked">
+                                            Don't generate invoices
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Hostel}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="hostel" ng-model="form.hostel" >
+                                        <option ng-repeat="(key,value) in hostel" value="{{key}}">{{value}}</option>
+                                    </select>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Communication}}</label>
+                                <div class="col-sm-4">
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="editDorm.$invalid">{{phrase.editStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.medHistory}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.insPolicy}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="med_data[inspol]" ng-model="form.med_data.inspol" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bloodGroup}} </label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" ng-model="form.med_data.blood_group" name="med_data[blood_group]">
+                                        <option value="O+">O+</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option><option value="O-">O-</option><option value="A-">A-</option><option value="B-">B-</option><option value="AB-">AB-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Weight}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="med_data[weight]" ng-model="form.med_data.weight" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.height}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="med_data[height]" ng-model="form.med_data.height" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label"> {{phrase.disType}} </label>
+                                <div class="col-sm-4">
+                                    <textarea type="text" name="med_data[disab]" ng-model="form.med_data.disab" class="form-control"></textarea>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.contactInfo}}</label>
+                                <div class="col-sm-4">
+                                    <textarea type="text" name="med_data[contact]" ng-model="form.med_data.contact" class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="editDorm.$invalid">{{phrase.editStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.parent}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatheName}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[name]" ng-model="form.father.name" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherName}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[name]" ng-model="form.mother.name" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatherMob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[mobile]" ng-model="form.father.mobile" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherMob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[mobile]" ng-model="form.mother.mobile" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatherJob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[job]" ng-model="form.father.job" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherJob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[job]" ng-model="form.mother.job" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatherNotes}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[notes]" ng-model="form.father.notes" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherNotes}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[notes]" ng-model="form.mother.notes" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="editDorm.$invalid">{{phrase.editStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="col-sm-12" id="guard-acc-section">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.guardAcc}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.linkGuard}} </label>
+                                <div class="col-sm-10">
+                                    <button type="button" ng-click="linkParent()" class="btn btn-danger btn-flat">{{phrase.linkStudentParent}}</button>
+                                    <input type="text" name="linkParentSer" ng-model="form.parentInfoSer" style="display:none;">
+                                    <div class="row" ng-repeat="parentOne in form.parentInfo track by $index">
+                                        <div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="parentP[]" ng-model="parentOne.parent"></div>
+                                        <div class="col-md-4"><input type="text" class="form-control" ng-model="parentOne.relation" name="relationR[]" placeholder="{{phrase.Relation}}" ng-change="monitorParentChange()"></div>
+                                        <button type="button" ng-click="removeParent(parentOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="editDorm.$invalid">{{phrase.editStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <button type="button" ng-click="add_document_row_edit()" class="btn pull-right btn-info card-block-input-item"> + {{phrase.addDocRow}}</button>
+                        <h4 class="card-title">{{phrase.Documents}}</h4>
+                        <div class="form">
+
+                            <table class="table table-bordered table-hover">
+                                <tbody class="table_clone">
+                                    <tr>
+                                        <th>{{phrase.title}}</th>
+                                        <th>{{phrase.File}}</th>
+                                        <th>{{phrase.notes}}</th>
+                                    </tr>
+                                    <tr ng-repeat="doc in form.docs">
+                                        <td>
+                                            <input type="hidden" name="docs_id[]" value="{{doc.id}}">
+                                            <input type="text" name="docs_title[]" ng-model="doc.file_title" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input type="file" name="docs_files[]" style="display: none;">
+                                            <a target="_BLANK" href="{{'https://upload.cutebrains.com/student_docs/'+doc.file_name}}">{{phrase.Download}}</a>
+                                        </td>
+                                        <td>
+                                            <textarea name="docs_notes[]" ng-model="doc.file_notes" class="form-control"></textarea>
+                                        </td>
+                                        <td>
+                                            <button ng-click="remove_student_docs(doc.id,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat="doc in add_doc">
+                                        <td>
+                                            <input type="hidden" name="docs_id[]" value="0">
+                                            <input type="text" name="docs_title[]" ng-model="doc.title" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input type="file" name="docs_files[]" ng-model="doc.file">
+                                        </td>
+                                        <td>
+                                            <textarea name="docs_notes[]" ng-model="doc.notes" class="form-control"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <div class="form">
+
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="editDorm.$invalid">{{phrase.editStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row" ng-show="views.attendance">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <h4 class="card-title">{{phrase.attendanceStats}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.Date}}</th>
+                                <th ng-show="studentAttendance.attendanceModel=='subject'">{{phrase.Subject}}</th>
+                                <th>{{phrase.Attendance}}</th>
+                            </tr>
+                            <tr ng-repeat="(key,value) in studentAttendance.attendance">
+                                <td>{{value.date}}</td>
+                                <td ng-show="studentAttendance.attendanceModel=='subject'">{{studentAttendance.subjects[value.subjectId]}}</td>
+                                <td>
+                                    <div>
+                                        <span ng-show="value.status =='0'">{{phrase.Absent}}</span>
+                                        <span ng-show="value.status =='1'">{{phrase.Present}}</span>
+                                        <span ng-show="value.status =='2'">{{phrase.Late}}</span>
+                                        <span ng-show="value.status =='3'">{{phrase.LateExecuse}}</span>
+                                        <span ng-show="value.status =='4'">{{phrase.earlyDismissal}}</span>
+                                        <span ng-show="value.status =='9'">{{phrase.acceptedVacation}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.medical">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <button ng-click="medicalToggle()" type="button" class="btn btn-info btn-flat" title="{{phrase.toggleView}}" tooltip><i class="fa fa-eye"></i> {{phrase.toggleView}}</button>
+                <h4 class="card-title">{{phrase.medHistory}}</h4>
+                <div >
+
+                    <form class="form" name="editDorm" role="form" ng-submit="saveMedical()">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>{{phrase.medInfo}}</h4>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.bloodGroup}} </label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control" ng-model="medicalInfo.data.blood_group" name="blood_group" ng-disabled="medViewMode">
+                                            <option value="O+">O+</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option><option value="O-">O-</option><option value="A-">A-</option><option value="B-">B-</option><option value="AB-">AB-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.height}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="height" ng-model="medicalInfo.data.height" class="form-control" ng-disabled="medViewMode">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Weight}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="weight" ng-model="medicalInfo.data.weight" class="form-control" ng-disabled="medViewMode">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.RH}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="rh" ng-model="medicalInfo.data.rh" class="form-control" ng-disabled="medViewMode">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.insPolicy}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="inspol" ng-model="medicalInfo.data.inspol" class="form-control" ng-disabled="medViewMode">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.vacCard}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="vacc" ng-model="medicalInfo.data.vacc" class="form-control" ng-disabled="medViewMode">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.preMedMed}} </label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="premed" ng-model="medicalInfo.data.premed" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.prefclinic}} </label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="prefclinic" ng-model="medicalInfo.data.prefclinic" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label"> {{phrase.disType}} </label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="disab" ng-model="medicalInfo.data.disab" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <h4>{{phrase.inCaseEmerg}}</h4>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.contactInfo}} * </label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="contact" ng-model="medicalInfo.data.contact" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>{{phrase.specMedInfo}}</h4>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Allergies}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="aller" ng-model="medicalInfo.data.aller" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Medications}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="medica" ng-model="medicalInfo.data.medica" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Immunization}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="immu" ng-model="medicalInfo.data.immu" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Diet}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="diet" ng-model="medicalInfo.data.diet" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Fractures}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="frac" ng-model="medicalInfo.data.frac" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Surgery}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="surg" ng-model="medicalInfo.data.surg" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label">{{phrase.Remarks}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea type="text" name="rema" ng-model="medicalInfo.data.rema" class="form-control" ng-disabled="medViewMode"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right control-label col-form-label"></label>
+                                    <div class="col-sm-9">
+                                        <button type="submit" class="btn btn-success pull-right" ng-show="!medViewMode">{{phrase.saveMed}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.import">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <h4 class="card-title">{{phrase.Import}} {{importType}}</h4>
+                <div>
+
+                    <form class="form" ng-upload="saveImported(content)" method="post" action="{{'index.php/students/import/'+importType}}" name="importData" role="form" novalidate>
+                        <div class="form-group row" style="margin: 30px 0px; border: 1px solid #EEE; padding: 10px;">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fileToImport}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="excelcsv">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default" ng-disabled="importData.$invalid || $isUploading">{{phrase.Import}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.reviewImport">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <h4 class="card-title">{{phrase.Import}} {{importType}}</h4>
+                <div>
+
+                    <form class="form-horizontal" ng-submit="reviewImportData()" name="importData" role="form" novalidate>
+
+                        <h4>{{phrase.failedImport}}</h4>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody><tr>
+                                    <th>{{phrase.FullName}}</th>
+                                    <th>{{phrase.username}}</th>
+                                    <th>{{phrase.email}}</th>
+                                    <th>{{phrase.class}}</th>
+                                    <th ng-show="$root.dashboardData.enableSections == '1'">{{phrase.sections}}</th>
+                                    <th>{{phrase.password}}</th>
+                                    <td> </td>
+                                </tr>
+                                <tr ng-repeat="student in importReview.revise">
+                                    <td>{{student.fullName}}</td>
+                                    <td ng-class="{'has-error': student.error.indexOf('username',0) != -1}"><input type="text" name="username" class="form-control mobilenumber" ng-model="student.username"></td>
+                                    <td ng-class="{'has-error': student.error.indexOf('email',0) != -1}"><input type="text" name="email" class="form-control mobilenumber" ng-model="student.email"></td>
+                                    <td ng-class="{'has-error': student.error.indexOf('class',0) != -1}">
+                                        <select class="form-control" name="studentClass" ng-model="student.studentClass" required>
+                                            <option ng-repeat="class in classes" value="{{class.id}}" ng-selected="student.studentClass == class.id">{{class.className}}</option>
+                                        </select>
+                                    </td>
+                                    <td ng-class="{'has-error': student.error.indexOf('section',0) != -1}" ng-show="$root.dashboardData.enableSections == '1'">
+                                        <select class="form-control" name="studentSection" ng-model="student.studentSection" required>
+                                            <option ng-repeat="(key,value) in importSections[student.studentClass]" value="{{key}}" ng-selected="student.studentSection == key">{{value}}</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="password" name="password" class="form-control mobilenumber" ng-model="student.password"></td>
+                                    <td><button ng-click="removeImport(student,$index,'revise')" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button></td>
+                                </tr>
+                                <tr ng-show="!importReview.revise.length"><td class="noTableData" colspan="6">{{phrase.noStudents}}</td></tr>
+                            </tbody></table>
+                        </div>
+
+                        <h4>{{phrase.readyImport}}</h4>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody><tr>
+                                    <th>{{phrase.FullName}}</th>
+                                    <th>{{phrase.username}}</th>
+                                    <th>{{phrase.email}}</th>
+                                    <th>{{phrase.class}}</th>
+                                    <th ng-show="$root.dashboardData.enableSections == '1'">{{phrase.sections}}</th>
+                                    <th>{{phrase.password}}</th>
+                                    <td> </td>
+                                </tr>
+                                <tr ng-repeat="student in importReview.ready">
+                                    <td>{{student.fullName}}</td>
+                                    <td><input type="text" name="username" class="form-control mobilenumber" ng-model="student.username"></td>
+                                    <td><input type="text" name="email" class="form-control mobilenumber" ng-model="student.email"></td>
+                                    <td>
+                                        <select class="form-control" name="studentClass" ng-model="student.studentClass" required>
+                                            <option ng-repeat="class in classes" value="{{class.id}}" ng-selected="student.studentClass == class.id">{{class.className}}</option>
+                                        </select>
+                                    </td>
+                                    <td ng-show="$root.dashboardData.enableSections == '1'">
+                                        <select class="form-control" name="studentSection" ng-model="student.studentSection" required>
+                                            <option ng-repeat="(key,value) in importSections[student.studentClass]" value="{{key}}" ng-selected="student.studentSection == key">{{value}}</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="password" name="password" class="form-control mobilenumber" ng-model="student.password"></td>
+                                    <td><a ng-click="removeImport(student,$index,'ready')" type="button" class="btn btn-danger btn-flat" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></a></td>
+                                </tr>
+                                <tr ng-show="!importReview.ready.length"><td class="noTableData" colspan="6">{{phrase.noStudents}}</td></tr>
+                            </tbody></table>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default">{{phrase.Import}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-if="views.bus_track">
+	<div class="col-12">
+      <div class="card">
+          <div class="card-block">
+              <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">
+	              {{phrase.Return}}
+	            </button>
+              <h4 class="card-title">Track student's bus</h4>
+              <hr>
+              <div>
+                  <iframe
+                  	ng-if="busTrackInfo.transport_vehicle != null"
+                  	ng-src="{{ trustSrc(gps_iframe_link) }}"
+                  	style="width: 100%; height: 400px; border: 3px solid #AAA;">
+                  </iframe>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div ng-show="views.admission">
+    <form ng-upload="saveAdd(content)" method="post" action="index.php/students" name="addAdmin" role="form" novalidate>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.admission}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} * </label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.fullName.$invalid}">
+                                    <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Gender}}</label>
+                                <div class="col-sm-4 control-label">
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="radio" name="gender" value="male" ng-model="form.gender" checked="checked">
+                                            {{phrase.Male}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="radio" name="gender" value="female" ng-model="form.gender">
+                                            {{phrase.Female}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Birthday}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" date-picker id="datemask_admin" name="birthday" ng-model="form.birthday" class="form-control datemask_admin">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Address}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="address" class="form-control" ng-model="form.address" placeholder="{{phrase.Address}}">
+                                </div>
+                            </div>
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.phoneNo}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="phoneNo" class="form-control" ng-model="form.phoneNo" placeholder="{{phrase.phoneNo}}" international-phone-number>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mobileNo}}</label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.mobileNo.$invalid}">
+                                    <input type="text" mobile-number name="mobileNo" class="form-control mobilenumber" ng-model="form.mobileNo" >
+                                </div>
+                            </div>
+
+                            <div class="form-group row" >
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.religion}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="religion" class="form-control" ng-model="form.religion" placeholder="{{phrase.religion}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                                <div class="col-sm-4">
+                                    <input type="file" name="photo" ng-model="form.photo">
+                                </div>
+                            </div>
+
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="addAdmin.$invalid">{{phrase.addStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.admissionInfo}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.admNumber}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="admission_number" ng-model="form.admission_number" class="form-control" placeholder="{{phrase.admNumber}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.admDate}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" date-picker id="admission_date" name="admission_date" ng-model="form.admission_date" placeholder="{{phrase.admDate}}" class="form-control admission_date">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.rollid}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="studentRollId" ng-model="form.studentRollId" class="form-control" placeholder="{{phrase.rollid}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} <span ng-show="$root.dashboardData.emailIsMandatory == 1">*</span></label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.email.$invalid}">
+                                    <input type="email" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" ng-required="$root.dashboardData.emailIsMandatory == 1">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.username}} * </label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.username.$invalid}">
+                                    <input type="text" name="username" ng-model="form.username" class="form-control" required placeholder="{{phrase.username}}">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.password}} *</label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.password.$invalid}">
+                                    <input type="password" name="password" ng-model="form.password" class="form-control" required placeholder="{{phrase.password}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <!-- <label class="col-sm-2 text-right control-label col-form-label">{{phrase.std_cat}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="std_category" ng-model="form.std_category">
+                                        <option ng-repeat="cat in student_categories" value="{{cat.id}}">{{cat.cat_title}}</option>
+                                    </select>
+                                </div> -->
+                                <label class="col-sm-2 text-right control-label col-form-label">Student type</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="std_type" ng-model="form.std_type">
+                                        <option ng-repeat="type in student_types" value="{{type.id}}">{{type.title}}</option>
+                                    </select>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bioId}}</label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.biometric_id.$invalid}">
+                                    <input type="text" name="biometric_id" class="form-control" ng-model="form.biometric_id" >
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}}</label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.studentClass.$invalid}">
+                                    <select class="form-control" name="studentClass" ng-model="form.studentClass" required ng-change="subjectList()">
+                                        <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                    </select>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label" ng-show="$root.dashboardData.enableSections == '1'">{{phrase.section}} *</label>
+                                <div class="col-sm-4" ng-class="{'has-error': addAdmin.studentSection.$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                                    <select class="form-control" ng-model="form.studentSection" ng-required="$root.dashboardData.enableSections == '1'" name="studentSection">
+                                        <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="addAdmin.$invalid">{{phrase.addStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.admission}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Transportation}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="transport" ng-model="form.transport" >
+                                        <option ng-repeat="transport in transports" value="{{transport.id}}">{{transport.transportTitle}}</option>
+                                    </select>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.trans_vehicles}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="transport_vehicle" ng-model="form.transport_vehicle">
+                                        <option ng-repeat="(key,item) in transports[form.transport].vehicles" value="{{key}}">{{item}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Hostel}}</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="hostel" ng-model="form.hostel" >
+                                        <option ng-repeat="(key,value) in hostel" value="{{key}}">{{value}}</option>
+                                    </select>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Communication}}</label>
+                                <div class="col-sm-4">
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list" style="display: inline-block;">
+                                        <label>
+                                            <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="addAdmin.$invalid">{{phrase.addStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.medHistory}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.insPolicy}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="med_data[inspol]" ng-model="form.med_data.inspol" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.bloodGroup}} </label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" ng-model="form.med_data.blood_group" name="med_data[blood_group]">
+                                        <option value="O+">O+</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option><option value="O-">O-</option><option value="A-">A-</option><option value="B-">B-</option><option value="AB-">AB-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Weight}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="med_data[weight]" ng-model="form.med_data.weight" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.height}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="med_data[height]" ng-model="form.med_data.height" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label"> {{phrase.disType}} </label>
+                                <div class="col-sm-4">
+                                    <textarea type="text" name="med_data[disab]" ng-model="form.med_data.disab" class="form-control"></textarea>
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.contactInfo}}</label>
+                                <div class="col-sm-4">
+                                    <textarea type="text" name="med_data[contact]" ng-model="form.med_data.contact" class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="addAdmin.$invalid">{{phrase.addStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.parent}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatheName}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[name]" ng-model="form.father.name" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherName}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[name]" ng-model="form.mother.name" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatherMob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[mobile]" ng-model="form.father.mobile" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherMob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[mobile]" ng-model="form.mother.mobile" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatherJob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[job]" ng-model="form.father.job" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherJob}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[job]" ng-model="form.mother.job" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.fatherNotes}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="father[notes]" ng-model="form.father.notes" class="form-control">
+                                </div>
+
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.motherNotes}} </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mother[notes]" ng-model="form.mother.notes" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="addAdmin.$invalid">{{phrase.addStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <h4 class="card-title">{{phrase.guardAcc}}</h4>
+                        <div class="form">
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 text-right control-label col-form-label">{{phrase.linkStudentParent}} </label>
+                                <div class="col-sm-10">
+                                    <button type="button" ng-click="linkParent()" class="btn btn-danger btn-flat">{{phrase.linkStudentParent}}</button>
+                                    <input type="text" name="linkParentSer" ng-model="form.parentInfoSer" style="display:none;">
+                                    <div class="row" ng-repeat="parentOne in form.parentInfo track by $index">
+                                        <div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="parentP[]" ng-model="parentOne.parent"></div>
+                                        <div class="col-md-4"><input type="text" class="form-control" ng-model="parentOne.relation" name="relationR[]" placeholder="{{phrase.Relation}}" ng-change="monitorParentChange()"></div>
+                                        <button type="button" ng-click="removeParent(parentOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="addAdmin.$invalid">{{phrase.addStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <button type="button" ng-click="add_document_row()" class="btn pull-right btn-info card-block-input-item"> + {{phrase.addDocRow}}</button>
+                        <h4 class="card-title">{{phrase.Documents}}</h4>
+                        <div class="form">
+
+                            <table class="table table-bordered table-hover">
+                                <tbody class="table_clone">
+                                    <tr>
+                                        <th>{{phrase.title}}</th>
+                                        <th>{{phrase.File}}</th>
+                                        <th>{{phrase.notes}}</th>
+                                    </tr>
+                                    <tr class="tr_clone">
+                                        <td>
+                                            <input type="text" name="docs_title[]" ng-model="form.docs_files.title" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input type="file" name="docs_files[]" ng-model="form.docs_files.file">
+                                        </td>
+                                        <td>
+                                            <textarea name="docs_notes[]" ng-model="form.docs_files.notes" class="form-control"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-block">
+                        <div class="form">
+
+                            <div class="form-group m-b-0">
+                                <div class=" col-sm-12">
+                                    <button type="submit" class="btn btn-info waves-effect waves-light pull-right" ng-disabled="addAdmin.$invalid">{{phrase.addStudent}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </form>
+</div>
+
+<modal visible="showModal"><div ng-bind-html="modalContent"></div></modal>
+<modal visible="showModalLink">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink" placeholder="Type parent name / username / E-mail address">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="linkParentButton()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="parentOne in searchResults">
+                            <td>{{parentOne.name}}</td>
+                            <td>{{parentOne.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="linkParentFinish(parentOne)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>

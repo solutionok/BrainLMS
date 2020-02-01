@@ -1,0 +1,311 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.mediaCenter}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+        <button class="btn pull-right btn-info card-block-input-item" ng-show="views.list && dirParent != -1" ng-click="loadAlbum(dirParent)"><i class="mdi mdi-plus-circle"></i> {{phrase.goUp}}</button>
+        <button class="btn pull-right btn-success card-block-input-item" ng-show="$root.can('mediaCenter.addMedia') && views.list" ng-click="changeView('addMedia')"><i class="mdi mdi-plus-circle"></i> {{phrase.uploadMedia}}</button>
+        <button class="btn pull-right btn-success card-block-input-item" ng-show="$root.can('mediaCenter.addAlbum') && views.list" ng-click="changeView('addAlbum')"><i class="mdi mdi-plus-circle"></i> {{phrase.addAlbum}}</button>
+    </div>
+</div>
+
+<div class="col-md-12" ng-show="views.list">
+    <h4 class="card-title" ng-show="albums.length">{{phrase.albums}}</h4>
+    <h4 class="card-title" ng-show="current.albumTitle">{{current.albumTitle}}</h4>
+    <h6 class="card-subtitle m-b-20 text-muted" ng-show="current.albumTitle">{{current.albumDescription}}</h6>
+</div>
+
+<div class="row el-element-overlay" ng-show="views.list">
+    <div class="col-lg-3 col-md-6" ng-show="albums.length" ng-repeat="album in albums">
+        <div class="card">
+            <div class="el-card-item">
+                <div class="el-card-avatar el-overlay-1">
+                    <img ng-src="{{album.thumb == '' && uploads_provider + '/media/default.png' || album.thumb }}" alt="{{album.albumTitle}}">
+                    <div class="el-overlay">
+                        <ul class="el-info">
+                            <li><a ng-click="loadAlbum(album.id)" class="btn default btn-outline" href="javascript:void(0);"><i class="icon-magnifier"></i></a></li>
+                            <li ng-show="$root.can('mediaCenter.editAlbum')"><a ng-click="editAlbumData(album.id)" title="{{phrase.Edit}}" tooltip class="btn default btn-outline" href="javascript:void(0);"><i class="icon-pencil"></i></a></li>
+                            <li ng-show="$root.can('mediaCenter.delAlbum')"><a ng-click="removeAlbum(album,$index)" title="{{phrase.Remove}}" tooltip class="btn default btn-outline" href="javascript:void(0);"><i class="icon-trash"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="el-card-content">
+                    <h3 class="box-title">{{album.albumTitle}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12" ng-show="media.length && views.list">
+    <h4 class="card-title">{{phrase.media}}</h4>
+</div>
+
+<div class="row el-element-overlay" ng-show="views.list">
+    <div class="col-lg-3 col-md-6" ng-show="media.length" ng-repeat="item in media">
+        <div class="card">
+            <div class="el-card-item">
+                <div class="el-card-avatar el-overlay-1">
+                    <img ng-src="{{item.thumb == '' && uploads_provider + '/media/default.png' || item.thumb }}" class="center-block img-responsive mediaGroup" alt="{{item.mediaTitle}}"/>
+                    <div class="el-overlay">
+                        <ul class="el-info">
+                            <li ng-if="item.mediaType == '0'"><a colorbox="{transition:'elastic'}" title="{{item.mediaDescription}}" class="btn default btn-outline" href="{{uploads_provider}}/media/{{item.mediaURL}}"><i class="icon-magnifier"></i></a></li>
+                            <li ng-if="item.mediaType == '1'"><a colorbox="{transition:'elastic'}" class="btn default btn-outline" youtube="true" title="{{item.mediaDescription}}" href="https://www.youtube.com/embed/{{item.v}}?rel=0&amp;wmode=transparent"><i class="icon-magnifier"></i></a></li>
+                            <li ng-if="item.mediaType == '2'"><a colorbox="{transition:'elastic'}" class="btn default btn-outline" vimeo="true" title="{{item.mediaDescription}}" href="https://player.vimeo.com/video/{{item.v}}"><i class="icon-magnifier"></i></a></li>
+                            <li ng-show="$root.can('mediaCenter.editMedia')"><a ng-click="editItem(item.id)" title="{{phrase.Edit}}" tooltip class="btn default btn-outline" href="javascript:void(0);"><i class="icon-pencil"></i></a></li>
+                            <li ng-show="$root.can('mediaCenter.delMedia')"><a ng-click="removeItem(item,$index)" title="{{phrase.Remove}}" tooltip class="btn default btn-outline" href="javascript:void(0);"><i class="icon-trash"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="el-card-content">
+                    <h3 class="box-title">{{item.mediaTitle}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-show="!media.length" class="box-header">
+    <h3 class="box-title">{{phrase.noMediaInAlbum}}</h3>
+</div>
+
+<div class="row" ng-show="views.addAlbum">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addAlbum}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-upload="saveAlbum(content)" method="post" action="index.php/media/newAlbum" name="addAlbum" role="form" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addAlbum.albumTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.albumTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="albumTitle" ng-model="form.albumTitle" class="form-control" required placeholder="{{phrase.albumTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.albumDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="albumDescription" class="form-control" ng-model="form.albumDescription" placeholder="{{phrase.albumDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.albumImage}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="albumImage">
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <input type="hidden" name="albumParent" value="{{dirNow}}">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addAlbum.$invalid">{{phrase.addAlbum}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.editAlbum">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editAlbum}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-upload="saveEditAlbum(content)" method="post" action="{{'index.php/media/editAlbum/'+form.id}}" name="editAlbum" role="form" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editAlbum.albumTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.albumTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="albumTitle" ng-model="form.albumTitle" class="form-control" required placeholder="{{phrase.albumTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.albumDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="albumDescription" class="form-control" ng-model="form.albumDescription" placeholder="{{phrase.albumDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.albumImage}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="albumImage">
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <input type="hidden" name="albumParent" value="{{dirNow}}">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editAlbum.$invalid">{{phrase.editAlbum}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.addMedia">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addMedia}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="addMedia" role="form" ng-submit="addMediaServer()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addMedia.mediaTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="mediaTitle" ng-model="form.mediaTitle" class="form-control" required placeholder="{{phrase.mediaTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="mediaDescription" class="form-control" ng-model="form.mediaDescription" placeholder="{{phrase.mediaDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addMedia.mediaType.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaType}}</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="mediaType" value="0" ng-model="form.mediaType" required> {{phrase.image}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="mediaType" value="1" ng-model="form.mediaType" required> Youtube
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="mediaType" value="2" ng-model="form.mediaType" required> Vimeo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addMedia.mediaURL.$invalid}" ng-show="form.mediaType == '0'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaImage}}</label>
+                            <div class="col-sm-10">
+
+                                <div ngf-drop ngf-select ngf-multiple="true" ngf-keep="true" ng-model="mu_files_list" class="drop-box">{{phrase.selDrop}}</div>
+
+                                <ul class="ml_uploaded_images">
+                                    <li ng-repeat="file in mu_files_list" style="font:smaller">
+                                        <img ngf-thumbnail="file" ngf-size="{height: 150, quality: 0.9}">
+                                        <div class="image_progress" ng-show="file.progress">
+                                            <div class="image_progress_inner" style="width:{{file.progress}}%" ng-bind="file.progress + '%'"></div>
+                                        </div>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addMedia.mediaURL.$invalid}" ng-show="form.mediaType == '1'">
+                            <label class="col-sm-2 text-right control-label col-form-label">Youtube {{phrase.url}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="mediaURL" ng-model="form.mediaURL" class="form-control" ng-required="form.mediaType == '1'">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addMedia.mediaURL.$invalid}" ng-show="form.mediaType == '2'">
+                            <label class="col-sm-2 text-right control-label col-form-label">Vimeo {{phrase.url}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="mediaURL" ng-model="form.mediaURL" class="form-control" ng-required="form.mediaType == '2'">
+                            </div>
+                        </div>
+
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <input type="hidden" name="albumId" ng-model="form.albumId" value="{{dirNow}}">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addMedia.$invalid">{{phrase.addMedia}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.editMedia">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editMedia}}</h4>
+                <div class="form">
+
+
+                    <form class="form-horizontal" ng-upload="saveEditItem(content)" method="post" action="{{ 'index.php/media/' + form.id }}" name="editMedia" role="form" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editMedia.mediaTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="mediaTitle" ng-model="form.mediaTitle" class="form-control" required placeholder="{{phrase.mediaTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="mediaDescription" class="form-control" ng-model="form.mediaDescription" placeholder="{{phrase.mediaDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaType}}</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="mediaType" value="0" ng-model="form.mediaType" required> {{phrase.image}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="mediaType" value="1" ng-model="form.mediaType" required> Youtube
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="mediaType" value="2" ng-model="form.mediaType" required> Vimeo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editMedia.mediaURL.$invalid}" ng-show="form.mediaType == '0'">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mediaImage}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="mediaURL" ng-required="form.mediaType == '0'">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editMedia.mediaURL.$invalid}" ng-show="form.mediaType == '1'">
+                            <label class="col-sm-2 text-right control-label col-form-label">Youtube {{phrase.url}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="mediaURL" ng-model="form.mediaURL" class="form-control" ng-required="form.mediaType == '1'">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editMedia.mediaURL.$invalid}" ng-show="form.mediaType == '2'">
+                            <label class="col-sm-2 text-right control-label col-form-label">Vimeo {{phrase.url}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="mediaURL" ng-model="form.mediaURL" class="form-control" ng-required="form.mediaType == '2'">
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <input type="hidden" name="albumId" value="{{dirNow}}">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editMedia.$invalid">{{phrase.editMedia}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

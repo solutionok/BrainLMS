@@ -1,0 +1,214 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.roles}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('roles.add_role')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_role}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">Permission Roles list</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.role_title}}</th>
+                                <th>{{phrase.role_desc}}</th>
+                                <th ng-show="$root.can('roles.modify_role') || $root.can('roles.delete_role')" style='width:160px;'>{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="roles_one in roles | filter:searchText">
+                                <td>{{roles_one.role_title}}</td>
+                                <td>{{roles_one.role_description}}</td>
+                                <td ng-show="$root.can('roles.modify_role') || $root.can('roles.delete_role')">
+                                    <button ng-show="$root.can('roles.modify_role')" ng-click="edit(roles_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('roles.delete_role')" ng-click="remove(roles_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!roles.length"><td class="noTableData" colspan="3">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.add_role}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="roles_add_form" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': roles_add_form.role_title.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_title}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="role_title" ng-model="form.role_title" class="form-control" placeholder="{{phrase.role_title}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': roles_add_form.role_description.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_desc}} * </label>
+                            <div class="col-sm-10">
+                                <textarea name="role_description" class="form-control" ng-model="form.role_description" placeholder="{{phrase.role_desc}}" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': roles_add_form.def_for.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_default}} * </label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="none" ng-model="form.def_for" required> None
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="teacher" ng-model="form.def_for" required> {{phrase.teacher}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="student" ng-model="form.def_for" required> {{phrase.student}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="parent" ng-model="form.def_for" required> {{phrase.parent}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="admin" ng-model="form.def_for" required> {{phrase.Administrators}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': roles_add_form.role_permissions.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_perm}} * </label>
+                            <div class="col-sm-10">
+                                <table class="table table-bordered table-hover">
+                                    <tbody>
+                                        <tr ng-repeat="(key,inner_perms) in roles_perms">
+                                            <td>{{phrase[key]}}</td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="radio-list col-sm-4" ng-repeat="perm in inner_perms">
+                                                        <label>
+                                                            <input type="checkbox" checklist-value="key + '.' + perm" checklist-model="form.role_permissions" > {{phrase[perm]}}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="roles_add_form.$invalid">{{phrase.add_role}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.modify_role}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="roles_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': roles_edit_form.role_title.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_title}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="role_title" ng-model="form.role_title" class="form-control" placeholder="{{phrase.role_title}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': roles_edit_form.role_description.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_desc}} * </label>
+                            <div class="col-sm-10">
+                                <textarea name="role_description" class="form-control" ng-model="form.role_description" placeholder="{{phrase.role_desc}}" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': roles_edit_form.def_for.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_default}} * </label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="none" ng-model="form.def_for" required> None
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="teacher" ng-model="form.def_for" required> {{phrase.teacher}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="student" ng-model="form.def_for" required> {{phrase.student}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="parent" ng-model="form.def_for" required> {{phrase.parent}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="def_for" value="admin" ng-model="form.def_for" required> {{phrase.Administrators}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': roles_edit_form.role_permissions.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.role_perm}} * </label>
+                            <div class="col-sm-10">
+                                <table class="table table-bordered table-hover">
+                                    <tbody>
+                                        <tr ng-repeat="(key,inner_perms) in roles_perms">
+                                            <td>{{phrase[key]}}</td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="radio-list col-sm-4" ng-repeat="perm in inner_perms">
+                                                        <label>
+                                                            <input type="checkbox" checklist-value="key + '.' + perm" checklist-model="form.role_permissions">
+                                                            {{phrase[perm]}}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="roles_edit_form.$invalid">{{phrase.modify_role}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

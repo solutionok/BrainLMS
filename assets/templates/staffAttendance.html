@@ -1,0 +1,171 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.staffAttendance}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.selectAttendance}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="startAttendance()" name="attendance" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': attendance.attendanceDay.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Date}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="attendanceDay" ng-model="form.attendanceDay" id="datemask" class="form-control datemask" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="z-index: 999999999;" ng-show="$root.dashboardData.sAttendanceInOut == '1'" ng-class="{'has-error': attendance.InOut.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.type}} *</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="InOut" value="in" ng-model="form.InOut" ng-required="$root.dashboardData.sAttendanceInOut == '1'" > {{phrase.in}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="InOut" value="out" ng-model="form.InOut" ng-required="$root.dashboardData.sAttendanceInOut == '1'" > {{phrase.out}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light m-t-10" ng-disabled="attendance.$invalid">{{phrase.controlAttendance}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.lists">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button class="btn btn-danger btn-sm pull-right" type="button" ng-click="changeView('list')"> {{phrase.Return}}</button>
+                <h4 class="card-title">Staff Attendance - {{phrase.Date}} : {{form.attendanceDay}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="saveAttendance()" name="takeAttendance" name="form" novalidate>
+                        <table class="table table-bordered table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>{{phrase.teacher}}</th>
+                                    <th>{{phrase.Attendance}}</th>
+                                    <th>{{phrase.notes}}</th>
+                                </tr>
+                                <tr>
+                                    <td>Select All</td>
+                                    <td>
+                                        <input type="button" ng-click="selectAll(1)" class="btn btn-info btn-sm" value="{{phrase.Present}}">
+                                        <input type="button" ng-click="selectAll(0)" class="btn btn-info btn-sm" value="{{phrase.Absent}}">
+                                        <input type="button" ng-click="selectAll(2)" class="btn btn-info btn-sm" value="{{phrase.Late}}">
+                                        <input type="button" ng-click="selectAll(3)" class="btn btn-info btn-sm" value="{{phrase.LateExecuse}}">
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr ng-repeat="teacher in teachers | object2Array">
+                                    <td>{{teacher.name}}</td>
+                                    <td>
+                                        <div>
+                                            <div class="radio-list" ng-show="teacher.vacationStat" style="padding-bottom: 10px;">
+                                                Vacation requested :
+                                                <label style="color:green;" ng-show="teacher.vacationStat == '1'"> {{phrase.acceptedVacation}} </label>
+                                                <label style="color:red;" ng-show="teacher.vacationStat == '0'"> {{phrase.rejectedVacation}} </label>
+                                                <label ng-show="teacher.vacationStat == '-1'"> {{phrase.waitAction}} </label>
+                                            </div>
+                                            <div class="radio-list" ng-show="!teacher.vacationStat || teacher.vacationStat != '1'" ng-hide="form.InOut == 'out'">
+                                                <label>
+                                                    <input type="radio" ng-model="teacher.attendance" value="1"> {{phrase.Present}}
+                                                </label>
+                                                <label>
+                                                    <input type="radio" ng-model="teacher.attendance" value="0"> {{phrase.Absent}}
+                                                </label>
+                                                <label>
+                                                    <input type="radio" ng-model="teacher.attendance" value="2"> {{phrase.Late}}
+                                                </label>
+                                                <label>
+                                                    <input type="radio" ng-model="teacher.attendance" value="3"> {{phrase.LateExecuse}}
+                                                </label>
+                                            </div>
+                                            <div class="radio-list" ng-show="form.InOut == 'in' && (teacher.attendance == '1' || teacher.attendance == '2' || teacher.attendance == '3')" style="padding-top: 10px;">
+                                                <div class="row">
+                                                    <div class="col-sm-3 control-label col-form-label">
+                                                        {{phrase.chkin}}
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <select class="form-control" name="check_in[hour]" required ng-model="teacher.check_in.hour" >
+                                                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <select class="form-control" name="check_in[min]" required ng-model="teacher.check_in.min" >
+                                                            <option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <select class="form-control" name="check_in[ampm]" required ng-model="teacher.check_in.ampm" >
+                                                            <option value="AM">AM</option><option value="PM">PM</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="radio-list" ng-show="form.InOut == 'out'" style="padding-top: 10px;">
+                                                <span ng-show="teacher.attendance == '0'">
+                                                    {{phrase.Absent}}
+                                                </span>
+                                                <span ng-show="teacher.no_in_time">
+                                                    {{phrase.notChckedIn}}
+                                                </span>
+                                                <span ng-show="teacher.attendance == '1' || teacher.attendance == '2' || teacher.attendance == '3'">
+                                                    <div class="row">
+                                                        <div class="col-sm-3 control-label col-form-label">
+                                                            {{phrase.chkout}}
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <select class="form-control" name="check_out[hour]" required ng-model="teacher.check_out.hour" >
+                                                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <select class="form-control" name="check_out[min]" required ng-model="teacher.check_out.min" >
+                                                                <option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <select class="form-control" name="check_out[ampm]" required ng-model="teacher.check_out.ampm" >
+                                                                <option value="AM">AM</option><option value="PM">PM</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="attNotes" ng-model="teacher.attNotes" class="form-control" placeholder="{{phrase.notes}}">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light m-t-10">{{phrase.saveAttendance}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,249 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.items_stock}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('items_stock.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/items_stock/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/items_stock/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('items_stock.add_item')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_item}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_items}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.refno}}</th>
+								<th>{{phrase.Category}}</th>
+								<th>{{phrase.item}}</th>
+								<th>{{phrase.store}}</th>
+								<th>{{phrase.supplier}}</th>
+								<th>{{phrase.quantity}}</th>
+								<th>{{phrase.Date}}</th>
+								<th style="width:160px;" ng-show="$root.can('items_stock.edit_item') || $root.can('items_stock.del_item') || $root.can('items_stock.Download')" >{{phrase.Operations}}</th>
+							</tr>
+							<tr dir-paginate="items_stock_one in items_stock | itemsPerPage:20" total-items="totalItems">
+								<td>{{items_stock_one.refno}}</td>
+								<td>{{inv_cat[items_stock_one.cat_id]}}</td>
+								<td>{{items_code[items_stock_one.item_id]}}</td>
+								<td>{{stores[items_stock_one.store_id]}}</td>
+								<td>{{suppliers[items_stock_one.supplier_id]}}</td>
+								<td>{{items_stock_one.qty}}</td>
+								<td>{{items_stock_one.stock_date}}</td>
+								<td ng-show="$root.can('items_stock.edit_item') || $root.can('items_stock.del_item') || $root.can('items_stock.Download')">
+                                    <a ng-show="items_stock_one.stock_attach != '' && $root.can('items_stock.Download')" target="_blank" href="{{'index.php/items_stock/download/'+items_stock_one.id}}"><button type="button" class="btn btn-success btn-circle" title="{{phrase.Download}}" tooltip><i class="fa fa-cloud-download"></i></button></a>
+									<button ng-show="$root.can('items_stock.edit_item')" ng-click="edit(items_stock_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('items_stock.del_item')" ng-click="remove(items_stock_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!items_stock.length"><td class="noTableData" colspan="9">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls class="pull-right" on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+				<h4 class="card-title">{{phrase.add_item}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="items_stock_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': items_stock_add_form.refno.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.refno}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="refno" ng-model="form.refno" class="form-control" placeholder="{{phrase.refno}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_add_form.cat_id.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Category}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="cat_id" ng-model="form.cat_id" ng-change="load_items()" required>
+									<option ng-repeat="(key,item) in inv_cat" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_add_form.item_id.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.item}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_id" ng-model="form.item_id" required>
+									<option ng-repeat="(key,item) in items_code_edit" value="{{item.id}}">{{item.item_title}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.store}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="store_id" ng-model="form.store_id" >
+									<option ng-repeat="(key,item) in stores" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.supplier}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="supplier_id" ng-model="form.supplier_id" >
+									<option ng-repeat="(key,item) in suppliers" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_add_form.qty.$invalid || items_stock_add_form.qty_type.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.quantity}} *</label>
+							<div class="col-sm-1">
+								<select class="form-control" name="qty_type" ng-model="form.qty_type" required>
+									<option value="+">+</option>
+									<option value="-">-</option>
+								</select>
+							</div>
+							<div class="col-sm-9">
+								<input type="text" name="qty" ng-model="form.qty" class="form-control" placeholder="{{phrase.quantity}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_add_form.stock_date.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="stock_date_add" name="stock_date" ng-model="form.stock_date" class="form-control stock_date_add" placeholder="{{phrase.Date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<input type="file" name="stock_attach" file-model="form.stock_attach">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="stock_notes" class="form-control" ng-model="form.stock_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="items_stock_add_form.$invalid">{{phrase.add_item}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+				<h4 class="card-title">{{phrase.edit_item}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="items_stock_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': items_stock_edit_form.refno.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.refno}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="refno" ng-model="form.refno" class="form-control" placeholder="{{phrase.refno}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_edit_form.cat_id.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Category}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="cat_id" ng-model="form.cat_id" ng-change="load_items()" required>
+									<option ng-repeat="(key,item) in inv_cat" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_edit_form.item_id.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.item}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_id" ng-model="form.item_id" required>
+									<option ng-repeat="(key,item) in items_code_edit" value="{{item.id}}">{{item.item_title}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.store}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="store_id" ng-model="form.store_id" >
+									<option ng-repeat="(key,item) in stores" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.supplier}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="supplier_id" ng-model="form.supplier_id" >
+									<option ng-repeat="(key,item) in suppliers" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_edit_form.qty.$invalid || items_stock_edit_form.qty_type.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.quantity}} *</label>
+							<div class="col-sm-1">
+								<select class="form-control" name="qty_type" ng-model="form.qty_type" required>
+									<option value="+">+</option>
+									<option value="-">-</option>
+								</select>
+							</div>
+							<div class="col-sm-9">
+								<input type="text" name="qty" ng-model="form.qty" class="form-control" placeholder="{{phrase.quantity}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_stock_edit_form.stock_date.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="stock_date_add" name="stock_date" ng-model="form.stock_date" class="form-control stock_date_add" placeholder="{{phrase.Date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<a ng-show="form.stock_attach != ''" href="index.php/items_stock/download/{{form.id}}">{{phrase.viewFile}}</a><span style="margin-right:10px;" ng-show="form.stock_attach != ''">, {{phrase.orUpNew}}</span><input type="file" name="stock_attach" file-model="form.stock_attach">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="stock_notes" class="form-control" ng-model="form.stock_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="items_stock_edit_form.$invalid">{{phrase.edit_item}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

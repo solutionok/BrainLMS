@@ -1,0 +1,172 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Expenses}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('Expenses.addExpense')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addExpense}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.Expenses}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.expenseTitle}}</th>
+                                <th>{{phrase.Category}}</th>
+                                <th>{{phrase.expenseAmount}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.notes}}</th>
+                                <th>{{phrase.Operations}}</th>
+                            </tr>
+                            <tr dir-paginate="expense in expenses  | filter:searchText | itemsPerPage:20" total-items="totalItems">
+                                <td>{{expense.expenseTitle}}</td>
+                                <td>{{expenses_cat[expense.expenseCategory]}}</td>
+                                <td>{{expense.expenseAmount}}</td>
+                                <td>{{expense.expenseDate}}</td>
+                                <td>{{expense.expenseNotes}}</td>
+                                <td>
+                                    <a ng-show="expense.expenseImage != ''" target="_blank" href="{{'index.php/expenses/download/'+expense.id}}"><button type="button" class="btn btn-success btn-circle" title="{{phrase.Download}}" tooltip><i class="fa fa-cloud-download"></i></button></a>
+                                    <button ng-show="$root.can('Expenses.editExpense')" ng-click="edit(expense.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Expenses.delExpense')" ng-click="remove(expense,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {{phrase.Total}} : {{totalExpenses}}
+                    <dir-pagination-controls class="pull-right" on-page-change="listExpenses(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addExpense}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="addGrade" role="form" ng-upload="saveAdd(content)" role="form" method="post" action="index.php/expenses" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.expenseTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.expenseTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="expenseTitle" ng-model="form.expenseTitle" class="form-control" required placeholder="{{phrase.expenseTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.expenseAmount.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.expenseAmount}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="expenseAmount" ng-model="form.expenseAmount" class="form-control" required placeholder="{{phrase.expenseAmount}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.expenseDate.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.ExpenseDate}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="expenseDate" ng-model="form.expenseDate" class="form-control datemask" id="datemask" required placeholder="{{phrase.ExpenseDate}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.expenseCategory.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Category}} * </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.expenseCategory" name="expenseCategory" required>
+                                    <option ng-repeat="(key,value) in expenses_cat" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.notes}} *</label>
+                            <div class="col-sm-10">
+                                <textarea name="expenseNotes" ng-model="form.expenseNotes" class="form-control" placeholder="{{phrase.notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="expenseImage">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addGrade.$invalid">{{phrase.addExpense}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editExpense}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="editGrade" role="form" ng-upload="saveEdit(content)" role="form" method="post" action="{{'index.php/expenses/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.expenseTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.expenseTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="expenseTitle" ng-model="form.expenseTitle" class="form-control" required placeholder="{{phrase.expenseTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.expenseAmount.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.expenseAmount}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="expenseAmount" ng-model="form.expenseAmount" class="form-control" required placeholder="{{phrase.expenseAmount}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.expenseDate.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.ExpenseDate}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="expenseDate" ng-model="form.expenseDate" class="form-control datemask" id="datemaskEdit" required placeholder="{{phrase.ExpenseDate}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.expenseCategory.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Category}} * </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.expenseCategory" name="expenseCategory" required>
+                                    <option ng-repeat="(key,value) in expenses_cat" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.notes}} *</label>
+                            <div class="col-sm-10">
+                                <textarea name="expenseNotes" ng-model="form.expenseNotes" class="form-control" placeholder="{{phrase.notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="expenseImage">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editGrade.$invalid">{{phrase.editExpense}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

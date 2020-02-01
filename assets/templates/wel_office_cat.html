@@ -1,0 +1,195 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.wel_office_cat}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('wel_office_cat.add_cat')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_cat}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.wel_office_cat}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.catTitle}}</th>
+                                <th>{{phrase.catDesc}}</th>
+                                <th>{{phrase.av_for}}</th>
+                                <th style="width:160px;" ng-show="$root.can('wel_office_cat.edit_cat') || $root.can('wel_office_cat.del_cat')" >{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="wel_office_one in wel_office | filter:searchText">
+                                <td>{{wel_office_one.cat_title}}</td>
+                                <td>{{wel_office_one.cat_desc}}</td>
+                                <td>
+                                    <span ng-repeat="item in wel_office_one.av_for">
+                                        <span ng-switch="item">
+                                            <span ng-switch-when="visit_purpose">{{phrase.vis_purp}}</span>
+                                            <span ng-switch-when="phone_purpose">{{phrase.pho_purp}}</span>
+                                            <span ng-switch-when="enq_type">{{phrase.enq_type}}</span>
+                                            <span ng-switch-when="enq_source">{{phrase.enq_source}}</span>
+                                            <span ng-switch-when="comp_type">{{phrase.comp_type}}</span>
+                                            <span ng-switch-when="comp_source">{{phrase.comp_source}}</span>
+                                        </span><br/>
+                                    </span>
+                                </td>
+                                <td ng-show="$root.can('wel_office_cat.edit_cat') || $root.can('wel_office_cat.del_cat')">
+                                    <button ng-show="$root.can('wel_office_cat.edit_cat')" ng-click="edit(wel_office_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('wel_office_cat.del_cat')" ng-click="remove(wel_office_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!wel_office.length"><td class="noTableData" colspan="4">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.add_cat}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="wel_office_add_form" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': wel_office_add_form.cat_title.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.catTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="cat_title" ng-model="form.cat_title" class="form-control" placeholder="{{phrase.catTitle}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': wel_office_add_form.cat_desc.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.catDesc}} </label>
+                            <div class="col-sm-10">
+                                <textarea name="cat_desc" class="form-control" ng-model="form.cat_desc" placeholder="{{phrase.catDesc}}" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': wel_office_add_form.av_for.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.av_for}} </label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="visit_purpose" checklist-model="form.av_for"> {{phrase.vis_purp}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="phone_purpose" checklist-model="form.av_for"> {{phrase.pho_purp}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="enq_type" checklist-model="form.av_for"> {{phrase.enq_type}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="enq_source" checklist-model="form.av_for"> {{phrase.enq_source}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="comp_type" checklist-model="form.av_for"> {{phrase.comp_type}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="comp_source" checklist-model="form.av_for"> {{phrase.comp_source}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="wel_office_add_form.$invalid">{{phrase.add_cat}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.edit_cat}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="wel_office_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': wel_office_edit_form.cat_title.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.catTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="cat_title" ng-model="form.cat_title" class="form-control" placeholder="{{phrase.catTitle}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': wel_office_edit_form.cat_desc.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.catDesc}} </label>
+                            <div class="col-sm-10">
+                                <textarea name="cat_desc" class="form-control" ng-model="form.cat_desc" placeholder="{{phrase.catDesc}}" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': wel_office_edit_form.av_for.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.av_for}} </label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="visit_purpose" checklist-model="form.av_for"> {{phrase.vis_purp}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="phone_purpose" checklist-model="form.av_for"> {{phrase.pho_purp}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="enq_type" checklist-model="form.av_for"> {{phrase.enq_type}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="enq_source" checklist-model="form.av_for"> {{phrase.enq_source}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="comp_type" checklist-model="form.av_for"> {{phrase.comp_type}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="av_for[]" value="comp_source" checklist-model="form.av_for"> {{phrase.comp_source}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="wel_office_edit_form.$invalid">{{phrase.edit_cat}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

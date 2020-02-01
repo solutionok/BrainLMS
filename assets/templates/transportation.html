@@ -1,0 +1,264 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Transportation}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('Transportation.addTransport')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addTransport}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listTransport}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>ID</th>
+                                <th>{{phrase.transportTitle}}</th>
+                                <th>{{phrase.transportRoutes}}</th>
+                                <th>{{phrase.trans_vehicles}}</th>
+                                <th>{{phrase.Fare}}</th>
+                                <th ng-show="$root.can('Transportation.editTransport') || $root.can('Transportation.delTrans')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="transport in transports | filter:searchText">
+                                <td>{{transport.id}}</td>
+                                <td>{{transport.transportTitle}}</td>
+                                <td>{{transport.routeDetails}}</td>
+                                <td>
+                                    <span ng-repeat="key in transport.vehicles_list">{{vehicles[key]}}<br/></span>
+                                </td>
+                                <td>{{transport.transportFare}}</td>
+                                <td ng-show="$root.can('Transportation.editTransport') || $root.can('Transportation.delTrans')">
+                                    <button ng-show="$root.can('Transportation.editTransport')" ng-click="edit(transport.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Transportation.delTrans')" ng-click="remove(transport,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!transports.length"><td class="noTableData" colspan="6">{{phrase.noTransportation}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addTransport}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addTransport" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addTransport.transportTitle.$invalid}">
+                            <label class="col-sm-2 control-label">{{phrase.transportTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="transportTitle" ng-model="form.transportTitle" class="form-control" required placeholder="{{phrase.transportTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 control-label">{{phrase.transportRoutes}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="routeDetails" class="form-control" ng-model="form.routeDetails" placeholder="{{phrase.transportRoutes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 control-label">{{phrase.trans_vehicles}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="vehicles_list[]" ng-model="form.vehicles_list" multiple required>
+                                    <option ng-repeat="(key,item) in vehicles" value="{{key}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addTransport.transportFare.$invalid}">
+                            <label class="col-sm-2 control-label">{{phrase.Fare}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="transportFare" ng-model="form.transportFare" class="form-control" required placeholder="{{phrase.Fare}}">
+                            </div>
+                        </div>
+												<div class="form-group row" ng-class="{'has-error': addTransport.fine_amount.$invalid}">
+                            <label class="col-sm-2 control-label">Fee Fine Amount</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="fine_amount" ng-model="form.fine_amount" class="form-control" required placeholder="Fee Fine Amount">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addTransport.$invalid">{{phrase.addTransport}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editTransport}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editTrans" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editTrans.transportTitle.$invalid}">
+                            <label class="col-sm-2 control-label">{{phrase.transportTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="transportTitle" ng-model="form.transportTitle" class="form-control" required placeholder="{{phrase.transportTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 control-label">{{phrase.transportRoutes}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="routeDetails" class="form-control" ng-model="form.routeDetails" placeholder="{{phrase.transportRoutes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 control-label">{{phrase.trans_vehicles}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="vehicles_list[]" ng-model="form.vehicles_list" multiple required>
+                                    <option ng-repeat="(key,item) in vehicles" value="{{key}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editTrans.transportFare.$invalid}">
+                            <label class="col-sm-2 control-label">{{phrase.Fare}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="transportFare" ng-model="form.transportFare" class="form-control" required placeholder="{{phrase.Fare}}">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editTrans.$invalid">{{phrase.editTransport}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.listSubs">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listSubs}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.role}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.Contact}}</th>
+                            </tr>
+                            <tr ng-repeat="subscriber in transportsList | filter:searchText">
+                                <td>
+                                    <img alt="{{subscriber.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+subscriber.id}}">
+                                    {{subscriber.fullName}}
+                                </td>
+                                <td>{{subscriber.username}}</td>
+                                <td>{{subscriber.role}}</td>
+                                <td>{{subscriber.email}}</td>
+                                <td>{{subscriber.phoneNo}} <br/> {{subscriber.mobileNo}}</td>
+                            </tr>
+                            <tr ng-show="!transportsList.length"><td class="noTableData" colspan="5">{{phrase.noMatches}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.members">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.members}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form" ng-submit="search_users()" name="searchMembers" role="form" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': searchMembers.user_position.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Transportation}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="transport" ng-model="form.transport" required >
+                                    <option ng-repeat="transport in transports" value="{{transport.id}}">{{transport.transportTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.trans_vehicles}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="transport_vehicle" ng-model="form.transport_vehicle" required>
+                                    <option ng-repeat="(key,item) in transports[form.transport].vehicles" value="{{key}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="searchMembers.$invalid">{{phrase.searchUsers}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <table class="table table-bordered table-hover" ng-show="transport_members" style="margin-top: 20px;">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    {{phrase.user}}
+                                </th>
+                                <th>
+                                    {{phrase.username}}
+                                </th>
+                                <th>
+                                    {{phrase.email}}
+                                </th>
+                                <th>
+                                    {{phrase.role}}
+                                </th>
+                            </tr>
+                            <tr ng-repeat="user in transport_members">
+                                <td>
+                                    <img alt="{{user.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+user.id}}">
+                                    <a href="" ng-click="teacherProfile( user.id )">{{user.fullName}}</a>
+                                </td>
+                                <td>{{user.username}}</td>
+                                <td>{{user.email}}</td>
+                                <td>{{user.role}}</td>
+                            </tr>
+                            <tr ng-show="!transport_members.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -4,5 +4,5 @@
 /server
 Homestead.yaml
 Homestead.json
-sftp-config.json
 .env
+sftp-config.json

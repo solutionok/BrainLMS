@@ -1,0 +1,115 @@
+<style type="text/css">
+	table * {
+		font-size: 14px;
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">User logs</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+		<div class="col-0 hidden advSearch">
+        <div class="card card-outline-info">
+            <div class="card-header">
+                <a ng-click="toggleSearch(); resetSearch();" class="closeButt pull-right">x</a>
+                <h4 class="m-b-0 text-white">{{phrase.advSearch}}</h4>
+            </div>
+            <div class="card-block">
+                <form class="form-horizontal" name="searchForm" ng-submit="searchDB(1)" role="form" novalidate>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" class="form-control" ng-model="searchInput.username">
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.from}}</label>
+                        <input type="text" class="form-control" ng-model="searchInput.fromDate" date-picker id="search1">
+                    </div>
+                    <div class="form-group">
+                        <label>{{phrase.to}}</label>
+                        <input type="text" class="form-control" ng-model="searchInput.toDate" date-picker id="search2">
+                    </div>
+                    <div class="form-group">
+                        <label>Module</label>
+                        <select class="form-control" ng-model="searchInput.module">
+                        	<option value=""></option>
+                        	<option value="users">Users</option>
+                        	<option value="payments">Payments</option>
+                        	<option value="reports">Reports</option>
+                        	<option value="classes">Classes</option>
+                        	<option value="sections">Sections</option>
+                        	<option value="attendance">Attendance</option>
+                        	<option value="homework">Homework</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>User role</label>
+                        <select class="form-control" ng-model="searchInput.user_role">
+                        	<option value=""></option>
+                        	<option value="admin">Admin</option>
+                        	<option value="teacher">Teacher</option>
+                        	<option value="parent">Parent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                      <button type="submit" class="btn btn-info waves-effect waves-light">{{phrase.advSearch}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 listContent">
+        <div class="card">
+            <div class="card-block">
+            		<button ng-click="toggleSearch()" class="btn pull-right btn-success card-block-input-item">{{phrase.advSearch}}</button>
+                <div
+                	ng-show="$root.can('Reports.Reports')"
+                	ng-if="user_logs.length"
+                	class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" href="index.php/user-logs/export/excel" target="_BLANK">{{phrase.ExportExcel}}</a>
+                            <!-- <a class="dropdown-item" href="index.php/user-logs/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a> -->
+                        </div>
+                    </div>
+                </div>
+                <h4 class="card-title">All actions</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <!-- <th>Action ID</th> -->
+                                <th>User info.</th>
+                                <th>Module</th>
+                                <th>Action</th>
+                                <th>Payload</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody dir-paginate="log in user_logs | itemsPerPage:50" total-items="totalItems">
+                            <tr>
+                                <!-- <td>#{{log.id}}</td> -->
+                                <td ng-bind-html="log.user_info"></td>
+                                <td>{{log.module_name}}</td>
+                                <td>{{log.action}}</td>
+                                <td ng-bind-html="log.payload"></td>
+                                <td>{{log.current_date}}</td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-show="user_logs.length == '0'">
+                        	<tr><td class="noTableData" colspan="6">No logs recorded</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

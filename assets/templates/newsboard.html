@@ -1,0 +1,222 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.newsboard}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('newsboard.addNews')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addNews}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" tooltip title="{{phrase.minCharLength3}}" name="table_search" ng-model="searchText" ng-change="searchDB()" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listNews}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.newsTitle}}</th>
+                                <th>{{phrase.newsContent}}</th>
+                                <th>{{phrase.for}}</th>
+                                <th ng-show="$root.can('newsboard.editNews') || $root.can('newsboard.delNews')">{{phrase.visibleCMS}}</th>
+                                <th style="width:170px;" ng-show="$root.can('newsboard.editNews') || $root.can('newsboard.delNews')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr dir-paginate="news in newsboard | itemsPerPage:20" total-items="totalItems">
+                                <td>
+                                    <a ng-show="$root.can('newsboard.View')" href="portal#/newsboard/{{news.id}}">{{news.newsTitle}}</a>
+                                    <span ng-show="!$root.can('newsboard.View')">{{news.newsTitle}}</span>
+                                </td>
+                                <td><div ng-bind-html="news.newsText"></div></td>
+                                <td>{{news.newsFor}}</td>
+                                <td ng-show="$root.can('newsboard.editNews') || $root.can('newsboard.delNews')">
+                                    <i ng-class="{'color_red':news.fe_active != 1,'color_green':news.fe_active == 1}" class="fa fa-lightbulb-o"></i>
+                                </td>
+                                <td ng-show="$root.can('newsboard.editNews') || $root.can('newsboard.delNews')">
+                                    <button ng-show="$root.can('newsboard.editNews')" ng-click="fe_status(news.id,$index)" type="button" class="btn btn-warning btn-circle" title="{{phrase.toggleCMS}}" tooltip><i class="fa fa-lightbulb-o"></i></button>
+                                    <button ng-show="$root.can('newsboard.editNews')" ng-click="edit(news.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('newsboard.delNews')" ng-click="remove(news,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!newsboard.length"><td class="noTableData" colspan="5">{{phrase.noNews}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addNews}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addNews" role="form" ng-upload="saveAdd(content)" method="post" action="{{'index.php/newsboard'}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addNews.newsTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.newsTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="newsTitle" ng-model="form.newsTitle" class="form-control" required placeholder="{{phrase.newsTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addNews.newsText.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.newsContent}} *</label>
+                            <div class="col-sm-10">
+                                <textarea ck-editor name="newsText" class="form-control" required ng-model="form.newsText" placeholder="{{phrase.newsContent}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addNews.newsFor.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.for}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.newsFor" name="newsFor" required>
+                                    <option value="all">{{phrase.all}}</option>
+                                    <option value="teacher">{{phrase.teachers}}</option>
+                                    <!-- <option value="student">{{phrase.students}}</option> -->
+                                    <option value="parent">{{phrase.parents}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row"  ng-class="{'has-error': addNews.newsDate.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Date}} *</label>
+                            <div class="col-sm-10">
+                                <input date-picker type="text" id="datemask" name="newsDate" ng-model="form.newsDate" required class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Image}} *</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="newsImage">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addNews.fe_active.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.visibleCMS}} *</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="fe_active" value="1" ng-model="form.fe_active" required>
+                                        {{phrase.Active}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="fe_active" value="0" ng-model="form.fe_active" required>
+                                        {{phrase.Inactive}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0 row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addNews.$invalid">{{phrase.addNews}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editNews}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editNews" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/newsboard/'+form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editNews.newsTitle.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.newsTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="newsTitle" ng-model="form.newsTitle" class="form-control" required placeholder="{{phrase.newsTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editNews.newsText.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.newsContent}} *</label>
+                            <div class="col-sm-10">
+                                <textarea ck-editor name="newsText" class="form-control" required ng-model="form.newsText" placeholder="{{phrase.newsContent}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editNews.newsFor.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.for}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.newsFor" name="newsFor" required>
+                                    <option value="all">{{phrase.all}}</option>
+                                    <option value="teacher">{{phrase.teachers}}</option>
+                                    <!-- <option value="student">{{phrase.students}}</option> -->
+                                    <option value="parent">{{phrase.parents}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row"  ng-class="{'has-error': editNews.newsDate.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Date}} *</label>
+                            <div class="col-sm-10">
+                                <input date-picker type="text" id="datemaskEdit" name="newsDate" ng-model="form.newsDate" required class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Image}} *</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="newsImage">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editNews.fe_active.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.visibleCMS}} *</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="fe_active" value="1" ng-model="form.fe_active" required>
+                                        {{phrase.Active}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="fe_active" value="0" ng-model="form.fe_active" required>
+                                        {{phrase.Inactive}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editNews.$invalid">{{phrase.editNews}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.read">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{newsTitle}}</h4>
+                <div class="table-responsive">
+
+                    <div ng-bind-html="newsText"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

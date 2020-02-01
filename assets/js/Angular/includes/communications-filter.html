@@ -1,0 +1,191 @@
+<style type="text/css">
+	.filter-view {
+		border: 3px solid #009efb;
+		border-radius: 0 0 7px 7px;
+		padding: 10px;
+		margin-top: 10px;
+	}
+	.filter-view-arrow {
+		left: 47%;
+		content:"";
+		position: absolute;
+		top: 100%;
+		border-color: #009efb transparent;
+		border-style: solid;
+		border-width: 8px 8px 0px 8px;
+		height: 0px;
+		width: 0px;
+	}
+</style>
+
+<div class="row">
+	<label class="col-sm-2 col-md-2 text-right control-label col-form-label">
+  	Choose Recipients (Filter)
+  </label>
+	<div class="col-3">
+		<button type="button" class="btn btn-info btn-block" ng-click="changeFilterView('students')" style="position: relative;">
+			Students
+			<div><b>Selected students ({{ choosen_students_ff.length }})</b></div>
+			<div class="filter-view-arrow" ng-show="filter_view.students"></div>
+		</button>
+	</div>
+	<div class="col-3">
+		<button type="button" class="btn btn-info btn-block" ng-click="changeFilterView('teachers')" style="position: relative;">
+			Teachers
+			<div><b>Selected teachers ({{ choosen_teachers_ff.length }})</b></div>
+			<div class="filter-view-arrow" ng-show="filter_view.teachers"></div>
+		</button>
+	</div>
+	<div class="col-4">
+		<button type="button" class="btn btn-info btn-block" ng-click="changeFilterView('non_teaching_staff')" style="position: relative;">
+			Users
+			<div><b>Selected users ({{ choosen_NTS_ff.length }})</b></div>
+			<div class="filter-view-arrow" ng-show="filter_view.non_teaching_staff"></div>
+		</button>
+	</div>
+	<div class="col-2"></div>
+	<div class="col-10" ng-show="filter_view.students">
+		<div class="filter-view filter-view-students">
+			<button type="button" class="close text-danger" ng-click="closeFilterView('students')" style="z-index: 30;position: absolute;right: 24px;top: 17px;">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+			<div class="row">
+				<div class="col-6">
+					<label class="control-label mb-3">Class</label>
+    			<select class="form-control select-checkbox" ng-show="classes.length" ng-model="$parent.selectedClassFilterStudent" ng-change="checkChangeClassFilter()" multiple style="max-height: 120px;">
+    				<option value="0" class="select-all text-primary" disabled>-- Choose class --</option>
+    				<option ng-repeat="class in classes" value="{{ class.id }}">{{ class.className }}</option>
+    			</select>
+    			<small>Press <code>ctrl</code> for multi select</small><br>
+			    <small>Press <code>shift</code> for group select</small>
+    			<hr>
+    			<label class="control-label mb-2">Section</label>
+    			<select class="form-control" ng-show="!sections.length" ng-disabled="!sections.length">
+    				<option>Please select class</option>
+    			</select>
+    			<select class="form-control" ng-show="sections.length" ng-model="$parent.selectedSectionFilterStudent" ng-change="checkChangeSectionFilter()">
+    				<option value="0" class="text-danger">-- All sections --</option>
+    				<option ng-repeat="section in sections" value="{{ section.id }}">{{ section.sectionName }}</option>
+    			</select>
+    			<small class="text-danger" ng-if="noSectionsWithThatClass">There's no sections with that class</small>
+				</div>
+				<div class="col-6" style="border-left: 1px solid #EDEDED">
+					<label class="control-label mb-2">Target Students</label>
+					<div ng-show="targetStudentsFF.length">
+  					<select class="form-control select-checkbox" ng-model="$parent.choosen_students_ff" ng-change="checkChangeTargetStudents()" multiple style="min-height: 140px; margin-top: 0">
+      				<option value="0" class="select-all text-danger">-- All Students --</option>
+      				<option ng-repeat="student in targetStudentsFF" value="{{ student.id }}">
+        				Name: {{ student.fullName }} &nbsp; - &nbsp; RollId: {{ student.studentRollId }}
+        			</option>
+      			</select>
+      			<small>Press <code>ctrl</code> for multi select</small><br>
+				    <small>Press <code>shift</code> for group select</small>
+					</div>
+    			<select class="form-control" ng-show="!targetStudentsFF.length" ng-disabled="!targetStudentsFF.length">
+    				<option>Please select class</option>
+    			</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-10" ng-show="filter_view.teachers">
+		<div class="filter-view filter-view-teachers">
+			<button type="button" class="close text-danger" ng-click="closeFilterView('teachers')" style="z-index: 30;position: absolute;right: 24px;top: 17px;">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+  		<div class="row">
+  			<div class="col-6">
+					<label class="control-label mb-3">Class</label>
+    			<select class="form-control select-checkbox" ng-show="classes.length" ng-model="$parent.selectedClassFilterTeacher" ng-change="checkChangeClassFilter()" multiple style="max-height: 120px;">
+    				<option value="0" class="select-all text-primary" disabled>-- Choose class --</option>
+    				<option ng-repeat="class in classes" value="{{ class.id }}">{{ class.className }}</option>
+    			</select>
+    			<small>Press <code>ctrl</code> for multi select</small><br>
+			    <small>Press <code>shift</code> for group select</small>
+    			<hr>
+
+    			<label class="control-label mb-2">Section</label>
+    			<select class="form-control" ng-show="!sections.length" ng-disabled="!sections.length">
+    				<option>Please select class</option>
+    			</select>
+    			<select class="form-control" ng-show="sections.length" ng-model="$parent.selectedSectionFilterTeacher" ng-change="checkChangeSectionFilter()">
+    				<option value="0" class="text-danger">-- All sections --</option>
+    				<option ng-repeat="section in sections" value="{{ section.id }}">{{ section.sectionName }}</option>
+    			</select>
+    			<small class="text-danger" ng-if="noSectionsWithThatClass">There's no sections with that class</small>
+    			<br><br>
+
+    			<label class="control-label mb-2">Subject</label>
+    			<select class="form-control" ng-show="!subjects.length" ng-disabled="!subjects.length">
+    				<option>Please select class</option>
+    			</select>
+    			<select class="form-control" ng-show="subjects.length" ng-model="$parent.selectedSubjectFilterTeacher" ng-change="checkChangeSubjectFilter()">
+    				<option value="0" class="text-danger">-- All subjects --</option>
+    				<option ng-repeat="subject in subjects" value="{{ subject.id }}">{{ subject.subjectTitle }}</option>
+    			</select>
+    			<small class="text-danger" ng-if="noSubjectsWithThatClass">There's no subjects with that class</small>
+				</div>
+  			<div class="col-6" style="border-left: 1px solid #EDEDED">
+  				<label class="control-label mb-2">Target Teachers</label>
+  				<div ng-show="targetTeachersFF.length">
+  					<select class="form-control select-checkbox" ng-model="$parent.choosen_teachers_ff" ng-change="checkChangeTargetTeachers()" multiple style="min-height: 140px; margin-top: 0">
+      				<option value="0" class="select-all text-danger">-- All teachers --</option>
+      				<option ng-repeat="teacher in targetTeachersFF" value="{{ teacher.id }}">
+        				Name: {{ teacher.fullName }} &nbsp; - &nbsp; Emp.ID: {{ teacher.id }}
+        			</option>
+      			</select>
+      			<small>Press <code>ctrl</code> for multi select</small><br>
+				    <small>Press <code>shift</code> for group select</small>
+					</div>
+    			<select class="form-control" ng-show="!targetTeachersFF.length" ng-disabled="!targetTeachersFF.length">
+    				<option>Please select class</option>
+    			</select>
+  			</div>
+  		</div>
+  	</div>
+	</div>
+	<div class="col-10" ng-show="filter_view.non_teaching_staff">
+		<div class="filter-view filter-view-nts">
+			<button type="button" class="close text-danger" ng-click="closeFilterView('nts')" style="z-index: 30;position: absolute;right: 24px;top: 17px;">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+  		<div class="row">
+  			<div class="col-4">
+					<label class="control-label mb-2">Department</label>
+    			<select class="form-control" ng-show="departments.length" ng-model="$parent.selectedDepartmentFilterNTS" ng-change="checkChangeDepartmentFilter()">
+    				<option value="0">-- Choose Dep. --</option>
+    				<option ng-repeat="department in departments" value="{{ department.id }}">{{ department.role_title }}</option>
+    			</select>
+				</div>
+  			<div class="col-8" style="border-left: 1px solid #EDEDED">
+  				<label class="control-label mb-2">Users</label>
+  				<div ng-show="targetNTSFF.length">
+  					<select class="form-control select-checkbox" ng-model="$parent.choosen_NTS_ff" ng-change="checkChangeTargetNTS()" multiple style="min-height: 140px; margin-top: 0">
+      				<option value="0" class="select-all text-danger">-- All Users --</option>
+      				<option ng-repeat="user in targetNTSFF" value="{{ user.id }}">
+        				Name: {{ user.fullName }} &nbsp; - &nbsp; ID: {{ user.id }}
+        			</option>
+      			</select>
+      			<small>Press <code>ctrl</code> for multi select</small><br>
+				    <small>Press <code>shift</code> for group select</small>
+					</div>
+					<div ng-show="!targetNTSFF.length">
+      			<select class="form-control" ng-disabled="!targetNTSFF.length">
+      				<option>Please select users</option>
+      			</select>
+      			<small class="text-danger" ng-if="noUsersWithThatDepartment">There's no users with that department</small>
+					</div>
+  			</div>
+  		</div>
+  	</div>
+	</div>
+	<div class="col-2"></div>
+	<div class="col-10" ng-show="form.toId2.length" style="margin-top: 5px">
+		<hr>
+		<h5>Custom users filter</h5>
+		<a class="message-user" href="javascript:void(0)" ng-repeat="user in form.toId2">
+    	<img src="{{'index.php/dashboard/profileImage/'+user.id}}" alt="user" style="width:35px;height: 35px;" class="img-circle">
+    	{{user.name}}
+    </a>
+	</div>
+</div>

@@ -1,0 +1,292 @@
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/redmond/jquery-ui.css" />
+
+<style type="text/css">
+	.days-of-week-tabs .tab-pane {
+		padding: 10px;
+		background: #FFF;
+	}
+
+	.scroll-style::-webkit-scrollbar-track {
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		background-color: #F5F5F5;
+	}
+	.scroll-style::-webkit-scrollbar {
+		height: 8px;
+		background-color: #F5F5F5;
+	}
+	.scroll-style::-webkit-scrollbar-thumb {
+		background-color: #888;
+	}
+
+	.timetables {
+		align-items: stretch;
+	  display: flex;
+	  flex-direction: row;
+	  flex-wrap: wrap;
+	  overflow-x: visible;
+	  /*overflow-y: overlay;*/
+	}
+	.timetables > .card {
+		max-width: 127px;
+	  border: 2px solid #999;
+	  padding: 4px;
+	  flex-basis: 127px;
+	  flex-grow: 0;
+	  flex-shrink: 0;
+	  margin-bottom: 5px;
+	}
+	.timetables input {
+		text-align: center;
+	}
+
+	.add-new-period-card {
+		max-width: 127px;
+	  border: 2px dashed green !important;
+	  padding: 4px;
+	  flex-basis: 127px;
+	  flex-grow: 0;
+	  flex-shrink: 0;
+	  font-size: 60px;
+	  cursor: pointer;
+	  margin-bottom: 5px;
+	  opacity: 0.7;
+	  -webkit-transition: all 0.5s;
+		transition: all 0.5s;
+	}
+	.add-new-period-card:hover {
+		opacity: 1;
+	}
+	input[type="text"]:disabled{
+		background-color: #EEE;
+	}
+
+	.search-typeahead .dropdown-item {
+		padding: 5px !important;
+	}
+	.timetable-searcher .dropdown {
+		margin-top: 25px;
+		position: absolute;
+		left: 15px !important;
+		/*margin-left: 40px;*/
+		/*clear: both;*/
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-12 align-self-center">
+        <div class="pull-right card-block-input-group card-block-input-item">
+            <div class="btn-group no-print" ng-if="server_info.server_type == 'sxd'">
+                <button type="button" class="btn btn-success btn-flat">Download Timetable</button>
+                <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                </button>
+                <div class="dropdown-menu" role="menu">
+                    <a class="dropdown-item" href="index.php/classschedule/export-full-timetables">Full timetable (Excel)</a>
+                    <a class="dropdown-item" href="index.php/classschedule/export-juniors-timetables">Juniors timetable (Excel)</a>
+                    <a class="dropdown-item" href="index.php/classschedule/export-seniors-timetables">Seniors timetable (Excel)</a>
+                </div>
+            </div>
+        </div>
+        <button class="pull-right btn btn-success mr-1" ng-click="importTimetable()">
+      		Import timetable (Excel)
+      	</button>
+      	<h3 class="text-themecolor">Institution Timetable (teacher-wise)</h3>
+      	<hr style="margin-top: 15px; margin-bottom: 5px">
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="card" style="background: transparent;">
+			<div class="card-block">
+				<ul class="nav nav-tabs justify-content-around" role="tablist">
+				  <li class="nav-item" ng-repeat="day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']">
+				    <a class="nav-link"
+				    	data-toggle="tab"
+				    	ng-class="{'active': currentDisplayDay == day}"
+				    	aria-controls="{{ day }}"
+				    	ng-click="changeDisplayDay(day)"
+				    	href="#{{ day }}" role="tab"
+				    	aria-selected="true">{{ day }}</a>
+				  </li>
+				</ul>
+				<div class="tab-content days-of-week-tabs" style="background: #FFF">
+				  <div class="tab-pane pt-3 fade"
+				  	ng-repeat="day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']"
+				  	ng-class="{'show active': day == 'Monday'}"
+				  	id="{{ day }}" role="tabpanel" aria-labelledby="{{ day }}-tab">
+					  	<div ng-if="!loading">
+					  		<div class="row">
+					  			<div class="col-md-5" style="border-right: 1px solid #CCC">
+					  				<div class="assign-teacher">
+								  		<input type="text"
+								  			name="new_teacher" autocomplete="false"
+								  			ng-model="new_teacher" class="form-control mb-1"
+								  			ng-keypress="changeAssignInputValue()"
+								  			typeahead="all_teachers" typeahead-callback="callbackTeachers"
+								  			placeholder="Type teacher name">
+								  		<small class="text-muted mb-2">Please type teacher name to start assigning</small><br>
+									  	<button class="btn btn-success mt-2"
+									  		ng-disabled="new_teacher.length <= 2 || disabledAssignTeacherBtn"
+									  		ng-click="assignNewTeacher()">
+										  		<i class="fa fa-plus"></i>
+										  		Assign new teacher
+									  	</button>
+								  	</div>
+					  			</div>
+					  			<div class="col-md-7 timetable-searcher">
+					  				<div class="form-inline">
+					  					<input type="text" ng-model="search.teacher_name"
+					  						style="width: 60%"
+					  						typeahead="all_teachers" typeahead-callback="callbackSearchTeacher"
+					  						class="form-control"
+					  						placeholder="Search for any teacher by his ID, name or phone number">
+					  					<button class="btn btn-primary ml-2"
+					  						style="padding: 9px 15px 10px 15px;"
+						  					ng-click="searchForTeacher()">
+						  					<i class="fa fa-search"></i>
+						  				</button>
+					  					<button class="btn btn-primary ml-2"
+					  						style="padding: 9px 15px 10px 15px;"
+					  						ng-disabled="!searchStatus"
+						  					ng-click="resetSearchStatus()">
+						  					<i class="fa fa-refresh"></i>&nbsp; reset filter
+						  				</button>
+					  				</div>
+				  					<div ng-if="timetable.length > 0">
+						  				<dir-pagination-controls
+						  					class="mt-4" style="float: left;"
+						  					ng-if="timetable.length > 0 && !searchStatus"
+						  					on-page-change="pageChanged(newPageNumber)"
+						  					template-url="assets/templates/dirPagination.html" >
+						  				</dir-pagination-controls>
+				  					</div>
+					  			</div>
+					  		</div>
+						  	<hr>
+					  		<div ng-if="timetable.length > 0">
+							  	<div class="item-row row mb-2 pb-2"
+							  		dir-paginate="(_key,_item) in timetable | itemsPerPage:10"
+							  		total-items="totalItems * 2"
+							  		style="margin: auto 0px; border-bottom: 2px solid #2d2d2d;">
+							  		<div class="col-2" style="padding-right: 0; padding-left: 0">
+								  		<div class="teacher">
+								  			<b>
+								  				{{ pluckAllTeachers[_item[0]] }}<br>
+								  				ID: {{ _item[0] }}
+								  			</b><br>
+								  			<button class="btn btn-outline-success btn-sm mt-2" ng-click="addNewPeriod(_key)" title="Add new period" tooltip>
+								  				<i class="fa fa-plus"></i>
+								  			</button>
+								  			<!-- <button class="btn btn-outline-warning btn-sm mt-2" ng-click="removeAllPeriods(_key, _item[0])" title="Remove all periods" tooltip>
+								  				<i class="fa fa-minus"></i>
+								  			</button> -->
+								  			<button class="btn btn-outline-danger btn-sm mt-2" ng-click="excludeTeacher(_key, _item[0])" title="Exclude teacher" tooltip>
+								  				<i class="fa fa-trash-o"></i>
+								  			</button>
+								  		</div>
+							  		</div>
+							  		<div class="col-10" style="padding-right: 0">
+								  		<div class="timetables scroll-style mr-2">
+								  			<div class="card mr-1" ng-repeat="period in _item[1] | toArray | orderBy:'_startTime':false">
+									  				<div class="times justify-content-between mb-1" style="display: flex;">
+								  						<input type="text" name="startTime"
+								  							ng-model="period.startTime"
+								  							data-period-id="{{period.id}}"
+								  							data-period-rand-id="{{period.rand_id}}"
+								  							data-time-type="startTime"
+								  							placeholder="Start at"
+								  							class="form-control form-control-sm pickup-time"
+								  							ng-disabled="period.disabled_status" style="width: 49%; padding: 4px 0">
+								  						<input type="text" name="endTime"
+								  							ng-model="period.endTime"
+								  							data-period-id="{{period.id}}"
+								  							data-period-rand-id="{{period.rand_id}}"
+								  							data-time-type="endTime"
+								  							placeholder="End at"
+								  							class="form-control form-control-sm pickup-time"
+								  							ng-disabled="period.disabled_status" style="width: 49%; padding: 4px 0">
+									  				</div>
+									  				<div class="times justify-content-between mb-1" style="display: flex;">
+								  						<input type="text" name="class_name"
+								  							ng-model="period.class_name" placeholder="Class"
+								  							class="form-control form-control-sm"
+								  							typeahead="all_classes" typeahead-callback="callbackClasses"
+								  							ng-disabled="period.disabled_status" style="width: 60%; padding: 4px">
+								  						<input type="text" name="section_name"
+								  							ng-model="period.section_name" placeholder="Section"
+								  							class="form-control form-control-sm"
+								  							ng-keypress="typing($event, 'section', period.section_name)"
+								  							typeahead="custom_sections" typeahead-callback="callbackSections"
+								  							ng-disabled="period.disabled_status" style="width: 38%">
+									  				</div>
+									  				<input type="text" name="subject_name"
+									  					ng-model="period.subject_name" placeholder="Subject"
+									  					typeahead="all_subjects" typeahead-callback="callbackSubjects"
+									  					ng-disabled="period.disabled_status"
+									  					class="form-control form-control-sm">
+									  				<div class="mt-1 justify-content-between" style="display: flex;">
+										  				<button class="btn btn-sm"
+										  					ng-class="{
+										  						'btn-outline-info': period.disabled_status,
+										  						'btn-info': !period.disabled_status,
+										  					}"
+										  					ng-click="updatePeriod(period.id)"
+										  					title="Update" tooltip style="width: 49%">
+											  				<i class="fa fa-edit"></i>
+											  			</button>
+											  			<!-- <button class="btn btn-outline-warning btn-sm" ng-click="resetPeriod(period.id)" ng-disabled="period.disabled_status" title="Reset content" tooltip style="width: 32%">
+											  				<i class="fa fa-refresh"></i>
+											  			</button> -->
+											  			<button class="btn btn-outline-danger btn-sm" ng-click="removePeriod(period.id)" title="Remove" tooltip style="width: 49%">
+											  				<i class="fa fa-minus"></i>
+											  			</button>
+									  				</div>
+								  			</div>
+								  			<div class="card mr-1 d-flex justify-content-center align-items-center add-new-period-card"
+								  				ng-click="addNewPeriod(_key)"
+								  				style="height: 130px;"
+								  				title="Add new period" tooltip>
+												  <i class="fa fa-plus text-success"></i>
+								  			</div>
+								  		</div>
+							  		</div>
+							  	</div>
+							  </div>
+							  <div ng-if="timetable.length <= 0" class="text-center pb-1">
+					  			There's no assigned teachers
+					  		</div>
+						  	<button class="btn btn-primary pull-left"
+						  		ng-click="saveAllChanges()"
+						  		ng-if="timetable.length > 0"
+						  		style="margin-top: 6px">Save all changes</button>
+						  	<dir-pagination-controls
+						  		class="pull-right"
+						  		ng-if="timetable.length > 0 && !searchStatus"
+						  		on-page-change="pageChanged(newPageNumber)"
+						  		template-url="assets/templates/dirPagination.html"></dir-pagination-controls>
+						  	<div style="clear: both;"></div>
+					  	</div>
+					  	<div ng-if="loading">Loading...</div>
+				  </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<modal visible="ImportModalStatus">
+	<form class="form-horizontal" ng-upload="saveImported(content)" method="post" action="{{'index.php/classschedule/import/excel'}}" name="importData" role="form" novalidate>
+      <div class="form-group" style="border: 2px dashed #EEE; padding: 10px;">
+          <label class="control-label">{{phrase.fileToImport}}</label><br>
+          <input class="mt-2" type="file" name="excelcsv"><br>
+          <small class="mt-2" style="display: block;">File must be in excel or csv extension</small>
+      </div>
+     	<small class="text-danger">Previous timetable data will overwritten, so make sure you are taken a copy</small>
+			<br>
+			<button type="submit" class="btn btn-info btn-default" ng-disabled="importData.$invalid || $isUploading">
+				{{phrase.Import}}
+			</button>
+  </form>
+</modal>

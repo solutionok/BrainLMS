@@ -1,0 +1,32 @@
+repository: git@github.com:romaricp/kit-starter-symfony-4-docker.git
+platforms:
+    development:
+        default_branch: master
+        max_releases: 2
+        servers:
+            dddv-server:
+                host: 10.128.12.12
+                user: dev
+                password: %dev_password%
+                path: /home/wwwroot/sf4
+    preprod:
+        default_branch: preprod
+        max_releases: 2
+        servers:
+            pddv-server:
+                host: 10.128.12.13
+                user: dev
+                password: %preprod_password%
+                path: /home/wwwroot/sf4
+shared_files:
+    - .env
+shared_folders:
+    - public/upload
+on_deploy:
+    - "composer install"
+    - "setfacl -R -m u:www-data:rwX -m u:`whoami`:rwX var"
+    - "setfacl -dR -m u:www-data:rwX -m u:`whoami`:rwX var"
+    - "php bin/console c:c --env=prod --no-debug"
+post_deploy:
+    - "php bin/console doctrine:schema:update --force"
+    - "php bin/console cache:war --no-debug"

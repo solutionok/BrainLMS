@@ -1,0 +1,116 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.mailsmsTemplates}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addTemplate}}</button>
+                <h4 class="card-title">{{phrase.listTemplates}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.templateTitle}}</th>
+                                <th>{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="template in templates | filter:searchText">
+                                <td>{{template.templateTitle}}</td>
+                                <td>
+                                    <button ng-click="edit(template.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-click="remove(template,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!templates.length"><td class="noTableData" colspan="4">{{phrase.noTemplates}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.addTemplate}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editTemplate" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.templateTitle}} </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="templateTitle" ng-model="form.templateTitle" class="form-control" required placeholder="{{phrase.templateTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mailTemplate}}</label>
+                            <div class="col-sm-10">
+                                <textarea ck-editor name="templateMail" class="form-control" ng-model="form.templateMail" placeholder="{{phrase.mailTemplate}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.smsTemplate}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="templateSMS" class="form-control" ng-model="form.templateSMS" placeholder="{{phrase.smsTemplate}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editTemplate.$invalid">{{phrase.addTemplate}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editTemplate}} : {{form.templateTitle}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editTemplate" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-show="form.templateVars != '' && form.templateVars != null">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.templateVars}} </label>
+                            <div class="col-sm-10">
+                                {{form.templateVars}}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.mailTemplate}}</label>
+                            <div class="col-sm-10">
+                                <textarea ck-editor name="templateMail" class="form-control" ng-model="form.templateMail" placeholder="{{phrase.mailTemplate}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.smsTemplate}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="templateSMS" class="form-control" ng-model="form.templateSMS" placeholder="{{phrase.smsTemplate}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editTemplate.$invalid">{{phrase.editTemplate}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

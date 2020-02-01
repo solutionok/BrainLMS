@@ -1,0 +1,179 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.studyMaterial}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('studyMaterial.addMaterial')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addMaterial}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text"  name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listStudyMaterial}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.materialTitle}}</th>
+                                <th>{{phrase.materialDesc}}</th>
+                                <th ng-show="$root.can('studyMaterial.Download') || $root.can('studyMaterial.editMaterial') || $root.can('studyMaterial.delMaterial')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="material in materials | filter:searchText">
+                                <td>{{material.material_title}}</td>
+                                <td>{{material.material_description}}</td>
+                                <td ng-show="$root.can('studyMaterial.Download') || $root.can('studyMaterial.editMaterial') || $root.can('studyMaterial.delMaterial')">
+                                    <a ng-show="$root.can('studyMaterial.Download')" target="_blank"
+                                    	ng-if="material.material_file != ''"
+                                    	href="{{'index.php/materials/download/'+material.id}}">
+                                    		<button type="button" class="btn btn-warning btn-circle" title="{{phrase.Download}}" tooltip>
+                                    			<i class="fa fa-cloud-download"></i>
+                                    		</button>
+                                    </a>
+                                    <button ng-show="$root.can('studyMaterial.editMaterial')" ng-click="edit(material.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('studyMaterial.delMaterial')" ng-click="remove(material,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="materials.length == '0'"><td class="noTableData" colspan="5">{{phrase.noMaterialData}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addMaterial}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addDorm" role="form" ng-upload="saveAdd(content)" role="form" method="post" action="index.php/materials" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addDorm.material_title.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.materialTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="material_title" ng-model="form.material_title" class="form-control" required placeholder="{{phrase.materialTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.materialDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="material_description" class="form-control" ng-model="form.material_description" placeholder="{{phrase.materialDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.materialFile}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="material_file" id="material_add_file">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addDorm['class_id[]'].$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.class_id" name="class_id[]" ng-change="sectionsList()" multiple required>
+                                    <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addDorm['sectionId[]'].$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                            <label class="col-sm-2 text-right control-label col-form-label">Sections *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.sectionId" name="sectionId[]" multiple ng-required="$root.dashboardData.enableSections == '1'">
+                                    <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addDorm.subject_id.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Subject}} </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.subject_id" name="subject_id">
+                                    <option ng-repeat="subjectOne in subject" value="{{subjectOne.id}}">{{subjectOne.subjectTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addDorm.$invalid">{{phrase.addMaterial}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editMaterial}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editMaterial" role="form" ng-upload="saveEdit(content)" role="form" method="post" action="{{'index.php/materials/' + form.id}}" enctype="multipart/form-data" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editMaterial.material_title.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.materialTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="material_title" ng-model="form.material_title" class="form-control" required placeholder="{{phrase.materialTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.materialDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="material_description" class="form-control" ng-model="form.material_description" placeholder="{{phrase.materialDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.materialFile}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="material_file" id="material_edit_file">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editMaterial['class_id[]'].$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.class_id" name="class_id[]" id="editClassId" multiple required>
+                                    <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editMaterial['sectionId[]'].$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                            <label class="col-sm-2 text-right control-label col-form-label">Sections *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.sectionId" name="sectionId[]" multiple ng-required="$root.dashboardData.enableSections == '1'">
+                                    <option ng-repeat="section in form.sections" value="{{section.id}}" ng-selected="isSectionSelected(form.sectionId,section.id)">{{section.sectionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editMaterial.subject_id.$invalid}">
+                            <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Subject}} </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.subject_id" name="subject_id">
+                                    <option ng-repeat="subjectOne in form.subject" value="{{subjectOne.id}}" ng-selected="subjectOne.id == form.subject_id">{{subjectOne.subjectTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editMaterial.$invalid">{{phrase.editMaterial}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

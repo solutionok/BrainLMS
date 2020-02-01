@@ -1,0 +1,288 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.classSch}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+            		<div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print" ng-if="server_info.server_type == 'sxd' && userRole == 'admin'">
+                        <button type="button" class="btn btn-success btn-flat">Download Timetable</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a
+                            	class="dropdown-item"
+                            	href="index.php/classschedule/export-full-timetables"
+                            	ng-if="server_info.server_type == 'sxd'">Full timetable (Excel)</a>
+                            <a
+                            	class="dropdown-item"
+                            	href="index.php/classschedule/export-juniors-timetables"
+                            	ng-if="server_info.server_type == 'sxd'">Juniors timetable (Excel)</a>
+                            <a
+                            	class="dropdown-item"
+                            	href="index.php/classschedule/export-seniors-timetables"
+                            	ng-if="server_info.server_type == 'sxd'">Seniors timetable (Excel)</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="pull-right btn btn-success mr-1" ng-click="importTimetable()" ng-if="userRole == 'admin'">
+              		Import timetable (Excel)
+              	</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text"  name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title" ng-show="userRole == 'admin'">{{phrase.classEditSch}}</h4>
+                <h4 class="card-title" ng-show="userRole != 'admin'">Timetable list</h4>
+                <div class="table-responsive">
+                    <div
+                    	ng-repeat="(key,value) in sections"
+                    	ng-show="$root.dashboardData.enableSections == '1'">
+                        <h4>{{key}}</h4>
+                        <table class="listTable table table-sm table-bordered table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>{{phrase.section}} </th>
+                                    <th>Act.</th>
+                                </tr>
+                                <tr ng-repeat="section in value | filter:searchText">
+                                    <td style="padding: 10px">
+                                    	{{section.sectionName}}
+                                    </td>
+                                    <td class="options">
+                                        <button ng-click="edit(section.classId,section.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.ReadSchedule}}" tooltip><i class="fa fa-fw fa-th-list"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <table
+                    	class="listTable table table-bordered table-hover"
+                    	ng-show="$root.dashboardData.enableSections != '1'">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.className}}</th>
+                                <th>Act.</th>
+                            </tr>
+                            <tr ng-repeat="class in classes | filter:searchText">
+                                <td>{{class.id}}</td>
+                                <td>{{class.className}}</td>
+                                <td class="options">
+                                    <button ng-click="edit(class.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.ReadSchedule}}" tooltip><i class="fa fa-fw fa-th-list"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!classes.length"><td class="noTableData" colspan="3">{{phrase.NoClasses}}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn no-print pull-right btn-danger card-block-input-item">{{phrase.Return}}</button>
+                <button onclick="window.print();" class="btn no-print pull-right btn-success card-block-input-item">{{phrase.Print}}</button>
+                <h4 class="card-title no-print">
+                	{{phrase.class}}: {{classSchedule.class.className}}
+                	<span ng-show="classSchedule.section">- Section: {{classSchedule.section.sectionName}}</span>
+                </h4>
+                <div class="table-responsive">
+                    <form class="form-horizontal" name="editDorm" role="form" ng-submit="saveEdit()" novalidate>
+                        <table class="table table-bordered table-hover">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 10px">{{phrase.Day}}</th>
+                                    <th>{{phrase.ClassSchedule}}</th>
+                                    <th ng-show="$root.can('classSch.addSch')" class="no-print" style="width: 10px">{{phrase.addSch}}</th>
+                                </tr>
+                                <tr ng-repeat="(key,sch) in classSchedule.schedule">
+                                    <td>{{sch.dayName}}</td>
+                                    <td>
+                                        <div class="btn-group" ng-repeat="subSch in sch.sub" style="margin:5px;">
+                                            <button type="button" class="btn btn-sm btn-info"
+                                            	ng-class="{'dropdown-toggle': $root.can('classSch.editSch') || $root.can('classSch.delSch')}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            	{{subSch.subjectId}} - {{subSch.start}} -> {{subSch.end}}<br>
+                                            	{{subSch.teacherName}}
+                                            </button>
+                                            <div ng-if="$root.can('classSch.editSch') || $root.can('classSch.delSch')" class="dropdown-menu">
+                                                <a ng-show="$root.can('classSch.editSch')" class="dropdown-item" ng-click="editSubOne(subSch.id,key)">{{phrase.Edit}}</a>
+                                                <a ng-show="$root.can('classSch.delSch')" class="dropdown-item" ng-click="removeSub(subSch.id,key)">{{phrase.Remove}}</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td ng-show="$root.can('classSch.addSch')" class="no-print">
+                                        <button ng-click="addSubOne(key)" type="button" class="btn btn-info btn-circle"><i class="fa fa-fw fa-plus"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="scheduleModal">
+    <form class="form-horizontal" name="addSubForm" role="form" ng-submit="saveAddSub()" novalidate>
+        <div class="form-group row" ng-class="{'has-error': addSubForm.subjectId.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.Subject}} *</label>
+            <div class="col-sm-8">
+                <select class="form-control" ng-model="form.subjectId" required name="subjectId">
+                    <option ng-repeat="subjectOne in subject" value="{{subjectOne.id}}">{{subjectOne.subjectTitle}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': addSubForm.dayOfWeek.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.Day}} *</label>
+            <div class="col-sm-8">
+                <select class="form-control" ng-model="form.dayOfWeek" required name="dayOfWeek">
+                    <option ng-repeat="(key, value) in days" value="{{key}}">{{value}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': addSubForm.dayOfWeek.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.teacher}} *</label>
+            <div class="col-sm-8">
+                <select class="form-control" ng-model="form.teacherId" required name="teacherId">
+                    <option ng-repeat="value in teachers" value="{{value.id}}">{{value.fullName}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': addSubForm.startTimeHour.$invalid || addSubForm.startTimeMin.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.startTime}} *</label>
+            <div class="col-sm-8">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.startTimeHour" required name="startTimeHour">
+                            <option ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]" value="{{i}}">{{i}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.startTimeMin" required name="startTimeMin">
+                            <option ng-repeat="i in [00,05,10,15,20,25,30,35,40,45,50,55]" value="{{i}}">{{i}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': addSubForm.endTimeHour.$invalid || addSubForm.endTimeMin.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.endTime}} *</label>
+            <div class="col-sm-8">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.endTimeHour" required name="endTimeHour">
+                            <option ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]" value="{{i}}">{{i}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.endTimeMin" required name="endTimeMin">
+                            <option ng-repeat="i in [00,05,10,15,20,25,30,35,40,45,50,55]" value="{{i}}">{{i}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addSubForm.$invalid">{{phrase.addSch}}</button>
+            </div>
+        </div>
+    </form>
+</modal>
+
+<modal visible="scheduleModalEdit">
+    <form class="form-horizontal" name="editSubForm" role="form" ng-submit="saveEditSub(form.id)" novalidate>
+        <div class="form-group row" ng-class="{'has-error': editSubForm.subjectId.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.Subject}} *</label>
+            <div class="col-sm-8">
+                <select class="form-control" ng-model="form.subjectId" required name="subjectId">
+                    <option ng-repeat="subjectOne in subject" value="{{subjectOne.id}}">{{subjectOne.subjectTitle}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': editSubForm.dayOfWeek.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.Day}} *</label>
+            <div class="col-sm-8">
+                <select class="form-control" ng-model="form.dayOfWeek" required name="dayOfWeek">
+                    <option ng-repeat="(key, value) in days" value="{{key}}">{{value}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': addSubForm.dayOfWeek.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.teacher}} *</label>
+            <div class="col-sm-8">
+                <select class="form-control" ng-model="form.teacherId" required name="teacherId">
+                    <option ng-repeat="value in teachers" value="{{value.id}}">{{value.fullName}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': editSubForm.startTimeHour.$invalid || editSubForm.startTimeMin.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.startTime}} *</label>
+            <div class="col-sm-8">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.startTimeHour" required name="startTimeHour">
+                            <option ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]" value="{{i}}">{{i}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.startTimeMin" required name="startTimeMin">
+                            <option ng-repeat="v in [0,5,10,15,20,25,30,35,40,45,50,55]" value="{{v}}">{{v}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': editSubForm.endTimeHour.$invalid || editSubForm.endTimeMin.$invalid}">
+            <label class="col-sm-4 control-label">{{phrase.endTime}} *</label>
+            <div class="col-sm-8">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.endTimeHour" required name="endTimeHour">
+                            <option ng-repeat="x in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]" value="{{x}}">{{x}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="form.endTimeMin" required name="endTimeMin">
+                            <option ng-repeat="z in [0,5,10,15,20,25,30,35,40,45,50,55]" value="{{z}}">{{z}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editSubForm.$invalid">{{phrase.editSch}}</button>
+            </div>
+        </div>
+    </form>
+</modal>
+
+<modal visible="ImportModalStatus">
+	<form class="form-horizontal" ng-upload="saveImported(content)" method="post" action="{{'index.php/classschedule/import/excel'}}" name="importData" role="form" novalidate>
+      <div class="form-group" style="border: 2px dashed #EEE; padding: 10px;">
+          <label class="control-label">{{phrase.fileToImport}}</label><br>
+          <input class="mt-2" type="file" name="excelcsv"><br>
+          <small class="mt-2" style="display: block;">File must be in excel or csv extension</small>
+      </div>
+      <small class="text-danger">Previous timetable data will overwritten, so make sure you are taken a copy</small>
+      <br>
+      <button type="submit" class="btn btn-info btn-default" ng-disabled="importData.$invalid || $isUploading">
+      	{{phrase.Import}}
+      </button>
+  </form>
+</modal>

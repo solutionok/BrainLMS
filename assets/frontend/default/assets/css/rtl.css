@@ -1,0 +1,21 @@
+@import url(https://fonts.googleapis.com/earlyaccess/droidarabickufi.css);
+body{font-family: 'Droid Arabic Kufi',"Roboto", Helvetica, Arial, sans-serif,serif;text-align: right;}
+.top-bar i{
+	margin-left: 10px;
+}
+.social-custom i{
+	margin-left: 0px;
+}
+.contact_topbar{
+	text-align: right;
+}
+.contact_topbar i{
+	padding-right: 10px;
+	padding-left: 0px !important;
+}
+#navigation{
+	flex-grow:unset;
+}
+*{
+	letter-spacing: 0px !important;
+}

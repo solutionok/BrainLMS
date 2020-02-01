@@ -1,0 +1,246 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.employees}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('employees.addEmployee')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addEmployee}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listEmployee}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.name}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th ng-show="$root.can('employees.editEmployee') || $root.can('employees.delEmployee')">{{phrase.Operations}}</th>
+                            </tr>
+                            <tr ng-repeat="employee in employees | filter:searchText">
+                                <td>
+                                    <img alt="{{employee.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+employee.id}}">
+                                    {{employee.fullName}}
+                                    <i ng-class="{'color_red':employee.account_active==0,'color_green':employee.account_active==1}" class="fa fa-lightbulb-o"></i>
+                                </td>
+                                <td>
+                                    {{employee.username}}
+                                </td>
+                                <td>{{employee.email}}</td>
+                                <td>
+                                    <button ng-show="$root.can('employees.editEmployee')" ng-click="account_status(employee.id,$index)" type="button" class="btn btn-warning btn-circle" title="Toggle Account Status" tooltip><i class="fa fa-lightbulb-o"></i></button>
+                                    <button ng-show="$root.can('employees.editEmployee')" ng-click="edit(employee.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('employees.delEmployee')" ng-click="remove(employee,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!employees.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addEmployee}}</h4>
+                <form class="form-horizontal" name="addEmployee" role="form" ng-upload="saveAdd(content)" method="post" action="index.php/employees" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': addEmployee.fullName.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEmployee.username.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.username}} *</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="username" ng-model="form.username" class="form-control" placeholder="{{phrase.username}}" autocomplete="off" required>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEmployee.email.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} *</label>
+                        <div class="col-sm-10">
+                            <input type="email" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" autocomplete="off" required>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEmployee.password.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.password}} *</label>
+                        <div class="col-sm-10">
+                            <input type="password" name="password" ng-model="form.password" class="form-control" placeholder="{{phrase.password}}" autocomplete="off" required>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEmployee.role_perm.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Permissions}}</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="role_perm" ng-model="form.role_perm" required>
+                                <option ng-repeat="(key,value) in roles" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group row" ng-class="{'has-error': addEmployee.depart.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.depart}}</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="department" ng-model="form.department">
+                                <option ng-repeat="(key,value) in departments" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addEmployee.desig.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.desig}}</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="designation" ng-model="form.designation">
+                                <option ng-repeat="(key,value) in designations" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div> -->
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="photo">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Communication}}</label>
+                        <div class="col-sm-10">
+
+                            <div class="radio-list">
+                                <label>
+                                    <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addEmployee.$invalid">{{phrase.addEmployee}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editEmployee}}</h4>
+                <form class="form-horizontal" name="editEmployee" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/employees/' + form.id}}" novalidate>
+                    <div class="form-group row" ng-class="{'has-error': editEmployee.fullName.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEmployee.username.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.username}} *</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="username" ng-model="form.username" autocomplete="off" class="form-control" placeholder="{{phrase.username}}" required>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEmployee.email.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} *</label>
+                        <div class="col-sm-10">
+                            <input type="email" name="email" ng-model="form.email" autocomplete="off" class="form-control" placeholder="{{phrase.email}}" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.password}}</label>
+                        <div class="col-sm-10">
+                            <input type="password" name="password" ng-model="form.password" autocomplete="off" class="form-control" placeholder="{{phrase.password}}">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEmployee.role_perm.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Permissions}}</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="role_perm" ng-model="form.role_perm" required>
+                                <option ng-repeat="(key,value) in roles" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEmployee.depart.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.depart}}</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="department" ng-model="form.department">
+                                <option ng-repeat="(key,value) in departments" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editEmployee.desig.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.desig}}</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="designation" ng-model="form.designation">
+                                <option ng-repeat="(key,value) in designations" value="{{key}}">{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Photo}}</label>
+                        <div class="col-sm-10">
+                        		<img alt="{{form.fullName}}"
+                        			ng-if="form.photo.length"
+                        			class="user-image img-circle" style="width:45px; height:45px; margin-right: 10px"
+                        			ng-src="{{'index.php/dashboard/profileImage/'+form.id}}"
+                        		>
+                            <input type="file" name="photo">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Communication}}</label>
+                        <div class="col-sm-10">
+
+                            <div class="radio-list">
+                                <label>
+                                    <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                </label>
+                            </div>
+                            <div class="radio-list">
+                                <label>
+                                    <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editEmployee.$invalid">{{phrase.editEmployee}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

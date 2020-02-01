@@ -1,0 +1,297 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.phn_calls}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('phn_calls.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/phone_calls/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/phone_calls/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('phn_calls.add_call')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_call}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_calls}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.FullName}}</th>
+								<th>{{phrase.phoneNo}}</th>
+								<th>{{phrase.email}}</th>
+								<th>{{phrase.call_type}}</th>
+								<th>{{phrase.purpose}}</th>
+								<th>{{phrase.time}}</th>
+								<th>{{phrase.nxt_fup}}</th>
+								<th>{{phrase.call_dur}}</th>
+								<th style="width:160px;" ng-show="$root.can('phn_calls.edit_call') || $root.can('phn_calls.del_call')" >{{phrase.Operations}}</th>
+							</tr>
+							<tr dir-paginate="phone_calls_one in phone_calls | itemsPerPage:20" total-items="totalItems">
+								<td>{{phone_calls_one.FullName}}</td>
+								<td>{{phone_calls_one.phoneNo}}</td>
+								<td>{{phone_calls_one.email}}</td>
+								<td>
+									<span ng-switch="phone_calls_one.call_type">
+										<span ng-switch-when="incoming">{{phrase.incoming}}</span>
+										<span ng-switch-when="outgoing">{{phrase.outgoing}}</span>
+									</span>
+								</td>
+								<td>{{wel_office[phone_calls_one.purpose]}}</td>
+								<td>{{phone_calls_one.call_time.date}} {{phone_calls_one.call_time.hour}}:{{phone_calls_one.call_time.min}} {{phone_calls_one.call_time.ampm}}</td>
+								<td><span ng-show="phone_calls_one.nxt_follow.date && phone_calls_one.nxt_follow.date != ''">{{phone_calls_one.nxt_follow.date}} {{phone_calls_one.nxt_follow.hour}}:{{phone_calls_one.nxt_follow.min}} {{phone_calls_one.nxt_follow.ampm}}</span></td>
+								<td>{{phone_calls_one.call_duration}}</td>
+								<td ng-show="$root.can('phn_calls.edit_call') || $root.can('phn_calls.del_call')">
+									<button ng-show="$root.can('phn_calls.edit_call')" ng-click="edit(phone_calls_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('phn_calls.del_call')" ng-click="remove(phone_calls_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!phone_calls.length"><td class="noTableData" colspan="9">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls class="pull-right" on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+				<h4 class="card-title">{{phrase.add_call}}</h4>
+				<div class="table-responsive">
+
+					<form class="form-horizontal" name="phone_calls_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_add_form.FullName.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="FullName" ng-model="form.FullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_add_form.call_type.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.call_type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="call_type" ng-model="form.call_type" required>
+									<option value="incoming">{{phrase.incoming}}</option>
+									<option value="outgoing">{{phrase.outgoing}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_add_form.purpose.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.purpose}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="purpose" ng-model="form.purpose" required>
+									<option ng-repeat="(key,item) in wel_office" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_add_form['call_time[date]'].$invalid || phone_calls_add_form['call_time[hour]'].$invalid || phone_calls_add_form['call_time[min]'].$invalid || phone_calls_add_form['call_time[ampm]'].$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.time}} *</label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="call_timeـadd" name="call_time[date]" ng-model="form.call_time.date" class="form-control call_time_add" placeholder="{{phrase.time}}" required>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="call_time[hour]" ng-model="form.call_time.hour" required>
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="call_time[min]" ng-model="form.call_time.min" required>
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="call_time[ampm]" ng-model="form.call_time.ampm" required>
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.nxt_fup}} </label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="nxt_followـadd" name="nxt_follow[date]" ng-model="form.nxt_follow.date" class="form-control nxt_follow_add" placeholder="{{phrase.nxt_fup}}" >
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="nxt_follow[hour]" ng-model="form.nxt_follow.hour" >
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="nxt_follow[min]" ng-model="form.nxt_follow.min" >
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="nxt_follow[ampm]" ng-model="form.nxt_follow.ampm" >
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.call_dur}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="call_duration" ng-model="form.call_duration" class="form-control" placeholder="{{phrase.call_dur}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_add_form.call_details.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.call_det}} *</label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="call_details" class="form-control" ng-model="form.call_details" placeholder="{{phrase.call_det}}" required></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="phone_calls_add_form.$invalid">{{phrase.add_call}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+				<h4 class="card-title">{{phrase.edit_call}}</h4>
+				<div class="table-responsive">
+
+					<form class="form-horizontal" name="phone_calls_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': phone_calls_edit_form.FullName.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="FullName" ng-model="form.FullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_edit_form.call_type.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.call_type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="call_type" ng-model="form.call_type" required>
+									<option value="incoming">{{phrase.incoming}}</option>
+									<option value="outgoing">{{phrase.outgoing}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_edit_form.purpose.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.purpose}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="purpose" ng-model="form.purpose" required>
+									<option ng-repeat="(key,item) in wel_office" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_edit_form['call_time[date]'].$invalid || phone_calls_edit_form['call_time[hour]'].$invalid || phone_calls_edit_form['call_time[min]'].$invalid || phone_calls_edit_form['call_time[ampm]'].$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.time}} *</label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="call_timeـadd" name="call_time[date]" ng-model="form.call_time.date" class="form-control call_time_add" placeholder="{{phrase.time}}" required>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="call_time[hour]" ng-model="form.call_time.hour" required>
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="call_time[min]" ng-model="form.call_time.min" required>
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="call_time[ampm]" ng-model="form.call_time.ampm" required>
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.nxt_fup}} </label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="nxt_followـadd" name="nxt_follow[date]" ng-model="form.nxt_follow.date" class="form-control nxt_follow_add" placeholder="{{phrase.nxt_fup}}" >
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="nxt_follow[hour]" ng-model="form.nxt_follow.hour" >
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="nxt_follow[min]" ng-model="form.nxt_follow.min" >
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="nxt_follow[ampm]" ng-model="form.nxt_follow.ampm" >
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.call_dur}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="call_duration" ng-model="form.call_duration" class="form-control" placeholder="{{phrase.call_dur}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': phone_calls_edit_form.call_details.$invalid}">
+							<label class="col-sm-2 text-right control-label col-form-label">{{phrase.call_det}} *</label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="call_details" class="form-control" ng-model="form.call_details" placeholder="{{phrase.call_det}}" required></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="phone_calls_edit_form.$invalid">{{phrase.edit_call}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

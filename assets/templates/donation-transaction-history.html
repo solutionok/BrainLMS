@@ -1,0 +1,71 @@
+<style type="text/css">
+	.select-checkbox {
+		padding: 5px !important;
+		height: 170px;
+		margin-top: -10px;
+	}
+	.select-checkbox option.all {
+	  color: blue;
+	}
+	.select-checkbox option::before {
+	  content: "\2610";
+	  width: 1.3em;
+	  text-align: center;
+	  display: inline-block;
+	}
+	.select-checkbox option:checked::before {
+	  content: "\2611";
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">Donation transaction history</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">List all</h4>
+                <div class="table-responsive" ng-if="donation_transactions.length > 0">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th ng-if="$root.dashboardData.role == 'admin'">User name</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Created at</th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr ng-repeat="item in donation_transactions">
+                                <td>{{ item.transaction_id }}</td>
+                                <td ng-if="$root.dashboardData.role == 'admin'">{{ item.user_name }}</td>
+                                <td>{{ item.donation_amount }}</td>
+                                <td>
+                                	<button class="btn disabled"
+                                		ng-class="{
+                                		'btn-danger': item.status == 'FAILURE',
+                                		'btn-success': item.status == 'SUCCESS',
+                                		'btn-warning': item.status == 'AWAITED',
+                                		}">{{ item.status }}</button>
+                                </td>
+                                <td>{{ item.created_at }}</td>
+                                <td>
+                                	<button ng-click="refreshTransaction(item.id)" type="button" class="btn btn-info" title="Refresh transaction" tooltip>
+                                		<i class="fa fa-refresh"></i> Refresh
+                                	</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div ng-if="donation_transactions == 0 || donation_transactions == null">
+                	There's no transactions yet
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

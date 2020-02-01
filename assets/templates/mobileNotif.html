@@ -1,0 +1,159 @@
+<style type="text/css">
+	.selected-data-list .remove-all,
+	.selected-data-list .remove-item {
+		cursor: pointer;
+	}
+	ul.list-group > li.list-group-item {
+		padding: 7px !important;
+	}
+	ul.list-group > li.list-group-item small {
+		width: 80%;
+	}
+</style>
+
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.mobileNotifications}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.mobileNotifications}}</h4>
+                <hr>
+                <div class="form">
+                    <div>
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs tabsItem" role="tablist">
+                            <li class="nav-item" role="presentation"
+                            	ng-if="dashboardData.role == 'admin' || dashboardData.role == 'teacher'"
+                            	ng-click="getClickedTab('sendNotif')">
+                            	<a showtab="" class="nav-link active" href="#sendNotif" aria-controls="sendNotif" role="tab" data-toggle="tab">{{phrase.sendNewNotification}}</a>
+                            </li>
+                            <li class="nav-item" role="presentation" >
+                            	<a showtab="" class="nav-link"
+                            		href="#history" aria-controls="history" role="tab" data-toggle="tab"
+                            		ng-click="getClickedTab('history')"
+                            		ng-class="{'active': dashboardData.role != 'admin' && dashboardData.role != 'teacher'}" >
+                            			{{phrase.History}}
+                            	</a>
+                            </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content tabcontent-border">
+                            <div role="tabpanel"
+                            	class="tab-pane active p-20"
+                            	id="sendNotif"
+                            	ng-if="dashboardData.role == 'admin' || dashboardData.role == 'teacher'"
+                            	ng-controller="communicationsFilterController"
+                            	>
+                                <form class="form-horizontal" ng-submit="saveAdd()" name="mailsms" ng-show="sendNewScope == 'form'" novalidate>
+                                    <button
+										                	type="button"
+										                	ng-click="linkUser()"
+										                	ng-show="active_table == 'sendNotif'"
+										                	class="btn pull-right btn-success btn-flat"
+										                	style="position: absolute; top: 18px; right: 20px;">
+														        	{{phrase.searchUsers}}
+														        </button>
+                                    <div ng-include="'/assets/js/Angular/includes/communications-filter.html?id=5459'"></div>
+						                        <hr>
+                                    <div class="form-group row" ng-class="{'has-error': mailsms.notifData.$invalid}">
+                                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.messageContent}} *</label>
+                                        <div class="col-sm-10">
+                                            <textarea name="notifData" class="form-control" ng-model="form.notifData" required placeholder="{{phrase.messageContent}}"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-b-0">
+                                        <div class="offset-2 col-10" style="padding-left: 5px">
+                                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="mailsms.$invalid">{{phrase.sendNewNotification}}</button>
+                                        </div>
+                                    </div>
+                                    <modal visible="searchUsers">
+																		  <div class="row">
+																		      <div class="col-md-8">
+																		          <input type="text" class="form-control" id="searchKeyword" placeholder="{{phrase.typeNameUserMail}}">
+																		      </div>
+																		      <div class="col-md-3">
+																		          <button type="button" ng-click="searchUserButton()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+																		      </div>
+																		  </div>
+																		  <div class="row">
+																		      <div class="col-md-12" style="padding-top:10px;">
+																		          <div class="box-body table-responsive">
+																		              <table class="table table-bordered">
+																		                  <tbody>
+																		                      <tr ng-repeat="user in searchResults">
+																		                          <td>{{user.name}} - {{user.role}}</td>
+																		                          <td>{{user.email}}</td>
+																		                          <td class="no-print">
+																		                              <button type="button" ng-click="linkStudentFinish(user)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+																		                          </td>
+																		                      </tr>
+																		                  </tbody>
+																		              </table>
+																		          </div>
+																		      </div>
+																		  </div>
+																		</modal>
+                                </form>
+                                <span ng-show="sendNewScope == 'success'">
+                                    message sent successfully
+                                </span>
+                            </div>
+                            <div role="tabpanel"
+                            	class="tab-pane p-20" id="history"
+                            	ng-class="{'active': dashboardData.role != 'admin' && dashboardData.role != 'teacher'}"
+                            	>
+                                <div class="pull-right card-block-input-group card-block-input-item mb-3">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text"  name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <th>{{phrase.to}}</th>
+                                                <th>{{phrase.Date}}</th>
+                                                <th>{{phrase.details}}</th>
+                                                <th>{{phrase.Sender}}</th>
+                                                <!-- <th>{{phrase.Operations}}</th> -->
+                                            </tr>
+                                            <tr dir-paginate="message in messages | filter:searchText | itemsPerPage:20" total-items="totalItems">
+                                                <td>{{message.notifTo}}</td>
+                                                <td>{{message.notifDate}}</td>
+                                                <td>
+                                                	<span ng-if="message.notifCurrentRedirectLink.length">
+                                                		<a href="{{ message.notifCurrentRedirectLink }}">
+                                                			{{ message.notifData | limitTo: 80 }}{{message.notifData.length > 80 ? '...' : ''}}
+                                                		</a>
+                                                	</span>
+                                                	<span ng-if="!message.notifCurrentRedirectLink.length">
+                                                		{{ message.notifData | limitTo: 80 }}{{message.notifData.length > 80 ? '...' : ''}}
+                                                	</span>
+                                                </td>
+                                                <td>{{message.notifSender}}</td>
+                                                <!-- <td>
+                                                    <button ng-click="remove(message,$index)"
+                                                    	type="button" class="btn btn-danger btn-circle"
+                                                    	title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i>
+                                                    </button>
+                                                </td> -->
+                                            </tr>
+                                            <tr ng-show="!messages.length"><td class="noTableData" colspan="6">{{phrase.noMessages}}</td></tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls class="pull-right" on-page-change="loadNotifications(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

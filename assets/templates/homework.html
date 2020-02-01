@@ -1,0 +1,336 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Homework}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-show="$root.can('Homework.addHomework')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addHomework}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text"  name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.lstHomework}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.HomeworkTitle}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.class}} / {{phrase.section}}</th>
+                                <th ng-show="$root.can('Homework.View') || ($root.can('Homework.Download') && homework.homeworkFile != '') || $root.can('Homework.editHomework') || $root.can('Homework.delHomework')" style="width:200px;">{{phrase.Operations}}</th>
+                            </tr>
+                        </thead>
+                        <tbody dir-paginate="homework in homeworks | itemsPerPage:20" total-items="totalItems">
+                            <tr>
+                                <td>{{homework.id}}</td>
+                                <td>{{homework.homeworkTitle}}</td>
+                                <td>
+                                    {{phrase.Date}} : {{homework.homeworkDate}}<br/>
+                                    {{phrase.SubmissionDate}} : {{homework.homeworkSubmissionDate}}<br/>
+                                    <!-- {{phrase.EvaluationDate}} : {{homework.homeworkEvaluationDate}} -->
+                                </td>
+                                <td>
+                                    {{phrase.class}} : {{homework.classes}}<br/>
+                                    <span ng-show="homework.sections">{{phrase.section}} : {{homework.sections}} <br/></span>
+                                    {{phrase.Subject}} : {{homework.subject}}
+                                </td>
+                                <td ng-show="$root.can('Homework.View') || ($root.can('Homework.Download') && homework.homeworkFile != '') || $root.can('Homework.editHomework') || $root.can('Homework.delHomework')">
+                                  <button ng-show="$root.can('Homework.View')" ng-click="viewhomework(homework.id)" type="button" class="btn btn-warning btn-circle" title="{{phrase.View}}" tooltip><i class="fa fa-eye"></i></button>
+                                  <a ng-show="$root.can('Homework.Download') && homework.homeworkFile != ''" target="_blank" href="{{'index.php/homeworks/download/'+homework.id}}"><button type="button" class="btn btn-warning btn-circle" title="{{phrase.Download}}" tooltip><i class="fa fa-cloud-download"></i></button></a>
+                                  <button ng-show="$root.can('Homework.editHomework')" ng-click="edit(homework.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+                                  <button ng-show="$root.can('Homework.delHomework')" ng-click="remove(homework,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-show="homeworks.length == '0'"><tr><td class="noTableData" colspan="5">{{phrase.noHomeworks}}</td></tr></tbody>
+                    </table>
+                    <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+                <h4 class="card-title">{{phrase.addHomework}}</h4>
+                <form class="form-horizontal" name="addHomework" role="form" ng-upload="saveAdd(content)" method="post" action="index.php/homeworks" novalidate ng-submit="submitAddAction()">
+                    <div class="form-group row" ng-class="{'has-error': addHomework.homeworkTitle.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.HomeworkTitle}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="homeworkTitle" ng-model="form.homeworkTitle" class="form-control" required placeholder="{{phrase.HomeworkTitle}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.HomeworkDesc}}</label>
+                        <div class="col-sm-10">
+                            <textarea ck-editor name="homeworkDescription" class="form-control" ng-model="form.homeworkDescription" placeholder="{{phrase.HomeworkDesc}}"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addHomework.homeworkSubmissionDate.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.SubmissionDate}} *</label>
+                        <div class="col-sm-10">
+                            <input date-picker type="text" id="datemask" name="homeworkSubmissionDate" ng-model="form.homeworkSubmissionDate" required class="form-control datemask">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Attachment}}</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="homeworkFile" id="homeworkAddFile">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addHomework['classId[]'].$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.classId" name="classId[]" ng-change="subjectList()" multiple required>
+                                <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addHomework['sectionId[]'].$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.section}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.sectionId" name="sectionId[]" multiple ng-required="$root.dashboardData.enableSections == '1'">
+                                <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': addHomework.subjectId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Subject}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.subjectId" required name="subjectId">
+                                <option ng-repeat="subjectOne in subject" value="{{subjectOne.id}}">{{subjectOne.subjectTitle}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit"
+                            	class="btn btn-info waves-effect waves-light"
+                            	ng-class="{'disabled': addProcessingStatus}"
+                            	ng-disabled="addHomework.$invalid || addProcessingStatus">{{phrase.addHomework}}
+                            		<img ng-show="addProcessingStatus" class="custom-module-action-loader" src="/assets/images/inline-loader.gif">
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+                <h4 class="card-title">{{phrase.editHomework}}</h4>
+                <form class="form-horizontal" name="editHomeWork" role="form"  ng-upload="saveEdit(content)" role="form" method="post" action="{{'index.php/homeworks/' + form.id}}" novalidate ng-submit="submitEditAction()">
+                    <div class="form-group row" ng-class="{'has-error': editHomeWork.homeworkTitle.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.HomeworkTitle}} * </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="homeworkTitle" ng-model="form.homeworkTitle" class="form-control" required placeholder="{{phrase.HomeworkTitle}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.HomeworkDesc}}</label>
+                        <div class="col-sm-10">
+                            <textarea ck-editor name="homeworkDescription" class="form-control" ng-model="form.homeworkDescription" placeholder="{{phrase.HomeworkDesc}}"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editHomeWork.homeworkSubmissionDate.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.SubmissionDate}} *</label>
+                        <div class="col-sm-10">
+                            <input date-picker type="text" id="datemask3" name="homeworkSubmissionDate" ng-model="form.homeworkSubmissionDate" required class="form-control datemask">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Attachment}}</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="homeworkFile" id="homeworkAddFile">
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editHomeWork['classId[]'].$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.class}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.classId" name="classId[]" ng-change="subjectList()" multiple required>
+                                <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editHomeWork['sectionId[]'].$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.section}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.sectionId" name="sectionId[]" multiple ng-required="$root.dashboardData.enableSections == '1'">
+                                <option ng-repeat="section in form.sections" value="{{section.id}}" ng-selected="isSectionSelected(form.sectionId,section.id)">{{section.sectionName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" ng-class="{'has-error': editHomeWork.subjectId.$invalid}">
+                        <label class="col-sm-2 text-right control-label col-form-label">{{phrase.Subject}} *</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" ng-model="form.subjectId" required name="subjectId">
+                                <option ng-repeat="subjectOne in form.subject" value="{{subjectOne.id}}">{{subjectOne.subjectTitle}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group m-b-0">
+                        <div class="offset-sm-2 col-sm-10" style="padding: 5px">
+                            <button type="submit"
+                            	class="btn btn-info waves-effect waves-light"
+                            	ng-class="{'disabled': editProcessingStatus}"
+                            	ng-disabled="editHomeWork.$invalid || editProcessingStatus">{{phrase.editHomework}}
+                            		<img ng-show="editProcessingStatus" class="custom-module-action-loader" src="/assets/images/inline-loader.gif">
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="viewhomeworkmodal">
+    <div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs tabsItem" role="tablist">
+            <li class="nav-item" role="presentation"><a showtab="" class="nav-link active" href="#homework" aria-controls="homework" role="tab" data-toggle="tab">{{phrase.Homework}}</a></li>
+            <li class="nav-item" role="presentation" ng-show="$root.can('Homework.Answers') && (homeworkmodal_data.student_applied != null || homeworkmodal_data.student_not_applied != null)"><a showtab="" class="nav-link" href="#answers" aria-controls="answers" role="tab" data-toggle="tab">{{phrase.Answers}}</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content tabcontent-border">
+            <div role="tabpanel" class="tab-pane active p-20" id="homework">
+            		<div class="form-group row">
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.HomeworkDesc}}</b></label>
+                    <div class="col-sm-10 col-form-label">
+                        <div ng-bind-html="homeworkmodal_data.homeworkDescription"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.teacher}}</b></label>
+                    <div class="col-sm-4 col-form-label">
+                        {{homeworkmodal_data.teacher.fullName}}
+                    </div>
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.Attachment}}</b></label>
+                    <div class="col-sm-4">
+                        <span ng-show="homeworkmodal_data.homeworkFile != ''"><a target="_blank" href="{{'index.php/homeworks/download/'+homeworkmodal_data.id}}">{{phrase.Download}}</a></span>
+                        <span ng-show="homeworkmodal_data.homeworkFile == ''">{{phrase.noFilesAv}}</span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.class}}</b></label>
+                    <div class="col-sm-4 col-form-label">
+                        <span ng-repeat="class in homeworkmodal_data.classes">{{class.className}}<Br/></span>
+                    </div>
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.section}}</b></label>
+                    <div class="col-sm-4">
+                        <span ng-repeat="section in homeworkmodal_data.sections">{{section.sectionName}}<Br/></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.Subject}}</b></label>
+                    <div class="col-sm-4 col-form-label">
+                        {{homeworkmodal_data.subject.subjectTitle}}
+                    </div>
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.Date}}</b></label>
+                    <div class="col-sm-4">
+                        {{homeworkmodal_data.homeworkDate}}
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.SubmissionDate}}</b></label>
+                    <div class="col-sm-4 col-form-label">
+                        {{homeworkmodal_data.homeworkSubmissionDate}}
+                    </div>
+                    <!-- <label class="col-sm-2 text-right control-label col-form-label"><b>{{phrase.EvaluationDate}}</b></label>
+                    <div class="col-sm-4">
+                        {{homeworkmodal_data.homeworkEvaluationDate}}
+                    </div> -->
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane p-20" id="answers" ng-show="$root.can('Homework.Answers') && (homeworkmodal_data.student_applied != null || homeworkmodal_data.student_not_applied != null)">
+
+                <div class="form-group row" ng-show="userRole == 'admin' || userRole == 'teacher'">
+                    <div class="col-sm-6">
+                        <span style="color:red;font-weight: bold;">{{phrase.notApplied}}</span>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{phrase.student}}</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="(key,student) in homeworkmodal_data.student_not_applied">
+                                <tr>
+                                    <td>
+                                        {{student}}
+                                        <button ng-click="homework_apply(homeworkmodal_data.id,key,1)" type="button" class="btn btn-success btn-circle" tooltip><i class="fa fa-check"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-6">
+                        <span style="color:green;font-weight: bold;">{{phrase.applied}}</span>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{phrase.student}}</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="(key,student) in homeworkmodal_data.student_applied">
+                                <tr>
+                                    <td>
+                                        {{student}}
+                                        <button ng-click="homework_apply(homeworkmodal_data.id,key,0)" type="button" class="btn btn-danger btn-circle" tooltip><i class="fa fa-trash-o"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <span ng-show="userRole == 'student' || userRole == 'parent'">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{phrase.student}}</th>
+                                <th>{{phrase.Status}}</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="student in homeworkmodal_data.student_applied">
+                            <tr>
+                                <td>{{student}}</td>
+                                <td style="color:green;font-weight: bold;">{{phrase.applied}}</td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-repeat="student in homeworkmodal_data.student_not_applied">
+                            <tr>
+                                <td>{{student}}</td>
+                                <td style="color:red;font-weight: bold;">{{phrase.notApplied}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </span>
+
+            </div>
+
+        </div>
+    </div>
+</modal>

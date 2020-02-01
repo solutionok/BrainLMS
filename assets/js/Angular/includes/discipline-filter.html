@@ -1,0 +1,165 @@
+<div class="row">
+	<label class="col-sm-2 col-md-2 text-right control-label col-form-label">
+  	Persons
+  </label>
+	<div class="col-lg-5 col-md-5 col-sm-12">
+		<button type="button" class="btn btn-outline-info btn-block" ng-click="changeFilterView('complained_by')" style="position: relative;">
+			<b>Complained by</b>
+			<div class="mt-1">Selected admins, teachers, employees or students <b>({{ choosen_complained_by_ff.length }})</b></div>
+			<div class="filter-view-arrow" ng-show="filter_view.complained_by"></div>
+		</button>
+	</div>
+	<div class="col-lg-5 col-md-5 col-sm-12">
+		<button type="button" class="btn btn-outline-info btn-block" ng-click="changeFilterView('complained_against')" style="position: relative;">
+			<b>Complained against</b>
+			<div class="mt-1">Selected students <b>({{ choosen_complained_against_ff.length }})</b></div>
+			<div class="filter-view-arrow" ng-show="filter_view.complained_against"></div>
+		</button>
+	</div>
+	<label class="col-sm-2 col-md-2 text-right control-label col-form-label"></label>
+	<div class="col-lg-5 col-md-5 col-sm-12 mt-3">
+		<button type="button" class="btn btn-outline-info btn-block" ng-click="changeFilterView('jury')" style="position: relative;">
+			<b>Jury</b>
+			<div class="mt-1">Selected admins, principals or teachers <b>({{ choosen_jury_ff.length }})</b></div>
+			<div class="filter-view-arrow" ng-show="filter_view.jury"></div>
+		</button>
+	</div>
+	<div class="col-lg-5 col-md-5 col-sm-12 mt-3">
+		<button type="button" class="btn btn-outline-info btn-block" ng-click="changeFilterView('responsible_officials')" style="position: relative;">
+			<b>Responsible Officials</b>
+			<div class="mt-1">Selected admins, teachers or employees <b>({{ choosen_responsible_officials_ff.length }})</b></div>
+			<div class="filter-view-arrow" ng-show="filter_view.responsible_officials"></div>
+		</button>
+	</div>
+	<div class="col-2"></div>
+	<div class="col-10 mt-2" ng-show="filter_view.complained_by">
+		<div class="filter-view filter-view-students">
+			<button type="button" class="close text-danger" ng-click="closeFilterView('complained_by')" style="z-index: 30; position: absolute;right: 24px;top: 17px;">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+			<div class="row">
+				<div class="col-6">
+					<label class="control-label mb-3">Search for Admin, Teacher, Employee or Student</label>
+					<input type="text" class="form-control" ng-model="$parent.selectedWordComplainedBy" ng-keydown="fetchComplainedByUsersByWord($event)">
+    			<small>Type username, full name, employee ID or student rollID</small>
+				</div>
+				<div class="col-6" style="border-left: 1px solid #EDEDED">
+					<label class="control-label mb-2">Target Users</label>
+					<div ng-show="targetComplainedByFF.length">
+  					<select class="form-control select-checkbox" name="complained_by[]" ng-model="$parent.choosen_complained_by_ff" ng-change="checkChangeTargetStudents()" multiple style="min-height: 140px; margin-top: 0">
+      				<option ng-repeat="user in targetComplainedByFF" value="{{ user.id }}">
+      						{{ user.display_discipline }}
+      				</option>
+      			</select>
+      			<small>Press <code>ctrl</code> for multi select</small><br>
+				    <small>Press <code>shift</code> for group select</small>
+					</div>
+    			<select class="form-control" ng-show="!targetComplainedByFF.length" ng-disabled="!targetComplainedByFF.length">
+    				<option>Please type input first</option>
+    			</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-10 mt-2" ng-show="filter_view.complained_against">
+		<div class="filter-view filter-view-teachers">
+			<button type="button" class="close text-danger" ng-click="closeFilterView('complained_against')" style="z-index: 30; position: absolute;right: 24px;top: 17px;">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+  		<div class="row">
+  			<div class="col-6">
+					<label class="control-label mb-3">Class</label>
+    			<select class="form-control select-checkbox" ng-show="classes.length" ng-model="$parent.selectedClassFilterStudent" ng-change="checkChangeClassFilter()" multiple style="max-height: 120px;">
+    				<option value="0" class="select-all text-primary" disabled>-- Choose class --</option>
+    				<option ng-repeat="class in classes" value="{{ class.id }}">{{ class.className }}</option>
+    			</select>
+    			<small>Press <code>ctrl</code> for multi select</small><br>
+			    <small>Press <code>shift</code> for group select</small>
+    			<hr>
+    			<label class="control-label mb-2">Section</label>
+    			<select class="form-control" ng-show="!sections.length" ng-disabled="!sections.length">
+    				<option>Please select class</option>
+    			</select>
+    			<select class="form-control" ng-show="sections.length" ng-model="$parent.selectedSectionFilterStudent" ng-change="checkChangeSectionFilter()">
+    				<option value="0" class="text-danger">-- All sections --</option>
+    				<option ng-repeat="section in sections" value="{{ section.id }}">{{ section.sectionName }}</option>
+    			</select>
+    			<small class="text-danger" ng-if="noSectionsWithThatClass">There's no sections with that class</small>
+				</div>
+				<div class="col-6" style="border-left: 1px solid #EDEDED">
+					<label class="control-label mb-2">Target Students</label>
+					<div ng-show="targetComplainedAgainstFF.length">
+  					<select class="form-control select-checkbox" name="complained_against[]" ng-model="$parent.choosen_complained_against_ff" ng-change="checkChangeTargetStudents()" multiple style="min-height: 140px; margin-top: 0">
+      				<option ng-repeat="student in targetComplainedAgainstFF" value="{{ student.id }}">
+        				{{ student.fullName }} - RollId: {{ student.studentRollId }}
+        			</option>
+      			</select>
+      			<small>Press <code>ctrl</code> for multi select</small><br>
+				    <small>Press <code>shift</code> for group select</small>
+					</div>
+    			<select class="form-control" ng-show="!targetComplainedAgainstFF.length" ng-disabled="!targetComplainedAgainstFF.length">
+    				<option>Please select class</option>
+    			</select>
+				</div>
+  		</div>
+  	</div>
+	</div>
+	<div class="col-10 mt-2" ng-show="filter_view.jury">
+		<div class="filter-view filter-view-students">
+			<button type="button" class="close text-danger" ng-click="closeFilterView('jury')" style="z-index: 30; position: absolute;right: 24px;top: 17px;">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+			<div class="row">
+				<div class="col-6">
+					<label class="control-label mb-3">Search for Admin, Principal or Teacher</label>
+					<input type="text" class="form-control" ng-model="$parent.selectedWordJury" ng-keydown="fetchJuryUsersByWord($event)">
+    			<small>Type username, full name or employee ID</small>
+				</div>
+				<div class="col-6" style="border-left: 1px solid #EDEDED">
+					<label class="control-label mb-2">Target Users</label>
+					<div ng-show="targetJuryFF.length">
+  					<select class="form-control select-checkbox" name="jury[]" ng-model="$parent.choosen_jury_ff" ng-change="checkChangeTargetJury()" multiple style="min-height: 140px; margin-top: 0">
+      				<option ng-repeat="user in targetJuryFF" value="{{ user.id }}">
+      						{{ user.display_discipline }}
+      				</option>
+      			</select>
+      			<small>Press <code>ctrl</code> for multi select</small><br>
+				    <small>Press <code>shift</code> for group select</small>
+					</div>
+    			<select class="form-control" ng-show="!targetJuryFF.length" ng-disabled="!targetJuryFF.length">
+    				<option>Please type input first</option>
+    			</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-10 mt-2" ng-show="filter_view.responsible_officials">
+		<div class="filter-view filter-view-students">
+			<button type="button" class="close text-danger" ng-click="closeFilterView('responsible_officials')" style="z-index: 30; position: absolute;right: 24px;top: 17px;">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+			<div class="row">
+				<div class="col-6">
+					<label class="control-label mb-3">Search for Admin, Teacher or Employee</label>
+					<input type="text" class="form-control" ng-model="$parent.selectedWordResponsibleOfficial" ng-keydown="fetchResponsibleOfficialsUsersByWord($event)">
+    			<small>Type username, full name or employee ID</small>
+				</div>
+				<div class="col-6" style="border-left: 1px solid #EDEDED">
+					<label class="control-label mb-2">Target Users</label>
+					<div ng-show="targetResponsibleOfficialsFF.length">
+  					<select class="form-control select-checkbox" name="responsible_officials[]" ng-model="$parent.choosen_responsible_officials_ff" ng-change="checkChangeTargetNTS()" multiple style="min-height: 140px; margin-top: 0">
+      				<option ng-repeat="user in targetResponsibleOfficialsFF" value="{{ user.id }}">
+      						{{ user.display_discipline }}
+      				</option>
+      			</select>
+      			<small>Press <code>ctrl</code> for multi select</small><br>
+				    <small>Press <code>shift</code> for group select</small>
+					</div>
+    			<select class="form-control" ng-show="!targetResponsibleOfficialsFF.length" ng-disabled="!targetResponsibleOfficialsFF.length">
+    				<option>Please type input first</option>
+    			</select>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,395 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Certificates}}</h3>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-show="$root.can('Certificates.add_cert')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_cert}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_cert}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.cert_name}}</th>
+								<th>{{phrase.main_title}}</th>
+								<th style="width:160px;" ng-show="$root.can('Certificates.edit_cert') || $root.can('Certificates.del_cert')" >{{phrase.Operations}}</th>
+							</tr>
+							<tr ng-repeat="certificates_one in certificates | filter:searchText">
+								<td>{{certificates_one.certificate_name}}</td>
+								<td>{{certificates_one.main_title}}</td>
+								<td ng-show="$root.can('Certificates.edit_cert') || $root.can('Certificates.del_cert')">
+									<button ng-show="$root.can('Certificates.edit_cert')" ng-click="edit(certificates_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" tooltip><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('Certificates.del_cert')" ng-click="remove(certificates_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" tooltip><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!certificates.length"><td class="noTableData" colspan="3">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelAdd}}</button>
+				<h4 class="card-title">{{phrase.add_cert}}</h4>
+				<form class="form-horizontal" name="certificates_add_form" role="form" ng-submit="saveAdd()" novalidate>
+					<div class="row">
+						<div class="col-sm-10">
+							<div class="form-group row" ng-class="{'has-error': certificates_add_form.certificate_name.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.cert_name}} *</label>
+								<div class="col-sm-10">
+									<input type="text" name="certificate_name" ng-model="form.certificate_name" class="form-control" placeholder="{{phrase.cert_name}}" required>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.head_left}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="header_left" class="form-control" ng-model="form.header_left" placeholder="{{phrase.head_left}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.head_right}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="header_right" class="form-control" ng-model="form.header_right" placeholder="{{phrase.head_right}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.head_mid}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="header_middle" class="form-control" ng-model="form.header_middle" placeholder="{{phrase.head_mid}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" ng-class="{'has-error': certificates_add_form.main_title.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.main_title}} *</label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="main_title" class="form-control" ng-model="form.main_title" placeholder="{{phrase.main_title}}" required></textarea>
+								</div>
+							</div>
+							<div class="form-group row" ng-class="{'has-error': certificates_add_form.main_content.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.main_content}} *</label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="main_content" class="form-control" ng-model="form.main_content" placeholder="{{phrase.main_content}}" required></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.foot_left}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="footer_left" class="form-control" ng-model="form.footer_left" placeholder="{{phrase.foot_left}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.foot_right}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="footer_right" class="form-control" ng-model="form.footer_right" placeholder="{{phrase.foot_right}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.foot_mid}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="footer_middle" class="form-control" ng-model="form.footer_middle" placeholder="{{phrase.foot_mid}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" ng-class="{'has-error': certificates_add_form.certificate_image.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.cert_img}} *</label>
+								<div class="col-sm-10">
+									<input type="file" name="certificate_image" file-model="form.certificate_image">
+								</div>
+							</div>
+							<div class="form-group m-b-0">
+								<div class="offset-sm-2 col-sm-10" style="padding: 5px">
+									<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="certificates_add_form.$invalid">{{phrase.add_cert}}</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-2">
+							<div style="position: fixed;font-size: 12px;">
+								<table class="table table-bordered table-hover">
+									<tbody>
+										<tr>
+											<td style="padding: 5px;">
+												[user_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[full_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[email]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[date_of_birth]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[gender]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[religion]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[phone_number]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[mobile_number]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[address]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[admission_number]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[admission_date]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[roll_id]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[student_category]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[class_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[section_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[father_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[mother_name]
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">{{phrase.cancelEdit}}</button>
+				<h4 class="card-title">{{phrase.edit_cert}}</h4>
+				<form class="form-horizontal" name="certificates_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+					<div class="row">
+						<div class="col-sm-10">
+            	<div class="form-group row" ng-class="{'has-error': certificates_edit_form.certificate_name.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.cert_name}} *</label>
+								<div class="col-sm-10">
+									<input type="text" name="certificate_name" ng-model="form.certificate_name" class="form-control" placeholder="{{phrase.cert_name}}" required>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.head_left}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="header_left" class="form-control" ng-model="form.header_left" placeholder="{{phrase.head_left}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.head_right}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="header_right" class="form-control" ng-model="form.header_right" placeholder="{{phrase.head_right}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.head_mid}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="header_middle" class="form-control" ng-model="form.header_middle" placeholder="{{phrase.head_mid}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" ng-class="{'has-error': certificates_edit_form.main_title.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.main_title}} *</label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="main_title" class="form-control" ng-model="form.main_title" placeholder="{{phrase.main_title}}" required></textarea>
+								</div>
+							</div>
+							<div class="form-group row" ng-class="{'has-error': certificates_edit_form.main_content.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.main_content}} *</label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="main_content" class="form-control" ng-model="form.main_content" placeholder="{{phrase.main_content}}" required></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.foot_left}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="footer_left" class="form-control" ng-model="form.footer_left" placeholder="{{phrase.foot_left}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.foot_right}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="footer_right" class="form-control" ng-model="form.footer_right" placeholder="{{phrase.foot_right}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.foot_mid}} </label>
+								<div class="col-sm-10">
+									<textarea ck-editor name="footer_middle" class="form-control" ng-model="form.footer_middle" placeholder="{{phrase.foot_mid}}" ></textarea>
+								</div>
+							</div>
+							<div class="form-group row" ng-class="{'has-error': certificates_edit_form.certificate_image.$invalid}">
+								<label class="col-sm-2 text-right control-label col-form-label">{{phrase.cert_img}} *</label>
+								<div class="col-sm-10">
+									<a ng-show="form.certificate_image != ''" href="index.php/certificates/download/{{form.id}}">{{phrase.viewFile}}</a><span style="margin-right:10px;" ng-show="form.certificate_image != ''">, {{phrase.orUpNew}}</span><input type="file" name="certificate_image" file-model="form.certificate_image">
+								</div>
+							</div>
+							<div class="form-group m-b-0">
+								<div class="offset-sm-2 col-sm-10" style="padding: 5px">
+									<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="certificates_edit_form.$invalid">{{phrase.edit_cert}}</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-2">
+							<div style="position: fixed;font-size: 12px;">
+								<table class="table table-bordered table-hover">
+									<tbody>
+										<tr>
+											<td style="padding: 5px;">
+												[user_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[full_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[email]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[date_of_birth]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[gender]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[religion]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[phone_number]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[mobile_number]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[address]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[admission_number]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[admission_date]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[roll_id]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[student_category]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[class_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[section_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[father_name]
+											</td>
+										</tr>
+										<tr>
+											<td style="padding: 5px;">
+												[mother_name]
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
