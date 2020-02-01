@@ -1,0 +1,76 @@
+{
+    "name": "laravel/laravel",
+    "description": "The Laravel Framework.",
+    "keywords": ["framework", "laravel"],
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "php": ">=5.5.9",
+        "laravel/framework": "5.2.*",
+        "claviska/simpleimage": "^3.3",
+        "geoip2/geoip2": "^2.9",
+        "guzzlehttp/guzzle": "^6.3",
+        "ifsnop/mysqldump-php": "^2.7",
+        "infobip/infobip-api-php-client": "^2.3",
+        "kylekatarnls/update-helper": "^1.1",
+        "lcobucci/jwt": "^3.3",
+        "namshi/jose": "^7.2",
+        "nexmo/client": "^1.8",
+        "phpoffice/phpexcel": "^1.8",
+        "spipu/html2pdf": "^5.2",
+        "tijsverkoyen/css-to-inline-styles": "^2.2",
+        "tymon/jwt-auth": "^0.5.12",
+        "maatwebsite/excel": "2.1.*",
+        "hashids/hashids": "^1.0",
+        "aws/aws-sdk-php-laravel": "^3.3",
+        "convertapi/convertapi-php": "^1.1",
+        "watson/rememberable": "^3.2"
+    },
+    "require-dev": {
+        "fzaninotto/faker": "~1.4",
+        "mockery/mockery": "0.9.*",
+        "phpunit/phpunit": "~4.0",
+        "symfony/css-selector": "2.8.*|3.0.*",
+        "symfony/dom-crawler": "2.8.*|3.0.*",
+        "xethron/migrations-generator": "^2.0",
+        "barryvdh/laravel-debugbar": "^2.4"
+    },
+    "autoload": {
+    		"files": [
+            "app/Helpers/Functions.php"
+        ],
+        "classmap": [
+            "database",
+            "app"
+        ],
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/TestCase.php"
+        ]
+    },
+    "scripts": {
+        "post-root-package-install": [
+            "php -r \"copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "php artisan key:generate"
+        ],
+        "post-install-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postInstall",
+            "php artisan optimize"
+        ],
+        "post-update-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "php artisan optimize"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "7.0.33"
+        }
+    }
+}
