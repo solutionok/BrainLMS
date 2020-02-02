@@ -1,0 +1,364 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.enquiries}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('enquiries.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/enquiries/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/enquiries/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('enquiries.add_enq')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_enq}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_enq}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.enq_title}}</th>
+								<th>{{phrase.enq_type}}</th>
+								<th>{{phrase.enq_source}}</th>
+								<th>{{phrase.from}}</th>
+								<th>{{phrase.Date}}</th>
+								<th>{{phrase.nxt_fup}}</th>
+								<th style="width:160px;" ng-show="$root.can('enquiries.edit_enq') || $root.can('enquiries.del_enq') || $root.can('enquiries.Download')" >Action</th>
+							</tr>
+							<tr dir-paginate="enquiries_one in enquiries | itemsPerPage:10" total-items="totalItems">
+								<td>
+									<a ng-show="$root.can('enquiries.View')" href="portal#/enquiries/{{enquiries_one.id}}">{{enquiries_one.enq_title}}</a>
+									<span ng-show="!$root.can('enquiries.View')">{{enquiries_one.enq_title}}</span>
+								</td>
+								<td>{{enq_type[enquiries_one.enq_type]}}</td>
+								<td>{{enq_source[enquiries_one.enq_source]}}</td>
+								<td>
+									{{phrase.FullName}} : {{enquiries_one.FullName}}
+									<br/>
+									{{phrase.phoneNo}} : {{enquiries_one.phoneNo}}
+									<br/>
+									{{phrase.email}} : {{enquiries_one.email}}
+									<br/>
+									{{phrase.Address}} : {{enquiries_one.Address}}
+								</td>
+								<td>{{enquiries_one.enq_date}}</td>
+								<td>{{enquiries_one.nxt_fup}}</td>
+								<td ng-show="$root.can('enquiries.edit_enq') || $root.can('enquiries.del_enq') || $root.can('enquiries.Download')">
+                 	<!-- <a ng-show="$root.can('enquiries.Download') && enquiries_one.enq_file != ''" target="_blank" href="{{'index.php/enquiries/download/'+enquiries_one.id}}"><button type="button" class="btn btn-warning btn-circle" title="{{phrase.Download}}" ><i class="fa fa-cloud-download"></i></button></a> -->
+									<button ng-show="$root.can('enquiries.edit_enq')" ng-click="edit(enquiries_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('enquiries.del_enq')" ng-click="remove(enquiries_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!enquiries.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.add_enq}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="enquiries_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': enquiries_add_form.enq_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="enq_title" ng-model="form.enq_title" class="form-control" placeholder="{{phrase.enq_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_desc}} </label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="enq_desc" class="form-control" ng-model="form.enq_desc" placeholder="{{phrase.enq_desc}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': enquiries_add_form.enq_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="enq_type" ng-model="form.enq_type" required>
+									<option ng-repeat="(key,item) in enq_type" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_source}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="enq_source" ng-model="form.enq_source" >
+									<option ng-repeat="(key,item) in enq_source" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': enquiries_add_form.FullName.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="FullName" ng-model="form.FullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="Address" ng-model="form.Address" class="form-control" placeholder="{{phrase.Address}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': enquiries_add_form.enq_date.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="enq_date_add" name="enq_date" ng-model="form.enq_date" class="form-control enq_date_add" placeholder="{{phrase.Date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.nxt_fup}} </label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="nxt_fup_add" name="nxt_fup" ng-model="form.nxt_fup" class="form-control nxt_fup_add" placeholder="{{phrase.nxt_fup}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<input type="file" name="enq_file" file-model="form.enq_file">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="enq_notes" class="form-control" ng-model="form.enq_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="enquiries_add_form.$invalid">{{phrase.add_enq}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_enq}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="enquiries_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': enquiries_edit_form.enq_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="enq_title" ng-model="form.enq_title" class="form-control" placeholder="{{phrase.enq_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_desc}} </label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="enq_desc" class="form-control" ng-model="form.enq_desc" placeholder="{{phrase.enq_desc}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': enquiries_edit_form.enq_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="enq_type" ng-model="form.enq_type" required>
+									<option ng-repeat="(key,item) in enq_type" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_source}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="enq_source" ng-model="form.enq_source" >
+									<option ng-repeat="(key,item) in enq_source" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': enquiries_edit_form.FullName.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="FullName" ng-model="form.FullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="Address" ng-model="form.Address" class="form-control" placeholder="{{phrase.Address}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': enquiries_edit_form.enq_date.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="enq_date_add" name="enq_date" ng-model="form.enq_date" class="form-control enq_date_add" placeholder="{{phrase.Date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.nxt_fup}} </label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="nxt_fup_add" name="nxt_fup" ng-model="form.nxt_fup" class="form-control nxt_fup_add" placeholder="{{phrase.nxt_fup}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<a ng-show="form.enq_file != ''" href="index.php/enquiries/download/{{form.id}}">{{phrase.viewFile}}</a><span style="margin-right:10px;" ng-show="form.enq_file != ''">, {{phrase.orUpNew}}</span><input type="file" name="enq_file" file-model="form.enq_file">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="enq_notes" class="form-control" ng-model="form.enq_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="enquiries_edit_form.$invalid">{{phrase.edit_enq}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.view">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button class="btn no-print pull-right btn-success btn-default" onclick="window.print();"><i class="fa fa-print"></i> {{phrase.Print}}</button>
+				<a href="portal#/enquiries" class="btn btn-danger btn-sm no-print btn-flat pull-right card-block-input-item">Back</a>
+				<h4 class="card-title">{{phrase.enquiries}} : {{form.enq_title}}</h4>
+				<div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_title}} </label>
+						<div class="col-sm-10">
+							{{form.enq_title}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_desc}} </label>
+						<div class="col-sm-10">
+							{{form.enq_desc}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_type}} </label>
+						<div class="col-sm-10">
+							{{form.enq_type}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.enq_source}} </label>
+						<div class="col-sm-10">
+							{{form.enq_source}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} </label>
+						<div class="col-sm-10">
+							{{form.FullName}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+						<div class="col-sm-10">
+							{{form.phoneNo}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+						<div class="col-sm-10">
+							{{form.email}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}} </label>
+						<div class="col-sm-10">
+							{{form.Address}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} </label>
+						<div class="col-sm-10">
+							{{form.enq_date}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.nxt_fup}} </label>
+						<div class="col-sm-10">
+							{{form.nxt_fup}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+						<div class="col-sm-10">
+							<a ng-show="form.enq_file != ''" href="index.php/enquiries/download/{{form.id}}">{{phrase.Download}}</a>
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+						<div class="col-sm-10">
+							{{form.enq_notes}}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

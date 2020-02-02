@@ -1,0 +1,59 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.dbExport}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="$root.can('dbExport.dbExport')">
+    <div class="col-md-3 no-print">
+        <div class="card">
+            <div class="card-block">
+                <div class="list-group">
+
+                    <a showtab="" class="list-group-item active" href="#export" aria-controls="export" role="tab" data-toggle="tab">{{phrase.exportDB}}</a>
+                    <a showtab="" class="list-group-item" href="#import" aria-controls="import" role="tab" data-toggle="tab">{{phrase.importDB}}</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-block">
+
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="export">
+                        <h3>{{phrase.exportDB}}</h3>
+                        <br/>
+                        <div class="form-group row" ng-class="{'has-error': editSettings.siteTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.exportDB}} * </label>
+                            <div class="col-sm-9 control-label">
+                                <a href="backup" target="_BLANK">{{phrase.exportClick}}</a>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="import">
+                        <h3>{{phrase.importDB}}</h3>
+                        <br/>
+                        <div class="form-group row" ng-class="{'has-error': editSettings.siteTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.importDB}} * </label>
+                            <div class="col-sm-9">
+                                {{phrase.importClick}}
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

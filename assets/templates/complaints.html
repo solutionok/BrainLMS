@@ -1,0 +1,364 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.complaints}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('complaints.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/complaints/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/complaints/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('complaints.add_complaint')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_complaint}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_complaint}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.complaint_title}}</th>
+								<th>{{phrase.comp_type}}</th>
+								<th>{{phrase.comp_source}}</th>
+								<th>{{phrase.from}}</th>
+								<th>{{phrase.Date}}</th>
+								<th>{{phrase.nxt_fup}}</th>
+								<th style="width:160px;" ng-show="$root.can('complaints.edit_complaint') || $root.can('complaints.del_complaint') || $root.can('complaints.Download')" >Action</th>
+							</tr>
+							<tr dir-paginate="complaints_one in complaints | itemsPerPage:10" total-items="totalItems">
+								<td>
+									<a ng-show="$root.can('complaints.View')" href="portal#/complaints/{{complaints_one.id}}">{{complaints_one.comp_title}}</a>
+									<span ng-show="!$root.can('complaints.View')">{{complaints_one.comp_title}}</span>
+								</td>
+								<td>{{comp_type[complaints_one.comp_type]}}</td>
+								<td>{{comp_source[complaints_one.comp_source]}}</td>
+								<td>
+									{{phrase.FullName}} : {{complaints_one.FullName}}
+									<br/>
+									{{phrase.phoneNo}} : {{complaints_one.phoneNo}}
+									<br/>
+									{{phrase.email}} : {{complaints_one.email}}
+									<br/>
+									{{phrase.Address}} : {{complaints_one.Address}}
+								</td>
+								<td>{{complaints_one.enq_date}}</td>
+								<td>{{complaints_one.nxt_fup}}</td>
+								<td ng-show="$root.can('complaints.edit_complaint') || $root.can('complaints.del_complaint') || $root.can('complaints.Download')">
+                 	<!-- <a ng-show="$root.can('complaints.Download') && complaints_one.enq_file != ''" target="_blank" href="{{'index.php/complaints/download/'+complaints_one.id}}"><button type="button" class="btn btn-warning btn-circle" title="{{phrase.Download}}" ><i class="fa fa-cloud-download"></i></button></a> -->
+									<button ng-show="$root.can('complaints.edit_complaint')" ng-click="edit(complaints_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('complaints.del_complaint')" ng-click="remove(complaints_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!complaints.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.add_complaint}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="complaints_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': complaints_add_form.comp_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.complaint_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="comp_title" ng-model="form.comp_title" class="form-control" placeholder="{{phrase.complaint_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_desc}} </label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="comp_desc" class="form-control" ng-model="form.comp_desc" placeholder="{{phrase.comp_desc}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': complaints_add_form.comp_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="comp_type" ng-model="form.comp_type" required>
+									<option ng-repeat="(key,item) in comp_type" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_source}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="comp_source" ng-model="form.comp_source" >
+									<option ng-repeat="(key,item) in comp_source" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': complaints_add_form.FullName.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="FullName" ng-model="form.FullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="Address" ng-model="form.Address" class="form-control" placeholder="{{phrase.Address}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': complaints_add_form.enq_date.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="enq_date_add" name="enq_date" ng-model="form.enq_date" class="form-control enq_date_add" placeholder="{{phrase.Date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.nxt_fup}} </label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="nxt_fup_add" name="nxt_fup" ng-model="form.nxt_fup" class="form-control nxt_fup_add" placeholder="{{phrase.nxt_fup}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<input type="file" name="enq_file" file-model="form.enq_file">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="enq_notes" class="form-control" ng-model="form.enq_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="complaints_add_form.$invalid">{{phrase.add_complaint}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_complaint}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="complaints_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': complaints_edit_form.comp_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.complaint_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="comp_title" ng-model="form.comp_title" class="form-control" placeholder="{{phrase.complaint_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_desc}} </label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="comp_desc" class="form-control" ng-model="form.comp_desc" placeholder="{{phrase.comp_desc}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': complaints_edit_form.comp_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="comp_type" ng-model="form.comp_type" required>
+									<option ng-repeat="(key,item) in comp_type" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_source}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="comp_source" ng-model="form.comp_source" >
+									<option ng-repeat="(key,item) in comp_source" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': complaints_edit_form.FullName.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="FullName" ng-model="form.FullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="Address" ng-model="form.Address" class="form-control" placeholder="{{phrase.Address}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': complaints_edit_form.enq_date.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="enq_date_edit" name="enq_date" ng-model="form.enq_date" class="form-control enq_date_add" placeholder="{{phrase.Date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.nxt_fup}} </label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="nxt_fup_edit" name="nxt_fup" ng-model="form.nxt_fup" class="form-control nxt_fup_add" placeholder="{{phrase.nxt_fup}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<a ng-show="form.enq_file != ''" href="index.php/complaints/download/{{form.id}}">{{phrase.viewFile}}</a><span style="margin-right:10px;" ng-show="form.enq_file != ''">, {{phrase.orUpNew}}</span><input type="file" name="enq_file" file-model="form.enq_file">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="enq_notes" class="form-control" ng-model="form.enq_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="complaints_edit_form.$invalid">{{phrase.edit_complaint}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.view">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button class="btn no-print pull-right btn-success btn-default" onclick="window.print();"><i class="fa fa-print"></i> {{phrase.Print}}</button>
+				<a href="portal#/complaints" class="btn btn-danger no-print btn-flat pull-right btn-sm card-block-input-item">Back</a>
+				<h4 class="card-title">{{phrase.complaints}} : {{form.comp_title}}</h4>
+				<div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.complaint_title}} </label>
+						<div class="col-sm-10">
+							{{form.comp_title}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_desc}} </label>
+						<div class="col-sm-10">
+							{{form.comp_desc}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_type}} </label>
+						<div class="col-sm-10">
+							{{form.comp_type}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_source}} </label>
+						<div class="col-sm-10">
+							{{form.comp_source}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} </label>
+						<div class="col-sm-10">
+							{{form.FullName}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+						<div class="col-sm-10">
+							{{form.phoneNo}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+						<div class="col-sm-10">
+							{{form.email}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}} </label>
+						<div class="col-sm-10">
+							{{form.Address}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} </label>
+						<div class="col-sm-10">
+							{{form.enq_date}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.nxt_fup}} </label>
+						<div class="col-sm-10">
+							{{form.nxt_fup}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+						<div class="col-sm-10">
+							<a ng-show="form.enq_file != ''" href="index.php/complaints/download/{{form.id}}">{{phrase.Download}}</a>
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+						<div class="col-sm-10">
+							{{form.enq_notes}}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

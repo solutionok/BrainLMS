@@ -1,0 +1,196 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Promotion}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <h4 class="card-title">{{phrase.promoteStudents}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="promoteForm" role="form" novalidate ng-submit="listStudents()">
+                        <div class="form-group row" ng-class="{'has-error': promoteForm.promoType.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.promotionType}} * </label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="promoType" value="promote" ng-model="form.promoType" checked="checked" required> {{phrase.promote2AcYear}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="promoType" value="graduate" ng-model="form.promoType" required> {{phrase.graduate}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': promoteForm.selectType.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.select}} * </label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="selectType" value="acYear" ng-model="form.selectType" checked="checked" required>
+                                        {{phrase.fromAcYear}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="selectType" value="selStudents" ng-model="form.selectType" required>
+                                        {{phrase.selectStudents}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-if="form.selectType == 'acYear'" ng-class="{'has-error': promoteForm.acYear.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.fromAcYear}} * </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.acYear" name="acYear" ng-change="classesList()" required>
+                                    <option ng-repeat="year in $root.dashboardData.academicYear" value="{{year.id}}" ng-if="year.isDefault == '0'">{{year.yearTitle}}</option>
+                                    <option ng-repeat="year in $root.dashboardData.academicYear" value="{{year.id}}" ng-if="year.isDefault == '1'">{{year.yearTitle}} - Default Year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-if="form.selectType == 'acYear'" ng-class="{'has-error': promoteForm.classId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}} * </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId" required>
+                                    <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-if="form.selectType == 'selStudents'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.studentDetails}}</label>
+                            <div class="col-sm-10">
+                                <a type="button" ng-click="linkStudent()" class="btn btn-danger btn-flat">Link Student</a>
+                                <div class="row" ng-repeat="studentOne in form.studentInfo track by $index">
+                                    <div class="col-xs-4"><input type="text" class="form-control" disabled="disabled" ng-model="studentOne.student"></div>
+                                    <a type="button" ng-click="removeStudent(studentOne.id)" class="btn btn-danger btn-flat"><i class="fa fa-trash-o"></i></a></li>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="promoteForm.$invalid">{{phrase.promoteStudents}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.studentPromote">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm btn-danger btn-flat pull-right card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.promoteStudents}}</h4>
+                <div class="table-responsive">
+
+                    <strong ng-show="promoType == 'graduate'">{{phrase.graduateBelow}} <br/><br/></strong>
+                    <form class="form-horizontal" name="promoteStudentForm" role="form" novalidate ng-submit="promoteNow()">
+                        <table class="table table-bordered table-hover">
+                            <tr>
+                                <th>{{phrase.studentName}}</th>
+                                <th ng-show="promoType == 'promote'">{{phrase.newAcYear}}</th>
+                                <th ng-show="promoType == 'promote'">{{phrase.newClass}}</th>
+                                <th ng-show="$root.dashboardData.enableSections == '1' && promoType == 'promote'">New Section</th>
+                                <th>{{phrase.remove}}</th>
+                            </tr>
+                            <tr ng-repeat="(key,value) in studentsList.students">
+                                <td>{{value.fullName}}</td>
+                                <td ng-show="promoType == 'promote'" ng-class="{'has-error': promoteStudentForm['acYear[]'].$invalid}">
+                                    <select class="form-control" ng-model="studentsList.students[key].acYear" name="acYear[]" ng-change="classesPromoteList(key)">
+                                        <option ng-repeat="year in $root.dashboardData.academicYear" value="{{year.id}}" ng-if="year.isDefault == '0'" ng-selected="year.id == form.acYear">{{year.yearTitle}}</option>
+                                        <option ng-repeat="year in $root.dashboardData.academicYear" value="{{year.id}}" ng-if="year.isDefault == '1'" ng-selected="year.id == form.acYear">{{year.yearTitle}} - Default Year</option>
+                                    </select>
+                                </td>
+                                <td ng-show="promoType == 'promote'" ng-class="{'has-error': promoteStudentForm['class[]'].$invalid}">
+                                    <select class="form-control" ng-model="studentsList.students[key].class" ng-required="promoType == 'promote'" name="class[]" >
+                                        <option ng-repeat="class in classesArray[key].classes" value="{{class.id}}" ng-selected="class.id == value.class">{{class.className}}</option>
+                                    </select>
+                                </td>
+                                <td ng-show="$root.dashboardData.enableSections == '1' && promoType == 'promote'" ng-class="{'has-error': promoteStudentForm['section[]'].$invalid}">
+                                    <select class="form-control" ng-model="studentsList.students[key].section" ng-required="$root.dashboardData.enableSections == '1' && promoType == 'promote'" name="section[]" >
+                                        <option ng-repeat="section in sections[studentsList.students[key].class]" value="{{section.id}}" ng-selected="section.id == section.section">{{section.sectionName}}</option>
+                                    </select>
+                                </td>
+                                <th>
+                                    <button type="button" ng-click="removePromoStudent(value.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button>
+                                </th>
+                            </tr>
+                        </table>
+
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="promoteStudentForm.$invalid">{{phrase.promoteStudents}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.studentsPromoted">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm btn-danger btn-flat pull-right card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.promoteStudents}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>{{phrase.studentName}}</th>
+                            <th>{{phrase.Status}}</th>
+                        </tr>
+                        <tr ng-repeat="student in studentsPromoted">
+                            <td>{{student.fullName}}</td>
+                            <td>{{student.status}}</td>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="showModalLink">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink" placeholder="Type student name / username / E-mail address">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="linkStudentButton()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="studentOne in searchResults">
+                            <td>{{studentOne.name}}</td>
+                            <td>{{studentOne.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="linkStudentFinish(studentOne)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>

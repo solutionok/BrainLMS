@@ -1,0 +1,153 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Polls}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-show="$root.can('Polls.addPoll')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addPoll}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listPolls}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.pollTitle}}</th>
+                                <th>{{phrase.pollTarget}}</th>
+                                <th>{{phrase.pollStatus}}</th>
+                                <th ng-show="$root.can('Polls.editPoll') || $root.can('Polls.delPoll')">Action</th>
+                            </tr>
+                            <tr ng-repeat="poll in polls | filter:searchText">
+                                <td>{{poll.pollTitle}}</td>
+                                <td>
+                                    <ANY ng-switch="poll.pollTarget">
+                                        <ANY ng-switch-when="all">{{phrase.all}}</ANY>
+                                        <ANY ng-switch-when="teacher">{{phrase.teachers}}</ANY>
+                                        <ANY ng-switch-when="student">{{phrase.students}}</ANY>
+                                        <ANY ng-switch-when="parent">{{phrase.parents}}</ANY>
+                                    </ANY>
+                                </td>
+                                <td><span ng-show="poll.pollStatus == '1'">{{phrase.Active}}</span><span ng-show="poll.pollStatus == '0'">{{phrase.Inactive}}</span></td>
+                                <td ng-show="$root.can('Polls.editPoll') || $root.can('Polls.delPoll')">
+                                    <button ng-show="$root.can('Polls.editPoll')" ng-show="poll.pollStatus == '0'" ng-click="makeActive(poll.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Active}}" ><i class="fa  fa-check-square-o"></i></button>
+                                    <button ng-show="$root.can('Polls.editPoll')" ng-click="edit(poll.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Polls.delPoll')" ng-click="remove(poll,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!polls.length"><td class="noTableData" colspan="4">{{phrase.noPolls}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.addPoll}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addPoll" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addPoll.pollTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pollTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="pollTitle" ng-model="form.pollTitle" class="form-control" required placeholder="{{phrase.pollTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pollOptions}}</label>
+                            <div class="col-sm-10">
+                                <button ng-click="addPollOption()" type="button" class="btn bg-olive marginBottom15 btn-flat">{{phrase.newOption}}</button>
+                                <ul>
+                                    <li ng-repeat="option in form.pollOptions">{{option.title}} - <a ng-click="removePollOption(option,$index)">{{phrase.Remove}}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addPoll.pollTarget.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pollTarget}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="pollTarget" ng-model="form.pollTarget" required>
+                                    <option value="all">{{phrase.all}}</option>
+                                    <option value="teacher">{{phrase.teachers}}</option>
+                                    <option value="student">{{phrase.students}}</option>
+                                    <option value="parent">{{phrase.parents}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addPoll.$invalid">{{phrase.addPoll}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editPoll}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editPoll" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editPoll.pollTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pollTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="pollTitle" ng-model="form.pollTitle" class="form-control" required placeholder="{{phrase.pollTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pollOptions}}</label>
+                            <div class="col-sm-10">
+                                <button ng-click="addPollOption()" type="button" class="btn bg-olive marginBottom15 btn-flat">{{phrase.newOption}}</button>
+                                <ul>
+                                    <li ng-repeat="option in form.pollOptions">{{option.title}} - <a ng-click="removePollOption(option,$index)">{{phrase.Remove}}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editPoll.pollTarget.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pollTarget}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="pollTarget" ng-model="form.pollTarget" required>
+                                    <option value="all">{{phrase.all}}</option>
+                                    <option value="teacher">{{phrase.teachers}}</option>
+                                    <option value="student">{{phrase.students}}</option>
+                                    <option value="parent">{{phrase.parents}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editPoll.$invalid">{{phrase.editPoll}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

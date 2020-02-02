@@ -1,0 +1,113 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.usrBaseSelec}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <h4 class="card-title">{{phrase.selUsers}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="search_users()" name="search_users_form" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': search_users_form.user_search.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.usrSelect}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="user_search" ng-model="form.user_search" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light m-t-10" ng-disabled="search_users_form.$invalid">{{phrase.searchUsers}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card" ng-show="show_results_table == true">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.usrSelect}}</h4>
+                <div class="form">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.slryType}}</th>
+                                <th>{{phrase.salaryBase}}</th>
+                                <th class="no-print">Action</th>
+                            </tr>
+                            <tr ng-repeat="employee in employees">
+                                <td>
+                                    <img alt="{{employee.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+employee.id}}">
+                                    <a href="" ng-click="teacherProfile( employee.id )">{{employee.name}}</a>
+                                </td>
+                                <td>{{employee.email}}</td>
+                                <td>{{employee.salary_type}}</td>
+                                <td>{{employee.salary_base}}</td>
+                                <td class="no-print">
+                                    <button ng-click="edit(employee)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!employees.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="edit_base_modal">
+
+    <form class="form-horizontal" name="editUserSalary" role="form"  ng-submit="update_user_salary()" role="form" novalidate>
+        <div class="form-group row" ng-class="{'has-error': editUserSalary.homeworkTitle.$invalid}">
+            <label class="col-sm-4 text-right control-label col-form-label">{{phrase.slryType}} * </label>
+            <div class="col-sm-8">
+                <div class="radio-list">
+                    <label>
+                        <input type="radio" name="salary_type" value="monthly" required ng-model="form.salary_type"> {{phrase.monthly}}
+                    </label>
+                </div>
+                <div class="radio-list">
+                    <label>
+                        <input type="radio" name="salary_type" value="hourly" required ng-model="form.salary_type"> {{phrase.hourly}}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': editUserSalary.salary_base.$invalid}">
+            <label class="col-sm-4 text-right control-label col-form-label">{{phrase.salaryBase}} *</label>
+            <div class="col-sm-8">
+
+                <div class="radio-list" ng-if="form.salary_type == 'monthly'" ng-repeat="(key,value) in salary_base">
+                    <label>
+                        <input type="radio" name="salary_base_id" value="{{key}}" required ng-model="form.salary_base_id"> {{value}}
+                    </label>
+                </div>
+                <div class="radio-list" ng-if="form.salary_type == 'hourly'" ng-repeat="(key,value) in hourly_base">
+                    <label>
+                        <input type="radio" name="salary_base_id" value="{{key}}" required ng-model="form.salary_base_id"> {{value}}
+                    </label>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editUserSalary.$invalid">{{phrase.update}}</button>
+            </div>
+        </div>
+    </form>
+
+</modal>

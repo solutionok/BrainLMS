@@ -1,0 +1,249 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.teachers}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+    		<div class="form-inline mb-3 ml-4">
+					<select class="col-4 form-control mr-2" ng-model="filter_teachers_input_class" ng-change="getCurrentSubjects()">
+						<option value="0">-All Classes-</option>
+						<option ng-repeat="class in classes" value="{{ class.id }}">{{ class.className }}</option>
+					</select>
+					<select class="col-4 form-control mr-2" ng-model="filter_teachers_input_subject">
+						<option value="0">-All Subjects-</option>
+						<option ng-repeat="id in subject_ids" value="{{ id }}">{{ subject_array[id] }}</option>
+					</select>
+				  <button type="button" class="ml-2 col-2 btn btn-primary" ng-click="filterTeachers1(1)" style="padding: 9px">
+				  	<i class="fa fa-search"></i>
+				  </button>
+				</div>
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div class="table-responsive">
+                    <table id="listTable" class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>Name</th>
+                                <th>Info.</th>
+                                <!-- <th class="no-print" ng-show="$root.can('teachers.EditTeacher') || $root.can('teachers.EditTeacher') || $root.can('teachers.delTeacher')">Action</th> -->
+                            </tr>
+                            <tr dir-paginate="teacher in teachers | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                    <i ng-show="$root.can('teachers.EditTeacher')" ng-class="{'color_red':teacher.account_active==0,'color_green':teacher.account_active==1}" class="fa fa-lightbulb-o"></i>
+                                    <a href="" ng-click="teacherProfile( teacher.id )">{{teacher.fullName}}</a>
+                                </td>
+                                <td>
+                                    <b>ID:</b> {{teacher.id}}<br>
+                                    <span ng-if="teacher.phoneNo.length">
+                                    	<b>Phone:</b> {{teacher.phoneNo}}
+                                    </span>
+                                    <span ng-if="!teacher.phoneNo.length">
+                                    	<b>Phone:</b> <i>no detected</i>
+                                    </span>
+                                    <!-- <b>Sections:</b>
+                                    <div style="max-height: 40px; overflow-y: scroll;">
+																    	<span style="font-size: 13px;" ng-repeat="(index, section) in teacher.sections">
+																    			<span ng-if="index + 1 != teacher.sections">
+																		    		{{ section.sectionName }} -
+																		    	</span>
+																		    	<span ng-if="index + 1 == teacher.sections">
+																		    		{{ section.sectionName }}
+																		    	</span>
+																	    </span>
+															    	</div> -->
+                                </td>
+                                <!-- <td class="no-print options" ng-show="$root.can('teachers.EditTeacher') || $root.can('teachers.EditTeacher') || $root.can('teachers.delTeacher')">
+                                    <button ng-show="$root.can('teachers.EditTeacher')" ng-click="account_status(teacher.id,$index)" type="button" class="btn btn-warning btn-circle mb-1" title="{{phrase.toggleStatus}}" ><i class="fa fa-lightbulb-o"></i></button>
+                                    <button ng-show="$root.can('teachers.EditTeacher')" ng-click="edit(teacher.id)" type="button" class="btn btn-info btn-circle mb-1" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                </td> -->
+                            </tr>
+                            <tr ng-show="!teachers.length"><td class="noTableData" colspan="5">{{phrase.noTeachers}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls on-page-change="getResultsPage(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.EditTeacher}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form" name="editAdmin" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/teachers/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.fullName.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.username.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.username}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" ng-model="form.username" class="form-control" required placeholder="{{phrase.username}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.email.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} *</label>
+                            <div class="col-sm-10">
+                                <input type="email" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.password}} *</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="password" ng-model="form.password" class="form-control" placeholder="{{phrase.password}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Gender}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="male" ng-model="form.gender">
+                                        {{phrase.Male}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="female" ng-model="form.gender">
+                                        {{phrase.Female}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Birthday}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker id="datemaskEdit" name="birthday" ng-model="form.birthday" class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="address" class="form-control" ng-model="form.address" placeholder="{{phrase.Address}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="phoneNo" class="form-control" ng-model="form.phoneNo" placeholder="{{phrase.phoneNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.mobileNo.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.mobileNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" mobile-number name="mobileNo" class="form-control" ng-model="form.mobileNo" placeholder="{{phrase.mobileNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.biometric_id.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bioId}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="biometric_id" class="form-control" ng-model="form.biometric_id" >
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Transportation}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="transport" ng-model="form.transport" >
+                                    <option ng-repeat="transport in transports" value="{{transport.id}}">{{transport.transportTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.trans_vehicles}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="transport_vehicle" ng-model="form.transport_vehicle">
+                                    <option ng-repeat="(key,item) in transports[form.transport].vehicles" value="{{key}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.user_position.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.userPosition}} </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="user_position" ng-model="form.user_position" class="form-control" placeholder="{{phrase.userPosition}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="photo">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Communication}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div>
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editAdmin.$invalid">{{phrase.EditTeacher}}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="showModal">
+	<div ng-bind-html="modalContent"></div>
+</modal>

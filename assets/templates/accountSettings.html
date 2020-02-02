@@ -1,0 +1,452 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+	#menu > a {
+		padding: 8px 15px;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.AccountSettings}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 no-print">
+      <div class="list-group mb-3" id="menu">
+        <a ng-show="$root.can('AccountSettings.myInvoices')" href="index.php/portal#/account/invoices"
+        	class="list-group-item"
+        	ng-class="{'active': views.invoices || views.invoiceDetails}">{{phrase.myInvoices}}</a>
+        <a ng-show="$root.can('AccountSettings.ChgProfileData')" href="index.php/portal#/account"
+        	class="list-group-item" ng-class="{'active': views.profile}">
+        	Edit profile</a>
+        <a ng-show="$root.can('AccountSettings.chgEmailAddress')" href="index.php/portal#/account/email"
+        	class="list-group-item" ng-class="{'active': views.email}">Edit E-mail</a>
+        <a ng-show="$root.can('AccountSettings.chgPassword')" href="index.php/portal#/account/password"
+        	class="list-group-item" ng-class="{'active': views.password}">{{phrase.chgPassword}}</a>
+      </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-block">
+                <section  class="content" ng-show="views.invoices && $root.can('AccountSettings.myInvoices')">
+                    <div class="col-xs-12">
+                        <div class="box-header">
+                            <h3 class="box-title pb-3">{{phrase.myInvoices}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+
+                            <table class="table table-hover table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th>{{phrase.ID}}</th>
+                                        <th>{{phrase.InvTitle}}</th>
+                                        <th>{{phrase.dateDueDate}}</th>
+                                        <th width="180">{{phrase.Amount}} <Br/> {{phrase.discoutedAmount}} <br/> {{phrase.paidAmount}}</th>
+                                        <th>{{phrase.Status}}</th>
+                                    </tr>
+                                    <tr ng-repeat="invoice in invoices">
+                                        <td>
+                                            <a class="ahref" ng-click="seeInvoice(invoice.id)">{{invoice.paymentTitle}}</a>
+                                            <br/><i class="mdi mdi-account"></i> {{invoice.fullName}}
+                                        </td>
+                                        <td>
+                                            {{invoice.paymentDescription}}
+                                        </td>
+                                        <td>{{invoice.paymentDate}}<Br/>{{invoice.dueDate}}</td>
+                                        <td>{{invoice.paymentAmount}} <br/> {{invoice.paymentDiscounted}} <br/> {{invoice.paidAmount}}</td>
+                                        <td>
+                                            <span ng-click="alertPaidData(invoice.id)" ng-show="invoice.paymentStatus == '1'" style='color:green;cursor:pointer;'>{{phrase.paid}}</span>
+                                            <span ng-show="invoice.paymentStatus == '0'" style='color:red;'>{{phrase.unpaid}}</span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="!invoices.length"><td class="noTableData" colspan="7">{{phrase.noPayments}}</td></tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content" ng-show="views.profile && $root.can('AccountSettings.ChgProfileData')">
+                    <div class="col-xs-12">
+                        <div class="box-header">
+                            <h3 class="box-title pb-3">{{phrase.ChgProfileData}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <form class="form-horizontal" name="editDorm" role="form" ng-upload="saveProfile(content)" method="post" action="{{'index.php/accountSettings/profile'}}" novalidate>
+                                <div class="form-group row" ng-class="{'has-error': editDorm.fullName.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} * </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Gender}}</label>
+                                    <div class="col-sm-9">
+
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="gender" value="male" ng-model="form.gender" checked="checked">
+                                                {{phrase.Male}}
+                                            </label>
+                                        </div>
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="gender" value="female" ng-model="form.gender">
+                                                {{phrase.Female}}
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Birthday}}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" date-picker id="datemask" name="birthday" ng-model="form.birthday" class="form-control datemask">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="address" class="form-control" ng-model="form.address" placeholder="{{phrase.Address}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="phoneNo" class="form-control" ng-model="form.phoneNo" placeholder="{{phrase.phoneNo}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.mobileNo}}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" mobile-number name="mobileNo" class="form-control" ng-model="form.mobileNo" placeholder="{{phrase.mobileNo}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Communication}}</label>
+                                    <div class="col-sm-9">
+
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                            </label>
+                                        </div>
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                            </label>
+                                        </div>
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Photo}}</label>
+                                    <div class="col-sm-9">
+                                        <input type="file" name="photo">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-0">
+                                    <div>
+                                        <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editDorm.$invalid">{{phrase.editProfile}}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content" ng-show="views.invoiceDetails">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-block">
+                                <a ng-click="changeView('invoices')" class="btn pull-right btn-sm btn-danger card-block-input-item">Back</a>
+                                <h4 class="card-title">{{phrase.viewInvoice}}</h4>
+                                <div class="col-12">
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h2 class="page-header">
+                                                <i class="fa fa-globe"></i> {{invoice.siteTitle}}
+                                                <small class="pull-right"> #{{invoice.payment.paymentTitle}}</small>
+                                            </h2>
+                                        </div><!-- /.col -->
+                                    </div>
+                                    <!-- info row -->
+                                    <div class="row">
+                                        <div class="col-sm-4 invoice-col">
+                                            {{phrase.from}}
+                                            <address>
+                                                <strong>{{invoice.siteTitle}}</strong><br>
+                                                {{invoice.address}}<br>
+                                                {{invoice.address2}}<br>
+                                                {{phrase.phoneNo}}: {{invoice.phoneNo}}<br/>
+                                                {{phrase.email}}: {{invoice.systemEmail}}
+                                            </address>
+                                        </div><!-- /.col -->
+                                        <div class="col-sm-4 invoice-col">
+                                            {{phrase.to}}
+                                            <address>
+                                                <strong>{{invoice.user.fullName}}</strong><br>
+                                                {{invoice.user.address}}<br>
+                                                {{phrase.phoneNo}}: {{invoice.user.phoneNo}}<br/>
+                                                {{phrase.email}}: {{invoice.user.email}}<br/>
+                                                {{phrase.class}}: {{invoice.user.className}}
+                                                <span ng-show="$root.dashboardData.enableSections == '1'"><br/>{{phrase.section}}: {{invoice.user.sectionName}}</span>
+                                            </address>
+                                        </div><!-- /.col -->
+
+                                        <div class="col-sm-4 invoice-col text-center">
+                                            <span ng-show="invoice.payment.paymentStatus == '1'" style='color:green; font-size:30px;font-weight:bold;'>
+                                                {{phrase.paid}}
+                                            </span>
+                                            <span ng-show="invoice.payment.paymentStatus == '1'" style='color:green;font-weight:bold;'>
+                                                <br/>
+                                                Payment Method : {{invoice.payment.paidMethod}}<br/>
+                                                Paid at : {{invoice.payment.paidTime}}
+                                            </span>
+                                            <span ng-show="invoice.payment.paymentStatus == '0'" style='color:red; font-size:30px;font-weight:bold;'>
+                                                {{phrase.unpaid}}
+                                            </span>
+
+                                            <br/><button ng-show="invoice.payment.paymentStatus != '1'" ng-click="payOnline(invoice.payment.id)" type="button" class="btn btn-md btn-info"><i class="fa fa-inr"></i> Pay Now</button>
+
+                                        </div>
+                                    </div><!-- /.row -->
+
+                                    <div class="row" style="margin-top:10px; margin-bottom:10px;">
+                                        <div class="col-md-12">
+                                            <span class="pull-right">
+                                                <i class="fa fa-calendar"></i> {{phrase.Date}} : {{invoice.payment.paymentDate}}<br/>
+                                                <i class="fa fa-calendar"></i> Due Date : {{invoice.payment.dueDate}}
+                                            </span>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- Table row -->
+                                    <div class="row">
+                                        <div class="col-xs-12 table-responsive">
+                                            <table class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{phrase.Product}}</th>
+                                                        <th>{{phrase.Subtotal}}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="row in invoice.payment.paymentRows">
+                                                        <td>{{row.title}}</td>
+                                                        <td>{{invoice.currency_symbol}} {{row.amount}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div><!-- /.col -->
+                                    </div><!-- /.row -->
+
+                                    <div class="row">
+                                        <!-- accepted payments column -->
+                                        <div class="col-md-6"></div><!-- /.col -->
+                                        <div class="col-md-6">
+                                            <p class="lead"><br/>{{phrase.AmountDue}} {{invoice.payment.dueDate}}</p>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <tr>
+                                                        <th style="width:50%">{{phrase.Subtotal}}:</th>
+                                                        <td>{{invoice.currency_symbol}} {{invoice.prices.original}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th style="width:50%">Discount:</th>
+                                                        <td>{{invoice.currency_symbol}} {{invoice.prices.discount}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>{{phrase.payTax}} ({{invoice.paymentTax}}%)</th>
+                                                        <td>{{invoice.currency_symbol}} {{invoice.prices.tax_value}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>{{phrase.Total}}:</th>
+                                                        <td>{{invoice.currency_symbol}} {{invoice.prices.total_with_tax}}</td>
+                                                    </tr>
+                                                    <tr style="background-color: green;color: white;">
+                                                        <th>{{phrase.paidAmount}}:</th>
+                                                        <td style="border-top:0px;">{{invoice.currency_symbol}} {{invoice.prices.paid_value}}</td>
+                                                    </tr>
+                                                    <tr style="background-color: green;color: white;">
+                                                        <th>{{phrase.pendingAmount}}:</th>
+                                                        <td style="border-top:0px;">{{invoice.currency_symbol}} {{invoice.prices.total_pending}}</td>
+                                                    </tr>
+                                                    <tr ng-show="invoice.payment.isDueDate && invoice.payment.paymentStatus != '1'" style="background-color: red;color: white;">
+                                                        <th colspan="2"> {{phrase.invDueDate}} </th>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div><!-- /.col -->
+                                    </div><!-- /.row -->
+
+                                    <!-- this row will not appear when printing -->
+                                    <div class="row no-print">
+                                        <div class="col-xs-12">
+                                            <button class="btn btn-success btn-default" onclick="window.print();"><i class="fa fa-print"></i> {{phrase.Print}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content" ng-show="views.email && $root.can('AccountSettings.chgEmailAddress')">
+                    <div class="col-xs-12">
+                        <div class="box-header">
+                            <h3 class="box-title pb-3">Edit E-mail address</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <form class="form-horizontal" name="editemail" role="form" ng-submit="saveEmail()" method="post" novalidate>
+                                <div class="form-group row" ng-class="{'has-error': editemail.password.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.password}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="password" name="password" ng-model="form.password" class="form-control" required placeholder="{{phrase.password}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{'has-error': editemail.email.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="email" name="email" ng-model="form.email" class="form-control" required placeholder="{{phrase.email}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{'has-error': editemail.reemail.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">Re-Enter Email Address</label>
+                                    <div class="col-sm-9">
+                                        <input type="email" name="reemail" ng-model="form.reemail" class="form-control" ng-match="email" required placeholder="{{phrase.reemail}}">
+                                    </div>
+                                </div>
+                                <div class="form-group m-b-0">
+                                    <div>
+                                        <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editemail.$invalid">Edit E-mail</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content" ng-show="views.password && $root.can('AccountSettings.chgPassword')">
+                    <div class="col-xs-12">
+                        <div class="box-header">
+                            <h3 class="box-title pb-3">{{phrase.chgPassword}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <form class="form-horizontal" name="editpassword" role="form" ng-submit="savePassword()" method="post" novalidate>
+                                <div class="form-group row" ng-class="{'has-error': editpassword.password.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.oldPassword}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="password" name="password" ng-model="form.password" class="form-control" required placeholder="{{phrase.oldPassword}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{'has-error': editpassword.newPassword.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.newPassword}} </label>
+                                    <div class="col-sm-9">
+                                        <input type="password" name="newPassword" ng-model="form.newPassword" class="form-control" required placeholder="{{phrase.newPassword}}">
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{'has-error': editpassword.repassword.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">Re-Enter Password</label>
+                                    <div class="col-sm-9">
+                                        <input type="password" name="repassword" ng-model="form.repassword" class="form-control" ng-match="newPassword" required placeholder="{{phrase.renewPassword}}">
+                                    </div>
+                                </div>
+                                <div class="form-group m-b-0">
+                                    <div>
+                                        <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editpassword.$invalid">Change password</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="payOnlineModal">
+    <form class="form-horizontal" name="PayOnlineForm" role="form" action="{{'index.php/invoices/pay/'+invoice.payment.id}}" method="POST" novalidate>
+        <div class="form-group row">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.InvID}} * </label>
+            <div class="col-sm-9  control-label col-form-label">
+                {{invoice.payment.paymentTitle}}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.totalAmount}}</label>
+            <div class="col-sm-3  control-label col-form-label">
+                {{invoice.currency_symbol}} {{invoice.prices.total_with_tax}}
+            </div>
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pendingAmount}}</label>
+            <div class="col-sm-3  control-label col-form-label">
+                {{invoice.currency_symbol}} {{invoice.prices.total_pending}}
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': PayOnlineForm.payVia.$invalid}">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.payVia}} *</label>
+            <div class="col-sm-9">
+                <div class="radio-list" ng-show="invoice.paypalEnabled == '1'">
+                    <label>
+                        <input type="radio" name="payVia" value="paypal" ng-model="form.payVia" required> Paypal
+                    </label>
+                </div>
+                <div class="radio-list" ng-show="invoice.2coEnabled == '1'">
+                    <label>
+                        <input type="radio" name="payVia" value="2co" ng-model="form.payVia" required > 2CheckOut
+                    </label>
+                </div>
+                <div class="radio-list" ng-show="invoice.payumoneyEnabled == '1'">
+                    <label>
+                        <input type="radio" name="payVia" value="payumoney" ng-model="form.payVia" required > PayUmoney
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-3 col-sm-9">
+                <input type="hidden" name="return" value="accountSettings"/>
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="PayOnlineForm.$invalid">{{phrase.pay}}</button>
+            </div>
+        </div>
+    </form>
+</modal>

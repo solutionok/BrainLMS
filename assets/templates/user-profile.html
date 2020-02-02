@@ -1,0 +1,54 @@
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">My profile</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+							  <div class="card-body">
+							    <p><b>Name:</b> {{ profile_data.fullName }}</p>
+							    <p><b>Phone No.</b>
+							    	<span ng-if="profile_data.phoneNo.length">{{ profile_data.phoneNo }}</span>
+							    	<i ng-if="!profile_data.phoneNo.length" class="text-warning">not detected</i>
+							    </p>
+							    <p><b>Address:</b>
+							    	<span ng-if="profile_data.address.length">{{ profile_data.address }}</span>
+							    	<i ng-if="!profile_data.address.length" class="text-warning">not detected</i>
+							    </p>
+							    <div ng-if="profile_data.role == 'parent'">
+								    <hr>
+								    <p><b>Ward Name:</b>
+								    	<ul ng-if="profile_data.students.length">
+								    		<li style="list-style: circle;margin-left: -10px;font-size: 14px;" \
+								    			ng-repeat="student in profile_data.students"
+								    			>
+								    			<b class="text-danger">{{ student.fullName }}</b><br>
+								    			<b>Roll ID:</b>
+							    				<span ng-if="student.studentRollId.length">{{ student.studentRollId }}</span>
+						    					<i ng-if="!student.studentRollId.length" class="text-warning">not detected</i>
+							    				<br>
+								    			<b>Class:</b>
+							    				<span ng-if="student.mclass.className.length">{{ student.mclass.className }}</span>
+						    					<i ng-if="!student.mclass.className.length" class="text-warning">not detected</i>
+						    					<br>
+								    			<b>Section:</b>
+							    				<span ng-if="student.section.sectionName.length">{{ student.section.sectionName }}</span>
+						    					<i ng-if="!student.section.sectionName.length" class="text-warning">not detected</i>
+								    		</li>
+								    	</ul>
+								    	<div class="text-warning" ng-if="!profile_data.students.length">
+								    		There's no students linked.
+								    	</div>
+								    </p>
+							    </div>
+							  </div>
+            </div>
+        </div>
+    </div>
+</div>

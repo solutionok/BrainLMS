@@ -1,0 +1,259 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.frontendCMSpages}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-show="$root.can('frontendCMSpages.addPage')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addPage}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listPages}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.name}}</th>
+                                <th>{{phrase.permalink}}</th>
+                                <th>{{phrase.Visibility}} / {{phrase.Status}}</th>
+                                <th ng-show="$root.can('frontendCMSpages.editPage') || $root.can('frontendCMSpages.delPage')">Action</th>
+                            </tr>
+                            <tr ng-repeat="page in pages | filter:searchText">
+                                <td>
+                                    {{page.page_title}}
+                                </td>
+                                <td>
+                                    {{page.page_permalink}}
+                                </td>
+                                <td>
+                                    {{page.page_visibility}} / {{page.page_status}}
+                                </td>
+                                <td ng-show="$root.can('frontendCMSpages.editPage') || $root.can('frontendCMSpages.delPage')">
+                                    <button ng-show="$root.can('frontendCMSpages.editPage')" ng-click="edit(page.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('frontendCMSpages.delPage')" ng-click="remove(page,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!pages.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add || views.edit">
+    <div class="col-12">
+
+
+        <form class="form-horizontal" name="add_page" role="form" novalidate>
+
+            <div class="row">
+                <div class="col-sm-8">
+
+                    <div class="card">
+                        <div class="card-block">
+                            <button type="button" ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                            <h4 ng-show="views.add" class="card-title">{{phrase.addPage}}</h4>
+                            <h4 ng-show="views.edit" class="card-title">{{phrase.editPage}}</h4>
+                            <div class="table-responsive">
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_title.$invalid}">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pageTitle}} * </label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="page_title" ng-model="form.page_title" class="form-control" required ng-blur="generate_permalink()" placeholder="{{phrase.pageTitle}}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_title.$invalid}" ng-show="form.show_page_permalink">
+                                    <label class="pb-2 pl-3 control-label col-form-label">{{phrase.permalink}} * </label>
+                                    <div class="col-sm-10 control-label">
+                                        <a href="{{frontend_baseurl}}{{form.page_permalink}}" target="_BLANK">{{frontend_baseurl}}<span ng-show="chg_permalink_status=='1'">{{form.page_permalink}}</span></a>
+
+                                        <a ng-show="chg_permalink_status=='1'" ng-click="show_permalink_form()" style="color:red;cursor: pointer;">{{phrase.change}}</a>
+
+                                        <input ng-show="chg_permalink_status=='2'" type="text" name="new_page_permalink" ng-model="new_page_permalink" placeholder="New Permalink">
+                                        <button ng-show="chg_permalink_status=='2'" type="button" class="btn btn-info waves-effect waves-light" ng-click="check_permalink()" ng-disabled="new_page_permalink == ''">{{phrase.change}}</button>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_title.$invalid}">
+                                    <div class="col-sm-12">
+                                        <textarea ck-editor name="page_content" class="form-control" required ng-model="form.page_content" placeholder="{{phrase.pageContent}}"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-block">
+                            <h4  class="card-title">{{phrase.sliderImages}}</h4>
+                            <div class="table-responsive">
+                                <div ng-repeat="image in form.page_slider_images">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <img  ng-src="{{image.thumb_image}}" style="padding:5px;" />
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <div class="form-group row" ng-class="{'has-error': add_page.image_title.$invalid}">
+                                                <label class="col-sm-4 text-right control-label col-form-label">{{phrase.imageTitle}}</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="image_title" ng-model="image.image_title" class="form-control" required placeholder="{{phrase.imageTitle}}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{'has-error': add_page.image_description.$invalid}">
+                                                <label class="col-sm-4 text-right control-label col-form-label">{{phrase.imageDescription}}</label>
+                                                <div class="col-sm-8">
+                                                    <textarea name="image_description" class="form-control" required ng-model="image.image_description" placeholder="{{phrase.imageDescription}}"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <br/>
+                                <a ng-click="select_slider_image()" class="ahref" >{{phrase.selSlidImg}}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-4">
+
+                    <div class="card">
+                        <div class="card-block">
+                            <h4  class="card-title">{{phrase.pageProp}}</h4>
+                            <div class="table-responsive">
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_visibility.$invalid}">
+                                    <label class="col-sm-4 text-right control-label col-form-label">{{phrase.Visibility}}</label>
+                                    <div class="col-sm-8">
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="page_visibility" value="public" required ng-model="form.page_visibility"> {{phrase.Public}}
+                                            </label>
+                                        </div>
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="page_visibility" value="logged" required ng-model="form.page_visibility"> {{phrase.loggedUsers}}
+                                            </label>
+                                        </div>
+                                        <div class="radio-list" style="display: none;" >
+                                            <label>
+                                                <input type="radio" name="page_visibility" value="password" required ng-model="form.page_visibility"> Password Protected
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="form.page_visibility == 'password'" ng-class="{'has-error': add_page.page_password.$invalid}">
+                                    <label class="col-sm-4 text-right control-label col-form-label">Password</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="page_password" ng-model="form.page_password" class="form-control" ng-required="form.page_visibility == 'password'" placeholder="Password">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_navbar_visible.$invalid}">
+                                    <label class="col-sm-4 text-right control-label col-form-label">{{phrase.navbarVisibility}}</label>
+                                    <div class="col-sm-8">
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="page_navbar_visible" value="1" required ng-model="form.page_navbar_visible"> {{phrase.Visible}}
+                                            </label>
+                                        </div>
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="page_navbar_visible" value="0" required ng-model="form.page_navbar_visible"> {{phrase.Invisible}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_publish_date.$invalid}">
+                                    <label class="col-sm-4 text-right control-label col-form-label">{{phrase.Publish}}</label>
+                                    <div class="col-sm-8">
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="page_publish_date" value="0" required ng-model="form.page_publish_date"> {{phrase.Immediately}}
+                                            </label>
+                                        </div>
+                                        <div class="radio-list">
+                                            <label>
+                                                <input type="radio" name="page_publish_date" value="specific_date" required ng-model="form.page_publish_date"> {{phrase.specificDate}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="form.page_publish_date == 'specific_date'" ng-class="{'has-error': add_page.page_publish_specific_date.$invalid}">
+                                    <label class="col-sm-4 text-right control-label col-form-label">{{phrase.specificDate}}</label>
+                                    <div class="col-sm-8">
+                                        <input date-picker type="text" id="datemask" name="page_publish_specific_date" ng-model="form.page_publish_specific_date" class="form-control" ng-required="form.page_publish_date == 'specific_date'" placeholder="{{phrase.specificDate}}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_order.$invalid}">
+                                    <label class="col-sm-4 text-right control-label col-form-label">{{phrase.order}}</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="page_order" ng-model="form.page_order" class="form-control" required placeholder="{{phrase.order}}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{'has-error': add_page.page_template.$invalid}">
+                                    <label class="col-sm-4 text-right control-label col-form-label">{{phrase.Template}}</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="form.page_template" name="page_template" required>
+                                            <option ng-repeat="template in templates" value="{{template}}">{{template}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <button type="button" ng-click="save_draft()" class="btn btn-info waves-effect waves-light btn-block" ng-disabled="add_page.$invalid">{{phrase.saveDraft}}</button>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" ng-click="save_preview()" class="btn btn-info waves-effect waves-light btn-block" ng-disabled="add_page.$invalid">{{phrase.previewPage}}</button>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <button type="submit" ng-click="save_publish()" class="btn btn-info waves-effect waves-light btn-block" ng-disabled="add_page.$invalid">{{phrase.publishPage}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-block">
+                            <h4  class="card-title">{{phrase.featImage}}</h4>
+                            <div class="table-responsive">
+                                <img ng-show="form.page_feat_image.id" ng-src="{{form.page_feat_image.thumb_image}}" style="width: 100%;padding-bottom: 15px;" />
+                                <a ng-click="select_featured_image()" class="ahref" >{{phrase.selFeatImage}}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+

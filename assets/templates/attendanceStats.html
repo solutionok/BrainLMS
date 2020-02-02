@@ -1,0 +1,85 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.attendanceStats}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.lists">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.attendanceStats}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.Date}}</th>
+                                <th ng-show="$root.dashboardData.attendanceModel=='subject'">{{phrase.Subject}}</th>
+                                <th>{{phrase.Attendance}}</th>
+                            </tr>
+                            <tr ng-repeat="(key,value) in attendanceStats.studentAttendance">
+                                <td>{{value.date}}</td>
+                                <td ng-show="$root.dashboardData.attendanceModel=='subject'">{{value.subject}}</td>
+                                <td>
+                                    <div>
+                                        <span ng-show="value.status =='0'">{{phrase.Absent}}</span>
+                                        <span ng-show="value.status =='1'">{{phrase.Present}}</span>
+                                        <span ng-show="value.status =='2'">{{phrase.Late}}</span>
+                                        <span ng-show="value.status =='3'">{{phrase.LateExecuse}}</span>
+                                        <span ng-show="value.status =='4'">{{phrase.earlyDismissal}}</span>
+                                        <span ng-show="value.status =='9'">{{phrase.acceptedVacation}}</span>
+                                        <span ng-show="!value.status && value.status !='0'">N/A</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.listp">
+    <div class="col-12">
+        <div class="card" ng-repeat="(key, value) in attendanceStats.studentAttendance">
+            <div class="card-block">
+                <h4 class="card-title">{{value.n.name}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.Date}}</th>
+                                <th ng-show="$root.dashboardData.attendanceModel=='subject'">{{phrase.Subject}}</th>
+                                <th>{{phrase.Attendance}}</th>
+                            </tr>
+                            <tr ng-repeat="(key2,value2) in value.d">
+                                <td>{{value2.date}}</td>
+                                <td ng-show="$root.dashboardData.attendanceModel=='subject'">{{value2.subject}}</td>
+                                <td>
+                                    <div>
+                                        <span ng-show="value2.status =='0'">{{phrase.Absent}}</span>
+                                        <span ng-show="value2.status =='1'">{{phrase.Present}}</span>
+                                        <span ng-show="value2.status =='2'">{{phrase.Late}}</span>
+                                        <span ng-show="value2.status =='3'">{{phrase.LateExecuse}}</span>
+                                        <span ng-show="value2.status =='4'">{{phrase.earlyDismissal}}</span>
+                                        <span ng-show="value2.status =='9'">{{phrase.acceptedVacation}}</span>
+                                        <span ng-show="!value2.status && value2.status !='0'">N/A</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        <div ng-show="!attendanceStats.studentAttendance"> {{phrase.noAttendance}} </div>
+    </div>
+</div>

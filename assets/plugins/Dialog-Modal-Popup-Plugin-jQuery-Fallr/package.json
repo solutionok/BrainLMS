@@ -1,0 +1,37 @@
+{
+  "title": "Fallr.js",
+  "name": "fallr-js",
+  "version": "2.0.1",
+  "author": "Faisal Salman <f@faisalman.com> (http://faisalman.com)",
+  "description": "Fancy, simple, yet elegant modal box jQuery plugin",
+  "keywords": [
+    "modal",
+    "popup",
+    "alert",
+    "notification",
+    "dialog",
+    "box",
+    "lightbox",
+    "responsive",
+    "jquery-plugin",
+    "ecosystem:jquery"
+  ],
+  "homepage": "https://github.com/faisalman/fallr-js",
+  "contributors": [
+    "Faisal Salman <f@faisalman.com>"
+  ],
+  "scripts": {
+    "build": "uglifyjs src/js/jquery-fallr-2.0.1.js -o src/js/jquery-fallr-2.0.1.min.js --comments '/Fallr\\.js/'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/faisalman/fallr-js.git"
+  },
+  "license": "(GPL-2.0 OR MIT)",
+  "devDependencies": {
+    "uglify-js": "^3.4.9"
+  },
+  "bugs": "https://github.com/faisalman/fallr-js/issues",
+  "demo": "https://faisalman.github.io/fallr-js"
+}

@@ -1,0 +1,264 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.slryMakePay}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <h4 class="card-title">{{phrase.selUsers}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="search_users()" name="search_users_form" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': search_users_form.user_search.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.usrSelect}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="user_search" ng-model="form.user_search" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light m-t-10" ng-disabled="search_users_form.$invalid">{{phrase.searchUsers}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card" ng-show="show_results_table == true">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.selUsers}}</h4>
+                <div class="form">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.slryType}}</th>
+                                <th>{{phrase.salaryBase}}</th>
+                                <th class="no-print">Action</th>
+                            </tr>
+                            <tr ng-repeat="employee in employees">
+                                <td>
+                                    <img alt="{{employee.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+employee.id}}">
+                                    <a href="" ng-click="teacherProfile( employee.id )">{{employee.name}}</a>
+                                </td>
+                                <td>{{employee.email}}</td>
+                                <td>{{employee.salary_type}}</td>
+                                <td>{{employee.salary_base}}</td>
+                                <td class="no-print">
+                                    <button ng-click="make_payment(employee.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!employees.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.make_payment">
+    <div class="col-7">
+
+        <div class="card">
+            <div class="card-block">
+                <button class="btn btn-danger btn-sm pull-right" type="button" ng-click="changeView('list')"> Back</button>
+                <h4 class="card-title">{{phrase.usrInformation}}</h4>
+                <div class="form">
+
+                    <div class="row">
+                        <div class="col-3" style="text-align: center;">
+                            <img alt="{{user_data.user.fullName}}" class="user-image img-circle img-responsive" style="padding:10px;width: 140px;height: 140px;" ng-src="{{'index.php/dashboard/profileImage/'+user_data.user.id}}">
+                            <br/>
+                            <a href="" ng-click="teacherProfile( user_data.user.id )">{{user_data.user.fullName}}</a>
+                        </div>
+                        <div class="col-9">
+
+                            <div class="form-group row">
+                                <label class="col-sm-4 text-right control-label col-form-label">{{phrase.email}}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    {{user_data.user.email}}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-4 text-right control-label col-form-label">{{phrase.username}}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    {{user_data.user.username}} ( {{user_data.user.role}} )
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-4 text-right control-label col-form-label">{{phrase.salaryDetails}}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    {{user_data.user.salary_type}}
+                                    <br/>
+                                    <span ng-show="user_data.user.salary_type == 'monthly'">
+                                        {{phrase.netSalary}} : {{currency_symbol}}{{user_data.user.salary_details.net_salary}}
+                                        <br/>
+                                        {{phrase.overtime}} : {{currency_symbol}}{{user_data.user.salary_details.hour_overtime}}
+                                    </span>
+                                    <span ng-show="user_data.user.salary_type == 'hourly'">
+                                        {{phrase.rate}} : {{currency_symbol}}{{user_data.user.salary_details.hourly_cost}}
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.slryPayHistory}}</h4>
+                <div class="form">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.salaryDetails}}</th>
+                                <th>{{phrase.salaryForDate}}</th>
+                                <th>{{phrase.Amount}}</th>
+                                <th>{{phrase.method}}</th>
+                                <th>{{phrase.Comments}}</th>
+                                <th ng-show="$root.can('Payroll.delUsrPayment')">{{phrase.Remove}}</th>
+                            </tr>
+                            <tr ng-repeat="hist in user_data.history">
+                                <td>
+                                    {{hist.salary_type}}<br/>
+                                    <span ng-show="hist.salary_type == 'monthly'">
+                                        {{phrase.netSalary}} : {{currency_symbol}}{{hist.salary_value}}
+                                        <br/>
+                                        {{phrase.overtime}} : {{hist.hour_count}} x {{currency_symbol}}{{hist.hour_overtime}}
+                                    </span>
+                                    <span ng-show="hist.salary_type == 'hourly'">
+                                        {{phrase.rate}} : {{hist.hour_count}} x {{currency_symbol}}{{hist.salary_value}}
+                                    </span>
+                                </td>
+                                <td>{{hist.pay_month}} / {{hist.pay_year}}</td>
+                                <td>{{currency_symbol}}{{hist.pay_amount}}</td>
+                                <td>{{hist.pay_method}}</td>
+                                <td>{{hist.pay_comments}}</td>
+                                <th ng-show="$root.can('Payroll.delUsrPayment')">
+                                    <button ng-show="$root.can('Payroll.delUsrPayment')" ng-click="remove(hist,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </th>
+                            </tr>
+                            <tr ng-show="!user_data.history.length"><td class="noTableData" colspan="6">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-5">
+
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.slryMakePay}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="make_user_payment_submit()" name="make_pay_form" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': make_pay_form.pay_month.$invalid,'has-error': make_pay_form.pay_year.$invalid}">
+                            <div class="col-sm-12">
+                                <label class="text-right">{{phrase.salaryForDate}}</label>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <small>{{phrase.month}}</small>
+                                        <select class="form-control" ng-model="form.pay_month" required name="pay_month">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <small>{{phrase.year}}</small>
+                                        <select class="form-control" ng-model="form.pay_year" required name="pay_year">
+                                            <option value="2015">2015</option>
+                                            <option value="2016">2016</option>
+                                            <option value="2017">2017</option>
+                                            <option value="2018">2018</option>
+                                            <option value="2019">2019</option>
+                                            <option value="2020">2020</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="user_data.user.salary_type == 'monthly'" ng-class="{'has-error': make_pay_form.pay_overtime_count.$invalid}">
+                            <div class="col-sm-12">
+                                <label class="text-right">{{phrase.overtimeHours}}</label>
+                                <input type="text" name="pay_overtime_count" ng-model="form.pay_overtime_count" ng-required="user_data.user.salary_type == 'monthly'" class="form-control" ng-change="recalculate_salary()" />
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="user_data.user.salary_type == 'hourly'" ng-class="{'has-error': make_pay_form.pay_hours.$invalid}">
+                            <div class="col-sm-12">
+                                <label class="text-right">{{phrase.hours}}</label>
+                                <input type="text" name="pay_hours" ng-model="form.pay_hours" ng-required="user_data.user.salary_type == 'hourly'" class="form-control" ng-change="recalculate_salary()" />
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': make_pay_form.pay_amount.$invalid}">
+                            <div class="col-sm-12">
+                                <label class="text-right">{{phrase.Amount}}</label>
+                                <input type="text" name="pay_amount" ng-model="form.pay_amount" required class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': make_pay_form.pay_method.$invalid}">
+                            <div class="col-sm-12">
+                                <label class="text-right">{{phrase.payMethod}}</label>
+                                <select class="form-control" ng-model="form.pay_method" required name="pay_method">
+                                    <option value="Cash">{{phrase.Cash}}</option>
+                                    <option value="Cheque">{{phrase.Cheque}}</option>
+                                    <option value="bank">{{phrase.bnkTrn}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" >
+                            <div class="col-sm-12">
+                                <label class="text-right">{{phrase.Comments}}</label>
+                                <textarea name="pay_comments" ng-model="form.pay_comments" class="form-control" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="col-sm-12">
+                                <button type="submit" class="btn btn-info waves-effect waves-light m-t-10" ng-disabled="make_pay_form.$invalid">{{phrase.slryMakePay}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

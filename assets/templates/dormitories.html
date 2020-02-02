@@ -1,0 +1,108 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Dormitories}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-show="$root.can('Dormitories.addDormitories')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addDormitories}}</button>
+                <h4 class="card-title">{{phrase.listDormitories}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.DormName}}</th>
+                                <th>{{phrase.DormDesc}}</th>
+                                <th ng-show="$root.can('Dormitories.editDorm') | $root.can('Dormitories.delDorm')" style="width:120px;">Action</th>
+                            </tr>
+                            <tr ng-repeat="dormitory in dormitories | filter:searchText">
+                                <td>{{dormitory.dormitory}}</td>
+                                <td>{{dormitory.dormDesc}}</td>
+                                <td ng-show="$root.can('Dormitories.editDorm') | $root.can('Dormitories.delDorm')">
+                                    <button ng-show="$root.can('Dormitories.editDorm')" ng-click="edit(dormitory.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Dormitories.delDorm')" ng-click="remove(dormitory,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!dormitories.length"><td class="noTableData" colspan="4">{{phrase.noDorm}}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.addDorm}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addDorm" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addDorm.dormitory.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.DormName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="dormitory" ng-model="form.dormitory" class="form-control" required placeholder="{{phrase.DormName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.DormDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="dormDesc" class="form-control" ng-model="form.dormDesc" placeholder="{{phrase.DormDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addDorm.$invalid">{{phrase.addDorm}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editDorm}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editDorm" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.dormitory.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.DormName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="dormitory" ng-model="form.dormitory" class="form-control" required placeholder="{{phrase.DormName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.DormDesc}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="dormDesc" class="form-control" ng-model="form.dormDesc" placeholder="{{phrase.DormDesc}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editDorm.$invalid">{{phrase.editDorm}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

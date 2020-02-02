@@ -1,0 +1,246 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.parents}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12 listContent">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div ng-show="$root.can('parents.Export')" class="mb-2 pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" href="index.php/parents/export" target="_BLANK">{{phrase.ExportExcel}}</a>
+                            <a class="dropdown-item" href="index.php/parents/exportpdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="listTable" class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    {{phrase.FullName}}
+                                </th>
+                                <th>
+                                    Numbers
+                                </th>
+                            </tr>
+                            <tr dir-paginate="parent in stparents | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                    <a href="" ng-click="parentProfile( parent.id )">{{parent.fullName}}</a>
+                                </td>
+                                <td>
+                                    Phone: {{parent.phoneNo}}<br>
+                                    Mobile: {{parent.mobileNo}}
+                                </td>
+                            </tr>
+                            <tr ng-show="!stparents.length"><td class="noTableData" colspan="5">{{phrase.noParents}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls on-page-change="getResultsPage(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editParent}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="editDorm" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/parents/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.fullName.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.username.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.username}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" ng-model="form.username" class="form-control" required placeholder="{{phrase.username}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.email.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} *</label>
+                            <div class="col-sm-10">
+                                <input type="email" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.password}} *</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="password" ng-model="form.password" class="form-control" placeholder="{{phrase.password}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Gender}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="male" ng-model="form.gender">
+                                        {{phrase.Male}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="gender" value="female" ng-model="form.gender">
+                                        {{phrase.Female}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Birthday}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker id="datemaskEdit" name="birthday" ng-model="form.birthday" class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="address" class="form-control" ng-model="form.address" placeholder="{{phrase.Address}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="phoneNo" class="form-control" ng-model="form.phoneNo" placeholder="{{phrase.phoneNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editDorm.mobileNo.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.mobileNo}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" mobile-number name="mobileNo" class="form-control" ng-model="form.mobileNo" value="{{phrase.mobileNo}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Profession}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="parentProfession" class="form-control" ng-model="form.parentProfession" placeholder="{{phrase.Profession}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="photo">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Communication}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.studentDetails}}</label>
+                            <div class="col-sm-10">
+                                <button type="button" ng-click="linkStudent()" class="btn btn-danger btn-flat">{{phrase.linkStudentParent}}</button>
+                                <input type="text" name="linkedStudentsSer" ng-model="form.studentInfoSer" style="display:none;">
+                                <div class="row" ng-repeat="studentOne in form.studentInfo track by $index">
+                                    <div class="col-md-4"><input type="text" class="form-control" disabled="disabled" ng-model="studentOne.student"></div>
+                                    <div class="col-md-4"><input type="text" class="form-control" ng-model="studentOne.relation" placeholder="{{phrase.Relation}}" ng-change="monitorParentChange()"></div>
+                                    <button type="button" ng-click="removeStudent(studentOne.id)" class="btn btn-danger btn-flat"><i class="fa fa-trash-o"></i></button></li>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-info btn-default" ng-disabled="editDorm.$invalid || $isUploading">{{phrase.editParent}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="showModal"><div ng-bind-html="modalContent"></div></modal>
+<modal visible="showModalLink">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink" placeholder="Type student name / username / E-mail address">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="linkStudentButton()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="studentOne in searchResults">
+                            <td>{{studentOne.name}}</td>
+                            <td>{{studentOne.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="linkStudentFinish(studentOne)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>

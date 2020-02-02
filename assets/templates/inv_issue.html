@@ -1,0 +1,281 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.iss_ret}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('iss_ret.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/inv_issue/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/inv_issue/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('iss_ret.issue_item')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.issue_item}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_items}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.refno}}</th>
+								<th>{{phrase.Category}}</th>
+								<th>{{phrase.item}}</th>
+								<th>{{phrase.quantity}}</th>
+								<th>{{phrase.issue_to}}</th>
+								<th>{{phrase.issue_date}}</th>
+								<th>{{phrase.ret_date}}</th>
+								<th>{{phrase.Notes}}</th>
+								<th style="width:160px;" ng-show="$root.can('iss_ret.edit_item') || $root.can('iss_ret.del_item') || $root.can('iss_ret.Download')" >Action</th>
+							</tr>
+							<tr dir-paginate="inv_issue_one in inv_issue | itemsPerPage:10" total-items="totalItems">
+								<td>{{inv_issue_one.refno}}</td>
+								<td>{{inv_cat[inv_issue_one.item_cat]}}</td>
+								<td>{{items_code[inv_issue_one.item_title]}}</td>
+								<td>{{inv_issue_one.qty}}</td>
+								<td>
+									<span class="list_user_item" ng-repeat="userOne in inv_issue_one.issue_tu"><img class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+userOne.id}}">{{userOne.user}}<br/></span>
+								</td>
+								<td>{{inv_issue_one.issue_date}}</td>
+								<td>
+									{{inv_issue_one.ret_date}}
+									<button ng-show="$root.can('iss_ret.edit_item') && inv_issue_one.is_returned == 0" ng-click="return_item(inv_issue_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.ret_item}}" ><i class="fa fa-undo"></i></button>
+								</td>
+								<td>{{inv_issue_one.issue_notes}}</td>
+								<td ng-show="$root.can('iss_ret.edit_item') || $root.can('iss_ret.del_item') || $root.can('iss_ret.Download')">
+                  <!-- <a ng-show="inv_issue_one.attachment != '' && $root.can('iss_ret.Download')" target="_blank" href="{{'index.php/inv_issue/download/'+inv_issue_one.id}}"><button type="button" class="btn btn-success btn-circle" title="{{phrase.Download}}" ><i class="fa fa-cloud-download"></i></button></a> -->
+									<button ng-show="$root.can('iss_ret.edit_item')" ng-click="edit(inv_issue_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('iss_ret.del_item')" ng-click="remove(inv_issue_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!inv_issue.length"><td class="noTableData" colspan="10">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.issue_item}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="inv_issue_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_add_form.refno.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.refno}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="refno" ng-model="form.refno" class="form-control" placeholder="{{phrase.refno}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_add_form.item_cat.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Category}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_cat" ng-model="form.item_cat" ng-change="load_items()" required>
+									<option ng-repeat="(key,item) in inv_cat" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_add_form.item_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_title" ng-model="form.item_title" required>
+									<option ng-repeat="item in items_code_edit.items" value="{{item.id}}">{{item.item_title}}</option>
+								</select>
+								<small ng-show="form.item_title">{{phrase.avQty}} : {{items_code_edit.qty[form.item_title]?items_code_edit.qty[form.item_title]:0}}</small>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_add_form.qty.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.quantity}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="qty" ng-model="form.qty" class="form-control" placeholder="{{phrase.quantity}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_add_form.issue_tu.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.issue_to}} *</label>
+							<div class="col-sm-10">
+								<button type="button" ng-click="openSearchModal_issue_tu()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+								<input type="text" name="issue_tu_ser" ng-model="form.issue_tu_ser" style="display:none;">
+								<div class="row" ng-repeat="userOne in form.issue_tu track by $index">
+									<div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="userOne.user"></div>
+									<button type="button" ng-click="removeUserSearch_issue_tu(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_add_form.issue_date.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.issue_date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="issue_date_add" name="issue_date" ng-model="form.issue_date" class="form-control issue_date_add" placeholder="{{phrase.issue_date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.ret_date}} </label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="ret_date_add" name="ret_date" ng-model="form.ret_date" class="form-control ret_date_add" placeholder="{{phrase.ret_date}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<input type="file" name="attachment" file-model="form.attachment">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="issue_notes" class="form-control" ng-model="form.issue_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="inv_issue_add_form.$invalid">{{phrase.issue_item}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_item}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="inv_issue_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': inv_issue_edit_form.refno.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.refno}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="refno" ng-model="form.refno" class="form-control" placeholder="{{phrase.refno}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_edit_form.item_cat.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Category}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_cat" ng-model="form.item_cat" ng-change="load_items()" required>
+									<option ng-repeat="(key,item) in inv_cat" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_edit_form.item_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_title" ng-model="form.item_title" required>
+									<option ng-repeat="item in items_code_edit.items" value="{{item.id}}">{{item.item_title}}</option>
+								</select>
+								<small ng-show="form.item_title">{{phrase.avQty}} : {{items_code_edit.qty[form.item_title]?items_code_edit.qty[form.item_title]:0}}</small>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_edit_form.qty.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.quantity}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="qty" ng-model="form.qty" class="form-control" placeholder="{{phrase.quantity}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_edit_form.issue_tu.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.issue_to}} *</label>
+							<div class="col-sm-10">
+								<button type="button" ng-click="openSearchModal_issue_tu()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+								<input type="text" name="issue_tu_ser" ng-model="form.issue_tu_ser" style="display:none;">
+								<div class="row" ng-repeat="userOne in form.issue_tu track by $index">
+									<div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="userOne.user"></div>
+									<button type="button" ng-click="removeUserSearch_issue_tu(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': inv_issue_edit_form.issue_date.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.issue_date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="issue_date_add" name="issue_date" ng-model="form.issue_date" class="form-control issue_date_add" placeholder="{{phrase.issue_date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.ret_date}} </label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="ret_date_add" name="ret_date" ng-model="form.ret_date" class="form-control ret_date_add" placeholder="{{phrase.ret_date}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<a ng-show="form.attachment != ''" href="index.php/inv_issue/download/{{form.id}}">{{phrase.viewFile}}</a><span style="margin-right:10px;" ng-show="form.attachment != ''">, {{phrase.orUpNew}}</span><input type="file" name="attachment" file-model="form.attachment">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="issue_notes" class="form-control" ng-model="form.issue_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="inv_issue_edit_form.$invalid">{{phrase.edit_item}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<modal visible="showUsrSearchModal_issue_tu">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink_issue_tu" placeholder="{{phrase.typeUsrSearch}}">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="searchUserButton_issue_tu()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="user in searchResults_issue_tu">
+                            <td>{{user.name}}</td>
+                            <td>{{user.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="serachUserFinish_issue_tu(user)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>

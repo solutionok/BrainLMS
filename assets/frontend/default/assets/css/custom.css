@@ -1,0 +1,11 @@
+/* your styles go here */
+.carousel-caption{
+	background-color: rgba(0, 0, 0, .3);
+	right: 0;
+	left: 0;
+	bottom: 0px;
+	display: block;
+}
+.teacher_social_link{
+	padding-right: 0px !important;
+}

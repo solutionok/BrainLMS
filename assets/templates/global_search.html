@@ -1,0 +1,63 @@
+<style type="text/css">
+	.viewList {
+		padding-bottom: 10px;
+		margin-top: 15px;
+	}
+	.viewList .card {
+		margin-bottom: 15px;
+		border-radius: 10px 0;
+		box-shadow: 1px 1px 5px #CCC;
+	}
+	.viewList .card .card-title {
+		font-size: 20px;
+		margin-bottom: 15px;
+	}
+	.viewList .card-block {
+		padding: 15px;
+	}
+	.btn-circle {
+		width: 32px;
+		height: 32px;
+		padding: 6px;
+	}
+	.page-titles {
+		padding-bottom: 5px !important;
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">Search result</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row viewList">
+	<div class="col-12">
+		<div ng-show="searched_users.length" class="card" ng-repeat="user in searched_users | filter:searchText">
+        <div class="card-block">
+					  <div class="card-body">
+					    <h5 class="card-title text-dark">
+						    <i ng-class="{'color_red':user.account_active==0,'color_green':user.account_active==1}" class="fa fa-lightbulb-o"></i>
+						    {{ user.fullName }}
+						  </h5>
+					    <hr>
+					    <p class="card-text">
+					    	<b>Role:</b> {{user.role}}<br>
+					    	<b>Phone:</b> {{user.phoneNo}}<br>
+                <b>Mobile:</b> {{user.mobileNo}}
+					    </p>
+					  </div>
+        </div>
+    </div>
+    <div ng-show="!searched_users.length">
+    	There's no result yet, please try again
+    </div>
+  </div>
+</div>

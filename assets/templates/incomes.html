@@ -1,0 +1,175 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Incomes}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-show="$root.can('Incomes.addIncome')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addIncome}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">List Incomes</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.incomeTitle}}</th>
+                                <th>{{phrase.Category}}</th>
+                                <th>{{phrase.incomeAmount}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.notes}}</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr dir-paginate="income in incomes | filter:searchText | itemsPerPage:10" total-items="totalItems">
+                                <td>{{income.incomeTitle}}</td>
+                                <td>{{income_cat[income.incomeCategory]}}</td>
+                                <td>{{income.incomeAmount}}</td>
+                                <td>{{income.incomeDate}}</td>
+                                <td>{{income.incomeNotes}}</td>
+                                <td>
+                                    <!-- <a ng-show="income.incomeImage != ''" target="_blank" href="{{'index.php/incomes/download/'+income.id}}"><button type="button" class="btn btn-success btn-circle" title="{{phrase.Download}}" ><i class="fa fa-cloud-download"></i></button></a> -->
+                                    <button ng-show="$root.can('Incomes.editIncome')" ng-click="edit(income.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Incomes.delIncome')" ng-click="remove(income,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {{phrase.Total}} : {{totalIncome}}
+                    <dir-pagination-controls on-page-change="listIncome(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.addIncome}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="addGrade" role="form" ng-upload="saveAdd(content)" role="form" method="post" action="index.php/incomes" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.incomeTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.incomeTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="incomeTitle" ng-model="form.incomeTitle" class="form-control" required placeholder="{{phrase.incomeTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.incomeAmount.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.incomeAmount}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="incomeAmount" ng-model="form.incomeAmount" class="form-control" required placeholder="{{phrase.incomeAmount}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.incomeDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="incomeDate" ng-model="form.incomeDate" class="form-control datemask" id="datemask" required placeholder="{{phrase.Date}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addGrade.incomeCategory.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Category}} * </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.incomeCategory" name="incomeCategory" required>
+                                    <option ng-repeat="(key,value) in income_cat" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.notes}} *</label>
+                            <div class="col-sm-10">
+                                <textarea name="incomeNotes" ng-model="form.incomeNotes" class="form-control" placeholder="{{phrase.notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="incomeImage">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addGrade.$invalid">{{phrase.addIncome}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editIncome}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="editGrade" role="form" ng-upload="saveEdit(content)" role="form" method="post" action="{{'index.php/incomes/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.incomeTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.incomeTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="incomeTitle" ng-model="form.incomeTitle" class="form-control" required placeholder="{{phrase.incomeTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.incomeAmount.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.incomeAmount}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="incomeAmount" ng-model="form.incomeAmount" class="form-control" required placeholder="{{phrase.incomeAmount}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.incomeDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Date}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="incomeDate" ng-model="form.incomeDate" class="form-control datemask" id="datemaskEdit" required placeholder="{{phrase.Date}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editGrade.incomeCategory.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Category}} * </label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.incomeCategory" name="incomeCategory" required>
+                                    <option ng-repeat="(key,value) in income_cat" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.notes}} *</label>
+                            <div class="col-sm-10">
+                                <textarea name="incomeNotes" ng-model="form.incomeNotes" class="form-control" placeholder="{{phrase.notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="incomeImage">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editGrade.$invalid">{{phrase.editIncome}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

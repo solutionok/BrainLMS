@@ -1,0 +1,143 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.attReport}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <h4 class="card-title">{{phrase.reportClassif}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="generateReport()" name="attendance" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': attendance.classId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId" required ng-change="subjectList()">
+                                    <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" ng-class="{'has-error': attendance.sectionId.$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.section}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.sectionId" ng-required="$root.dashboardData.enableSections == '1'" name="sectionId">
+                                    <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" ng-show="attendanceModel == 'subject'" ng-class="{'has-error': attendance.subjectId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Subject}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.subjectId" name="subjectId" ng-required="attendanceModel == 'subject'">
+                                  <option ng-repeat="subject in subjects" value="{{subject.id}}">{{subject.subjectTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': attendance.attendanceDayFrom.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="attendanceDayFrom" ng-model="form.attendanceDayFrom" id="datemaskFrom" class="form-control datemaskFrom" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': attendance.attendanceDayTo.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="attendanceDayTo" ng-model="form.attendanceDayTo" id="datemaskTo" class="form-control datemaskTo" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="attendance.$invalid">{{phrase.controlAttendance}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.report">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button class="btn btn-danger btn-sm pull-right" type="button" ng-click="changeView('list')"> Back</button>
+                <h4 class="card-title">{{phrase.controlAttendance}}</h4>
+                <div class="form table-responsive">
+
+                    <div style="padding:  10px;text-align:  center;font-weight: bold;">
+                        {{phrase.class}} : {{class.className}}, <span ng-show="attendanceModel == 'subject'">{{phrase.Subject}}: {{subject.subjectTitle}}</span>
+                        <br/>
+                        P : {{phrase.Present}}  -  A : {{phrase.Absent}}
+                    </div>
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>{{phrase.studentName}}</th>
+                                <th colspan="5">{{phrase.percentage}}</th>
+                                <th colspan="{{date_range.length}}">{{phrase.details}}</th>
+                            </tr>
+                            <tr>
+                                <td style="width: 10px"></td>
+                                <td></td>
+                                <td class="att_perc">
+                                    <span  data-original-title="{{phrase.Present}}">%P</span>
+                                </td>
+                                <td class="att_perc">
+                                    <span  data-original-title="{{phrase.Absent}}">%A</span>
+                                </td>
+                                <td ng-repeat="range_one in date_range" style="text-align: center;">
+                                    <span  data-original-title="{{range_one.date}}">{{firstChunk(range_one.date)}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="student in students | object2Array">
+                                <td>{{student.studentRollId}}</td>
+                                <td style="white-space: nowrap;">
+                                    <img alt="{{student.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+student.id}}">
+                                    <a href="" ng-click="studentProfile( student.id )">{{student.fullName}}</a>
+                                </td>
+                                <td class="att_perc">{{student.precentage[1]}}%</td>
+                                <td class="att_perc">{{student.precentage[0]}}%</td>
+                                <td ng-repeat="date in date_range">
+                                    <span ng-repeat="(key,att) in student.attendance">
+                                        <span ng-show="date.timestamp == key"  data-original-title="{{att.attNotes}}">
+                                            <span ng-switch on="{{att.status}}">
+                                                <span ng-switch-when="0">{{phrase.Absent}}</span>
+                                                <span ng-switch-when="1">{{phrase.Present}}</span>
+                                            </span>
+                                        </span>
+                                    </span>
+
+                                    <span ng-repeat="(key,vac) in student.vacation">
+                                        <span ng-show="date.timestamp == key"  data-original-title="{{att.attNotes}}">
+                                            <span ng-switch on="{{vac}}">
+                                                <span ng-switch-when="1">{{phrase.acceptedVacation}}</span>
+                                                <span ng-switch-when="0">{{phrase.rejectedVacation}}</span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,535 @@
+<style type="text/css">
+	.listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	.listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	.listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	.view-list-block {
+		padding: 15px 10px;
+	}
+	.view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+	.init-button {
+		margin-bottom: 15px;
+		border-radius: 0;
+		padding-top: 25px !important;
+		padding-bottom: 25px !important;
+	}
+	.listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	.listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	.listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+</style>
+
+<!-- <div class="row page-titles no-print">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">payment fees</h3>
+        <a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a>
+    </div>
+</div> -->
+
+<div class="row" ng-show="views.init" style="margin-top: 15px;">
+	<div class="col-12">
+		<button type="button" ng-click="changeView('list_current_fee')" class="btn btn-lg btn-primary btn-block init-button" aria-pressed="false" autocomplete="off">
+		  <b>Pay Current Fee</b>
+		</button>
+		<button type="button" ng-click="changeView('list_pending_fee')" class="btn btn-lg btn-primary btn-block init-button" aria-pressed="false" autocomplete="off">
+		  <b>Pay Pending Fee</b>
+		</button>
+		<button type="button" ng-click="changeView('list_paid')" class="btn btn-lg btn-primary btn-block init-button" aria-pressed="false" autocomplete="off">
+		  <b>View Paid Fee</b>
+		</button>
+	</div>
+</div>
+
+<div class="row" ng-show="views.list_current_fee">
+    <div class="col-12 listContent">
+        <div class="card" style="margin-bottom: 10px">
+            <div class="card-block view-list-block">
+            		<button ng-click="changeView('init')" class="btn pull-right btn-danger mb-2 btn-sm">
+				      		<i class="fa fa-arrow-left"></i> back
+				      	</button>
+                <div class="table-responsive">
+                    <table class="listTable table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>Particulars</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th ng-show="$root.can('Invoices.collInvoice') || $root.can('Invoices.editPayment') || $root.can('Invoices.delPayment')" title="Actions">Action</th>
+                            </tr>
+                            <tr dir-paginate="invoice in invoices | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                	<a ng-show="$root.can('Invoices.View')" class="ahref" ng-click="seeInvoice(invoice.id)">{{invoice.paymentTitle}}</a>
+                                	<Br/>
+                              	 	<span ng-click="alertPaidData(invoice.id)" ng-show="invoice.paymentStatus == '1'" style='color:#5cb85c;cursor:pointer;'>{{phrase.paid}}</span>
+                                	<div ng-show="invoice.paymentStatus == '0'">
+                                		<button type="submit" class="btn btn-sm btn-info no-print" ng-click="seeInvoice(invoice.id)"><i class="fa fa-inr"></i> Pay Now</button>
+                                		<!-- <div ng-include="'/assets/js/Angular/includes/invoicePayNowForm.html?id=' + random_value"></div> -->
+                                	</div>
+                                	<span ng-show="invoice.paymentStatus == '2'" style='color:red;'>{{phrase.ppaid}}</span>
+                                </td>
+                                <td>
+                                	<small>{{invoice.paymentDate}} <br> Due: {{invoice.dueDate}}</small>
+                                </td>
+                                <td>
+                                	Amo.: {{invoice.paymentAmount}} {{currency_symbol}} + tax<br/>
+                                	Paid: {{invoice.paidAmount}} {{currency_symbol}}
+                                </td>
+                                <td class="options" ng-show="$root.can('Invoices.collInvoice') || $root.can('Invoices.editPayment') || $root.can('Invoices.delPayment')">
+                                    <button ng-if="$root.can('Invoices.collInvoice') && invoice.paymentStatus != '1'" ng-click="collect(invoice.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.collInvoice}}" ><i class="fa fa-inr"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!invoices.length"><td class="noTableData" colspan="7">{{phrase.noPayments}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list_pending_fee">
+    <div class="col-12 listContent">
+        <div class="card" style="margin-bottom: 10px">
+            <div class="card-block view-list-block">
+            		<button ng-click="changeView('init')" class="btn pull-right btn-danger mb-2 btn-sm">
+				      		<i class="fa fa-arrow-left"></i> back
+				      	</button>
+                <div class="table-responsive">
+                    <table class="listTable table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>Particulars</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th ng-show="$root.can('Invoices.collInvoice') || $root.can('Invoices.editPayment') || $root.can('Invoices.delPayment')" title="Actions">Action</th>
+                            </tr>
+                            <tr dir-paginate="invoice in invoices | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                	<a ng-show="$root.can('Invoices.View')" class="ahref" ng-click="seeInvoice(invoice.id)">{{invoice.paymentTitle}}</a>
+                                	<Br/>
+                              	 	<span ng-click="alertPaidData(invoice.id)" ng-show="invoice.paymentStatus == '1'" style='color:#5cb85c;cursor:pointer;'>{{phrase.paid}}</span>
+                                	<div ng-show="invoice.paymentStatus == '0'">
+                                		<button type="submit" class="btn btn-sm btn-info no-print" ng-click="seeInvoice(invoice.id)"><i class="fa fa-inr"></i> Pay Now</button>
+                                		<!-- <div ng-include="'/assets/js/Angular/includes/invoicePayNowForm.html?id=' + random_value"></div> -->
+                                	</div>
+                                	<span ng-show="invoice.paymentStatus == '2'" style='color:red;'>{{phrase.ppaid}}</span>
+                                </td>
+                                <td>
+                                	<small>{{invoice.paymentDate}} <br> Due: {{invoice.dueDate}}</small>
+                                </td>
+                                <td>
+                                	Amo.: {{invoice.paymentAmount}} {{currency_symbol}} + tax<br/>
+                                	Paid: {{invoice.paidAmount}} {{currency_symbol}}
+                                </td>
+                                <td class="options" ng-show="$root.can('Invoices.collInvoice') || $root.can('Invoices.editPayment') || $root.can('Invoices.delPayment')">
+                                    <button ng-if="$root.can('Invoices.collInvoice') && invoice.paymentStatus != '1'" ng-click="collect(invoice.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.collInvoice}}" ><i class="fa fa-inr"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!invoices.length"><td class="noTableData" colspan="7">{{phrase.noPayments}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list_paid">
+    <div class="col-12 listContent">
+        <div class="card" style="margin-bottom: 10px">
+            <div class="card-block view-list-block">
+            		<button ng-click="changeView('init')" class="btn pull-right btn-danger mb-2 btn-sm">
+				      		<i class="fa fa-arrow-left"></i> back
+				      	</button>
+                <div class="table-responsive">
+                    <table class="listTable table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>Particulars</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                            <tr dir-paginate="invoice in paidInvoices | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                	<a ng-show="$root.can('Invoices.View')" class="ahref" ng-click="seeInvoice(invoice.id)">{{invoice.paymentTitle}}</a>
+                                	<Br/>
+                              	 	<span ng-click="alertPaidData(invoice.id)" ng-show="invoice.paymentStatus == '1'" style='color:#5cb85c;cursor:pointer;'>{{phrase.paid}}</span>
+                                	<div ng-show="invoice.paymentStatus == '0'">
+                                		<button type="submit" class="btn btn-sm btn-info no-print" ng-click="seeInvoice(invoice.id)"><i class="fa fa-inr"></i> Pay Now</button>
+                                		<!-- <div ng-include="'/assets/js/Angular/includes/invoicePayNowForm.html?id=' + random_value"></div> -->
+                                	</div>
+                                	<span ng-show="invoice.paymentStatus == '2'" style='color:red;'>{{phrase.ppaid}}</span>
+                                </td>
+                                <td>
+                                	<small>{{invoice.paymentDate}} <br> Due: {{invoice.dueDate}}</small>
+                                </td>
+                                <td>
+                                	Amo.: {{invoice.paymentAmount}} {{currency_symbol}}<br/>
+                                	Paid: {{invoice.paidAmount}} {{currency_symbol}}
+                                </td>
+                            </tr>
+                            <tr ng-show="!invoices.length"><td class="noTableData" colspan="7">{{phrase.noPayments}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.invoice">
+		<button ng-click="changeView('init')"
+  		style="
+		    font-size: 20px;
+		    position: absolute;
+		    right: 20px;
+		    top: 8px;
+		    z-index: 99;
+  		"
+  		class="btn btn-sm pull-right btn-link">
+  			<i class="fa fa-arrow-left text-danger"></i>
+  	</button>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block" style="padding: 10px; padding-bottom: 0">
+                <div class="col-12" style="padding: 0">
+                    <!-- info row -->
+                    <div class="row">
+                        <div class="col-12 invoice-col text-center">
+		                        <h3 style="margin-bottom: 0px">
+		                        	#{{invoice.payment.paymentTitle}}
+		                        </h3>
+                            <span ng-show="invoice.payment.paymentStatus == '1'" style='color:#5cb85c; font-size:24px;font-weight:bold;'>
+                                {{phrase.paid}}
+                            </span>
+                            <span ng-show="invoice.payment.paymentStatus == '1'" style='color:#5cb85c;font-weight:bold;'>
+                                <br/>
+                                {{phrase.payMethod}} : {{invoice.payment.paidMethod}}<br/>
+                                {{phrase.payDate}} : {{invoice.payment.paidTime}}
+                            </span>
+                            <span ng-show="invoice.payment.paymentStatus == '0'" style='color:red; font-size:24px;font-weight:bold;'>
+                                {{phrase.unpaid}}
+                            </span>
+                            <span ng-show="invoice.payment.paymentStatus == '2'" style='color:#5cb85c; font-size:24px;font-weight:bold;'>
+                                {{phrase.ppaid}}
+                            </span>
+                            <hr style="margin-top: 5px; margin-bottom: 5px">
+                            <div class="mt-2" style="color:black;">
+	                            <address>
+	                                <strong>{{invoice.user.fullName}}</strong><br>
+	                              	Adm. No: {{ invoice.user.admission_number }}<br>
+	                                {{phrase.class}}: {{invoice.user.className}}
+	                                <span ng-show="$root.dashboardData.enableSections == '1'">
+	                                	- Section: {{invoice.user.sectionName}}
+	                                </span><br>
+	                                {{phrase.Date}} : {{invoice.payment.paymentDate}} / {{phrase.dueDate}} : {{invoice.payment.dueDate}}
+	                            </address>
+		                        </div>
+		                        <div style="margin-top: -10px; margin-bottom: 10px">
+	                        		<form id="invoicePayNowFormMain"
+																class="form-horizontal"
+																ng-show="invoice.payment.paymentStatus != '1'"
+																name="PayOnlineForm" role="form"
+																method="POST" action="{{'index.php/invoices/pay/'+invoice.payment.id}}"
+																ng-submit="invoicePayNowMain($event)" novalidate>
+																	<input type="hidden" name="payVia" value="eazypay" ng-model="form.payVia">
+																	<div class="form-group m-b-0">
+															          <div>
+															              <input type="hidden" name="return" value="invoices"/>
+															              <button type="submit" class="btn btn-sm btn-info no-print" ng-disabled="PayOnlineForm.$invalid" ><i class="fa fa-inr"></i> Pay Now</button>
+															          </div>
+															      </div>
+															</form>
+		                        </div>
+                        </div>
+                    </div><!-- /.row -->
+
+                    <!-- Table row -->
+                    <div class="row" style="color:black;">
+                        <div class="col-12 table-responsive">
+                            <table class="table table-bordered table-striped listTable">
+                                <thead>
+                                    <tr>
+                                        <th>{{phrase.Product}}</th>
+                                        <th>{{phrase.Subtotal}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in invoice.payment.paymentRows">
+                                        <td>{{row.title}}</td>
+                                        <td>{{invoice.currency_symbol}} {{row.amount}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
+
+                    <div class="row" style="color:black;">
+                        <!-- accepted payments column -->
+                        <div class="col-12">
+                            <p class="lead" style="font-size: 14px">{{phrase.AmountDue}} {{invoice.payment.dueDate}}</p>
+                            <div class="table-responsive">
+                                <table class="table listTable">
+                                    <tr>
+                                        <th style="width:50%">{{phrase.Subtotal}}:</th>
+                                        <td>{{invoice.currency_symbol}} {{invoice.prices.original}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:50%">{{phrase.Discount}}:</th>
+                                        <td>{{invoice.currency_symbol}} {{invoice.prices.discount}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{phrase.payTax}} ({{invoice.paymentTax}}%)</th>
+                                        <td>{{invoice.currency_symbol}} {{invoice.prices.tax_value}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{phrase.Total}}:</th>
+                                        <td>{{invoice.currency_symbol}} {{invoice.prices.total_with_tax}}</td>
+                                    </tr>
+																		<tr ng-show="invoice.payment.isDueDate && invoice.payment.paymentStatus != '1'">
+                                        <th>Late Fine:</th>
+                                        <td>{{invoice.currency_symbol}} {{invoice.payment.fine_amount}}</td>
+                                    </tr>
+                                    <tr ng-show="invoice.payment.paymentStatus == '1' && invoice.payment.paymentAmount != invoice.prices.paid_value">
+                                        <th>Late Fine:</th>
+                                        <td>{{invoice.currency_symbol}} {{invoice.payment.fine_amount}}</td>
+                                    </tr>
+                                    <tr style="background-color: #5cb85c;color: black;">
+                                        <th>{{phrase.paidAmount}}:</th>
+                                        <td style="border-top:0px;">{{invoice.currency_symbol}} {{invoice.prices.paid_value}}</td>
+                                    </tr>
+                                    <tr style="background-color: #5cb85c;color: black;" ng-if="invoice.payment.paymentStatus != 1">
+                                        <th>{{phrase.pendingAmount}}:</th>
+                                        <td style="border-top:0px;">{{invoice.currency_symbol}} {{invoice.prices.total_pending}}</td>
+                                    </tr>
+                                    <tr ng-show="invoice.payment.isDueDate && invoice.payment.paymentStatus != '1'" style="background-color: red;color: black;">
+                                        <th colspan="2"> {{phrase.invDueDate}} </th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block" style="padding: 15px 10px 0 10px;">
+                <button ng-if="$root.can('Invoices.collInvoice')" ng-click="collect(invoice.payment.id)" ng-show="invoice.payment.paymentStatus != '1'" class="btn pull-right btn-danger card-block-input-item no-print btn-sm">{{phrase.collInvoice}}</button>
+                <h4 class="card-title">{{phrase.viewInvoice}}</h4>
+                <table class="table table-hover table-bordered listTable" style="color:black;">
+                    <tbody>
+                        <tr>
+                            <th style="font-size: 13px">Parameters</th>
+                            <th style="font-size: 13px">Notes</th>
+                            <th style="font-size: 13px" class="no-print" ng-if="$root.can('Invoices.payRevert')">{{phrase.payRevert}}</th>
+                        </tr>
+                        <tr ng-repeat="collection in invoice.collection">
+                            <td>
+                            	On {{collection.collectionDate}}<br>
+                            	{{invoice.currency_symbol}} {{collection.collectionAmount}}<br>
+                            	Pay Method: {{collection.collectionMethod}}<br>
+                            </td>
+                            <td>{{collection.collectionNote}}</td>
+                            <td class="no-print options" ng-if="$root.can('Invoices.payRevert')">
+                                <button ng-click="revert(collection.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.payRevert}}" ><i class="fa fa-undo"></i></button>
+                            </td>
+                        </tr>
+                        <tr ng-show="!invoice.collection.length">
+                        	<td class="noTableData" colspan="7">{{phrase.noPayments}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.details">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.listPaymentDetail}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr ng-repeat="(key, value) in payDetails">
+                                <td>{{key}}</td>
+                                <td>{{value}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="showModal"><div ng-bind-html="modalContent"></div></modal>
+<modal visible="showModalLink">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink" placeholder="{{phrase.typeNameUserMail}}">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="linkStudentButton()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="studentOne in searchResults">
+                            <td>{{studentOne.name}}</td>
+                            <td>{{studentOne.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="linkStudentFinish(studentOne)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>
+<modal visible="collectInvoice">
+    <form class="form-horizontal" name="CollectIncoiveForm" role="form" ng-submit="collectInvoiceNow(invoice.payment.id)" novalidate>
+        <div class="form-group row" ng-class="{'has-error': CollectIncoiveForm.paymentTitle.$invalid}">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.InvID}} * </label>
+            <div class="col-sm-9  control-label col-form-label">
+                {{invoice.payment.paymentTitle}}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Total}}</label>
+            <div class="col-sm-3  control-label col-form-label">
+                {{invoice.currency_symbol}} {{invoice.prices.total_with_tax}}
+            </div>
+            <label class="pb-2 pl-3 control-label col-form-label">Pending {{phrase.Amount}}</label>
+            <div class="col-sm-3  control-label col-form-label">
+                {{invoice.currency_symbol}} {{invoice.prices.total_pending}}
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': CollectIncoiveForm.collectionAmount.$invalid}">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.collAmount}} *</label>
+            <div class="col-sm-9">
+                <input type="text" name="collectionAmount" ng-model="form.collectionAmount" required class="form-control">
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': CollectIncoiveForm.collectionDate.$invalid}">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.collDate}} *</label>
+            <div class="col-sm-9">
+                <input type="text" date-picker id="datemaskCollectEdit" name="collectionDate" ng-model="form.collectionDate" required class="form-control datemask">
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': CollectIncoiveForm.collectionMethod.$invalid}">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.payMethod}} *</label>
+            <div class="col-sm-9">
+                <select class="form-control" ng-model="form.collectionMethod" name="collectionMethod" required>
+                    <option value="Cash">Cash</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Cheque">Cheque</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': CollectIncoiveForm.collectionNote.$invalid}">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.notes}}</label>
+            <div class="col-sm-9">
+                <textarea name="collectionNote" class="form-control" ng-model="form.collectionNote" placeholder="Note"></textarea>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-3 col-sm-9">
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="CollectIncoiveForm.$invalid">Collect Fees</button>
+            </div>
+        </div>
+    </form>
+</modal>
+<modal visible="payOnlineModal">
+    <form class="form-horizontal" name="PayOnlineForm" role="form" action="{{'index.php/invoices/pay/'+invoice.payment.id}}" method="POST" novalidate>
+        <div class="form-group row">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.InvID}} * </label>
+            <div class="col-sm-9  control-label col-form-label">
+                {{invoice.payment.paymentTitle}}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Total}}{{phrase.Amount}}</label>
+            <div class="col-sm-3  control-label col-form-label">
+                {{invoice.currency_symbol}} {{invoice.prices.total_with_tax}}
+            </div>
+            <label class="pb-2 pl-3 control-label col-form-label">Pending {{phrase.Amount}}</label>
+            <div class="col-sm-3  control-label col-form-label">
+                {{invoice.currency_symbol}} {{invoice.prices.total_pending}}
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': PayOnlineForm.payVia.$invalid}">
+            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.payVia}} *</label>
+            <div class="col-sm-9">
+                <div class="radio-list" ng-show="invoice.eazypayEnabled == '1'">
+                    <label>
+                        <input type="radio" name="payVia" value="eazypay" ng-model="form.payVia" required checked> EazyPay
+                    </label>
+                </div>
+				<div class="radio-list" ng-show="invoice.paypalEnabled == '1'">
+                    <label>
+                        <input type="radio" name="payVia" value="paypal" ng-model="form.payVia" required> Paypal
+                    </label>
+                </div>
+                <div class="radio-list" ng-show="invoice.2coEnabled == '1'">
+                    <label>
+                        <input type="radio" name="payVia" value="2co" ng-model="form.payVia" required > 2CheckOut
+                    </label>
+                </div>
+                <div class="radio-list" ng-show="invoice.payumoneyEnabled == '1'">
+                    <label>
+                        <input type="radio" name="payVia" value="payumoney" ng-model="form.payVia" required > PayUmoney
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-3 col-sm-9">
+                <input type="hidden" name="return" value="invoices"/>
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="PayOnlineForm.$invalid">{{phrase.pay}}</button>
+            </div>
+        </div>
+    </form>
+</modal>

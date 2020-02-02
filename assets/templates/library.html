@@ -1,0 +1,319 @@
+<style type="text/css">
+	.listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	.listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	.listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+	.pdf-view {
+		position: relative;
+    width: 100%;
+    padding: 0;
+    top: -5px;
+    left: 0px;
+    z-index: 500s;
+	}
+	.pdf-view img {
+		width: 100%;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Library}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+      	<button
+      		ng-show="views.upload_file"
+      		ng-click="changeView('list')"
+      		class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-arrow-left"></i> Back
+      	</button>
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12" ng-if="!loading">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+          			<div class="card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm search-input">
+                        <input type="text"  title="{{phrase.minCharLength3}}" name="table_search" ng-model="searchText" ng-change="searchDB()" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <div class="listTable table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>Content</th>
+                                <th>Price/Status</th>
+                                <th ng-show="$root.can('Library.Download') || $root.can('Library.editBook') || $root.can('Library.delLibrary')">Action</th>
+                            </tr>
+                            <tr dir-paginate="book in library | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                	<span class="text-info">{{book.bookName}}</span><br>
+                                	<b>Author:</b> {{book.bookAuthor}}
+                                </td>
+                                <td>
+                                	<span ng-if="book.bookType == 'traditional' && book.bookPrice != ''">{{book.bookPrice}}</span>
+                                	<span ng-if="book.bookPrice == ''">-</span>
+                                	/
+                                	<span ng-if="book.bookState == 1">{{phrase.available}}</span>
+                                	<span ng-if="book.bookState == 0">{{phrase.unavailable}}</span>
+                                </td>
+                                <td class="options" ng-show="$root.can('Library.Download') || $root.can('Library.editBook') || $root.can('Library.delLibrary')">
+                                    <!-- <a ng-show="$root.can('Library.Download')" target="_blank" href="{{'index.php/library/download/'+book.id}}"><button ng-show="book.bookType == 'electronic'" type="button" class="btn btn-info btn-circle" title="{{phrase.Download}}" ><i class="fa fa-cloud-download"></i></button></a> -->
+                                    <button
+																    	ng-if="book.bookFile"
+																    	ng-show="$root.can('Library.Download')"
+																    	ng-click="showSingleItemFile(book)"
+																    	type="button" class="btn btn-success btn-circle">
+																    	<i class="fa fa-file"></i>
+																    </button>
+                                    <button ng-show="$root.can('Library.editBook')" ng-click="edit(book.id)" type="button" class="btn btn-warning btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Library.delLibrary')" ng-click="remove(book,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!library.length"><td class="noTableData" colspan="5">{{phrase.noBooks}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls
+                    	on-page-change="pageChanged(newPageNumber)"
+                    	template-url="assets/templates/dirPagination.html">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12" ng-if="loading">
+    	Loading...
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editBook}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editBook" ng-upload="saveEdit(content)" role="form" method="post" action="{{'index.php/library/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editBook.bookName.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookName" ng-model="form.bookName" class="form-control" required placeholder="{{phrase.bookTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookDescription}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="bookDescription" class="form-control" ng-model="form.bookDescription" placeholder="{{phrase.bookDescription}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookAuthor}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookAuthor" ng-model="form.bookAuthor" class="form-control" placeholder="{{phrase.bookAuthor}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookPub}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookPublisher" ng-model="form.bookPublisher" class="form-control" placeholder="{{phrase.bookPub}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookISBN}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookISBN" ng-model="form.bookISBN" class="form-control" placeholder="{{phrase.bookISBN}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editBook.bookType.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookType}} *</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="bookType" value="traditional" ng-model="form.bookType" required checked="checked">
+                                        {{phrase.traditionalBook}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="bookType" value="electronic" ng-model="form.bookType" required>
+                                        {{phrase.electronicBook}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookPrice}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookPrice" ng-model="form.bookPrice" class="form-control" placeholder="{{phrase.bookPrice}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.quantity}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookQuantity" ng-model="form.bookQuantity" class="form-control" placeholder="{{phrase.quantity}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'traditional'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookShelf}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bookShelf" ng-model="form.bookShelf" class="form-control" placeholder="{{phrase.bookShelf}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="form.bookType == 'electronic'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.uploadBook}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="bookFile">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.State}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="bookState" ng-model="form.bookState" >
+                                    <option value="1">{{phrase.available}}</option>
+                                    <option value="0">{{phrase.unavailable}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div>
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editBook.$invalid">{{phrase.editBook}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.subscription">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.mngSub}}</h4>
+                <div class="form">
+                    <form class="form-horizontal" ng-submit="search_subscription()" name="search_users_form" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': search_users_form.user_search.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.selUsers}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="user_search" ng-model="form.user_search" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group row m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light m-t-10" ng-disabled="search_users_form.$invalid">{{phrase.searchUsers}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card" ng-show="subscription_members.users">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.usrSelect}}</h4>
+                <div class="form">
+                    <table class="listTable table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.role}}</th>
+                                <th>Subs. ID</th>
+                                <th class="no-print">Action</th>
+                            </tr>
+                            <tr ng-repeat="user in subscription_members.users">
+                                <td>
+                                    <a href="" ng-click="teacherProfile( user.id )">{{user.fullName}}</a>
+                                </td>
+                                <td>{{subscription_members.prems[user.role_perm]}}</td>
+                                <td>{{user.library_id}}</td>
+                                <td class="no-print options">
+                                    <button ng-click="edit_subscription(user)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!subscription_members.users.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-if="views.upload_file">
+	<div class="col-12 pdf-view" style="margin-top: -10px" ng-if="current_shown_item.dir_images_count > 0">
+		<!-- <div class="csslider1">
+			<input ng-repeat="(key, item) in current_shown_item.dir_images_array" name="cs_anchor1" id="cs_slide1_{{key}}" type="radio" class="cs_anchor slide">
+			<input name="cs_anchor1" id="cs_play1" type="radio" class="cs_anchor" checked="">
+			<input ng-repeat="(key, item) in current_shown_item.dir_images_array" name="cs_anchor1" id="cs_pause1_{{key}}" type="radio" class="cs_anchor slide">
+
+			<ul>
+				<li class="cs_skeleton">
+					<img src="{{current_shown_item.dir_images_array[0]}}" style="width: 100%;">
+				</li>
+				<li class="num{{key}} img slide" ng-repeat="(key, item) in current_shown_item.dir_images_array">
+					<img src="{{item}}">
+				</li>
+			</ul>
+
+			<div class="cs_arrowprev">
+				<label class="num{{key}}"
+					style="border: 1px solid #BBB; background: rgba(255,255,255,.7);"
+					for="cs_slide1_{{key}}" ng-repeat="(key, item) in current_shown_item.dir_images_array"><span><i></i><b></b></span></label>
+			</div>
+			<div class="cs_arrownext">
+				<label class="num{{key}}"
+					style="border: 1px solid #BBB; background: rgba(255,255,255,.7);"
+					for="cs_slide1_{{key}}" ng-repeat="(key, item) in current_shown_item.dir_images_array"><span><i></i><b></b></span></label>
+			</div>
+		</div> -->
+		<img ng-repeat="image_path in current_shown_item.dir_images_array" src="{{image_path}}">
+	</div>
+	<div class="col-12" ng-if="current_shown_item.dir_images_count == 0">
+		No files to display
+	</div>
+</div>
+
+<modal visible="addSubsModal">
+    <form class="form-horizontal" name="addSubId" role="form" ng-submit="saveUsrSubscription()" role="form" novalidate>
+        <div class="form-group row" ng-class="{'has-error': addSubId.library_id.$invalid}">
+            <label class="col-sm-4 text-right control-label col-form-label">{{phrase.subId}} * </label>
+            <div class="col-sm-8">
+                <input type="text" name="library_id" ng-model="form.library_id" class="form-control" required>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addSubId.$invalid">{{phrase.chgSub}}</button>
+            </div>
+        </div>
+    </form>
+</modal>

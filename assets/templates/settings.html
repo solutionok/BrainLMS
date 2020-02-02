@@ -1,0 +1,1564 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.adminTasks}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.settings">
+    <div class="col-md-3 no-print">
+        <div class="card">
+            <div class="card-block">
+                <div class="list-group" tabheads>
+
+                    <a ng-show="$root.can('adminTasks.globalSettings')" showtab="" class="list-group-item" href="#global" aria-controls="global" role="tab" data-toggle="tab">{{phrase.globalSettings}}</a>
+                    <a ng-show="$root.can('adminTasks.activatedModules')" showtab="" class="list-group-item" href="#modules" aria-controls="modules" role="tab" data-toggle="tab">{{phrase.activatedModules}}</a>
+                    <a ng-show="$root.can('adminTasks.paymentsSettings')" showtab="" class="list-group-item" href="#payments" aria-controls="payments" role="tab" data-toggle="tab">{{phrase.paymentsSettings}}</a>
+                    <a ng-show="$root.can('adminTasks.mailSmsSettings')" showtab="" class="list-group-item" href="#sms" aria-controls="sms" role="tab" data-toggle="tab">{{phrase.mailSmsSettings}}</a>
+                    <a ng-show="$root.can('adminTasks.vacationSettings')" showtab="" class="list-group-item" href="#vacation" aria-controls="vacation" role="tab" data-toggle="tab">{{phrase.vacationSettings}}</a>
+                    <a ng-show="$root.can('adminTasks.mobileSettings')" showtab="" class="list-group-item" href="#mobile" aria-controls="mobile" role="tab" data-toggle="tab">{{phrase.mobileSettings}}</a>
+                    <a ng-show="$root.can('adminTasks.frontendCMS')" showtab="" class="list-group-item" href="#cms" aria-controls="cms" role="tab" data-toggle="tab">{{phrase.frontendCMS}}</a>
+                    <a ng-show="$root.can('adminTasks.bioItegration')" showtab="" class="list-group-item" href="#biometric" aria-controls="biometric" role="tab" data-toggle="tab">{{phrase.bioItegration}}</a>
+                    <a ng-show="$root.can('adminTasks.lookFeel')" showtab="" class="list-group-item" href="#lookFeel" aria-controls="lookFeel" role="tab" data-toggle="tab">{{phrase.lookFeel}}</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-block">
+
+                <form class="form-horizontal" name="editTerms" role="form" ng-submit="saveEdit()" novalidate>
+                    <div class="tab-content" tabcontent>
+                        <div role="tabpanel" class="tab-pane" id="global" ng-show="$root.can('adminTasks.globalSettings')">
+                            <h3>{{phrase.globalSettings}}</h3>
+                            <br/>
+                            <div class="form-group row" ng-class="{'has-error': editSettings.siteTitle.$invalid}">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.siteTitle}} * </label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="siteTitle" ng-model="form.siteTitle" class="form-control" required placeholder="{{phrase.siteTitle}}">
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{'has-error': editSettings.languageDef.$invalid}">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.defLang}}</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" ng-model="form.languageDef" name="languageDef" required>
+                                        <option ng-repeat="(key,value) in languages" value="{{key}}" ng-selected="form.languageDef == key">{{value}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.allowLanguage}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="languageAllow" value="1" ng-model="form.languageAllow" required ng-checked='true'>
+                                            {{phrase.allowed}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="languageAllow" value="0" ng-model="form.languageAllow" required >
+                                            {{phrase.notAllowed}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Country</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="country" ng-model="form.country" >
+                                        <option value="AF">Afghanistan</option><option value="AX">Åland Islands</option><option value="AL">Albania</option><option value="DZ">Algeria</option><option value="AS">American Samoa</option><option value="AD">Andorra</option><option value="AO">Angola</option><option value="AI">Anguilla</option><option value="AQ">Antarctica</option><option value="AG">Antigua and Barbuda</option><option value="AR">Argentina</option><option value="AM">Armenia</option><option value="AW">Aruba</option><option value="AU">Australia</option><option value="AT">Austria</option><option value="AZ">Azerbaijan</option><option value="BS">Bahamas</option><option value="BH">Bahrain</option><option value="BD">Bangladesh</option><option value="BB">Barbados</option><option value="BY">Belarus</option><option value="BE">Belgium</option><option value="BZ">Belize</option><option value="BJ">Benin</option><option value="BM">Bermuda</option><option value="BT">Bhutan</option><option value="BO">Bolivia, Plurinational State of</option><option value="BQ">Bonaire, Sint Eustatius and Saba</option><option value="BA">Bosnia and Herzegovina</option><option value="BW">Botswana</option><option value="BV">Bouvet Island</option><option value="BR">Brazil</option><option value="IO">British Indian Ocean Territory</option><option value="BN">Brunei Darussalam</option><option value="BG">Bulgaria</option><option value="BF">Burkina Faso</option><option value="BI">Burundi</option><option value="KH">Cambodia</option><option value="CM">Cameroon</option><option value="CA">Canada</option><option value="CV">Cape Verde</option><option value="KY">Cayman Islands</option><option value="CF">Central African Republic</option><option value="TD">Chad</option><option value="CL">Chile</option><option value="CN">China</option><option value="CX">Christmas Island</option><option value="CC">Cocos (Keeling) Islands</option><option value="CO">Colombia</option><option value="KM">Comoros</option><option value="CG">Congo</option><option value="CD">Congo, the Democratic Republic of the</option><option value="CK">Cook Islands</option><option value="CR">Costa Rica</option><option value="CI">Côte d'Ivoire</option><option value="HR">Croatia</option><option value="CU">Cuba</option><option value="CW">Curaçao</option><option value="CY">Cyprus</option><option value="CZ">Czech Republic</option><option value="DK">Denmark</option><option value="DJ">Djibouti</option><option value="DM">Dominica</option><option value="DO">Dominican Republic</option><option value="EC">Ecuador</option><option value="EG">Egypt</option><option value="SV">El Salvador</option><option value="GQ">Equatorial Guinea</option><option value="ER">Eritrea</option><option value="EE">Estonia</option><option value="ET">Ethiopia</option><option value="FK">Falkland Islands (Malvinas)</option><option value="FO">Faroe Islands</option><option value="FJ">Fiji</option><option value="FI">Finland</option><option value="FR">France</option><option value="GF">French Guiana</option><option value="PF">French Polynesia</option><option value="TF">French Southern Territories</option><option value="GA">Gabon</option><option value="GM">Gambia</option><option value="GE">Georgia</option><option value="DE">Germany</option><option value="GH">Ghana</option><option value="GI">Gibraltar</option><option value="GR">Greece</option><option value="GL">Greenland</option><option value="GD">Grenada</option><option value="GP">Guadeloupe</option><option value="GU">Guam</option><option value="GT">Guatemala</option><option value="GG">Guernsey</option><option value="GN">Guinea</option><option value="GW">Guinea-Bissau</option><option value="GY">Guyana</option><option value="HT">Haiti</option><option value="HM">Heard Island and McDonald Islands</option><option value="VA">Holy See (Vatican City State)</option><option value="HN">Honduras</option><option value="HK">Hong Kong</option><option value="HU">Hungary</option><option value="IS">Iceland</option><option value="IN">India</option><option value="ID">Indonesia</option><option value="IR">Iran, Islamic Republic of</option><option value="IQ">Iraq</option><option value="IE">Ireland</option><option value="IM">Isle of Man</option><option value="IL">Israel</option><option value="IT">Italy</option><option value="JM">Jamaica</option><option value="JP">Japan</option><option value="JE">Jersey</option><option value="JO">Jordan</option><option value="KZ">Kazakhstan</option><option value="KE">Kenya</option><option value="KI">Kiribati</option><option value="KP">Korea, Democratic People's Republic of</option><option value="KR">Korea, Republic of</option><option value="KW">Kuwait</option><option value="KG">Kyrgyzstan</option><option value="LA">Lao People's Democratic Republic</option><option value="LV">Latvia</option><option value="LB">Lebanon</option><option value="LS">Lesotho</option><option value="LR">Liberia</option><option value="LY">Libya</option><option value="LI">Liechtenstein</option><option value="LT">Lithuania</option><option value="LU">Luxembourg</option><option value="MO">Macao</option><option value="MK">Macedonia, the former Yugoslav Republic of</option><option value="MG">Madagascar</option><option value="MW">Malawi</option><option value="MY">Malaysia</option><option value="MV">Maldives</option><option value="ML">Mali</option><option value="MT">Malta</option><option value="MH">Marshall Islands</option><option value="MQ">Martinique</option><option value="MR">Mauritania</option><option value="MU">Mauritius</option><option value="YT">Mayotte</option><option value="MX">Mexico</option><option value="FM">Micronesia, Federated States of</option><option value="MD">Moldova, Republic of</option><option value="MC">Monaco</option><option value="MN">Mongolia</option><option value="ME">Montenegro</option><option value="MS">Montserrat</option><option value="MA">Morocco</option><option value="MZ">Mozambique</option><option value="MM">Myanmar</option><option value="NA">Namibia</option><option value="NR">Nauru</option><option value="NP">Nepal</option><option value="NL">Netherlands</option><option value="NC">New Caledonia</option><option value="NZ">New Zealand</option><option value="NI">Nicaragua</option><option value="NE">Niger</option><option value="NG">Nigeria</option><option value="NU">Niue</option><option value="NF">Norfolk Island</option><option value="MP">Northern Mariana Islands</option><option value="NO">Norway</option><option value="OM">Oman</option><option value="PK">Pakistan</option><option value="PW">Palau</option><option value="PS">Palestinian Territory, Occupied</option><option value="PA">Panama</option><option value="PG">Papua New Guinea</option><option value="PY">Paraguay</option><option value="PE">Peru</option><option value="PH">Philippines</option><option value="PN">Pitcairn</option><option value="PL">Poland</option><option value="PT">Portugal</option><option value="PR">Puerto Rico</option><option value="QA">Qatar</option><option value="RE">Réunion</option><option value="RO">Romania</option><option value="RU">Russian Federation</option><option value="RW">Rwanda</option><option value="BL">Saint Barthélemy</option><option value="SH">Saint Helena, Ascension and Tristan da Cunha</option><option value="KN">Saint Kitts and Nevis</option><option value="LC">Saint Lucia</option><option value="MF">Saint Martin (French part)</option><option value="PM">Saint Pierre and Miquelon</option><option value="VC">Saint Vincent and the Grenadines</option><option value="WS">Samoa</option><option value="SM">San Marino</option><option value="ST">Sao Tome and Principe</option><option value="SA">Saudi Arabia</option><option value="SN">Senegal</option><option value="RS">Serbia</option><option value="SC">Seychelles</option><option value="SL">Sierra Leone</option><option value="SG">Singapore</option><option value="SX">Sint Maarten (Dutch part)</option><option value="SK">Slovakia</option><option value="SI">Slovenia</option><option value="SB">Solomon Islands</option><option value="SO">Somalia</option><option value="ZA">South Africa</option><option value="GS">South Georgia and the South Sandwich Islands</option><option value="SS">South Sudan</option><option value="ES">Spain</option><option value="LK">Sri Lanka</option><option value="SD">Sudan</option><option value="SR">Suriname</option><option value="SJ">Svalbard and Jan Mayen</option><option value="SZ">Swaziland</option><option value="SE">Sweden</option><option value="CH">Switzerland</option><option value="SY">Syrian Arab Republic</option><option value="TW">Taiwan, Province of China</option><option value="TJ">Tajikistan</option><option value="TZ">Tanzania, United Republic of</option><option value="TH">Thailand</option><option value="TL">Timor-Leste</option><option value="TG">Togo</option><option value="TK">Tokelau</option><option value="TO">Tonga</option><option value="TT">Trinidad and Tobago</option><option value="TN">Tunisia</option><option value="TR">Turkey</option><option value="TM">Turkmenistan</option><option value="TC">Turks and Caicos Islands</option><option value="TV">Tuvalu</option><option value="UG">Uganda</option><option value="UA">Ukraine</option><option value="AE">United Arab Emirates</option><option value="GB">United Kingdom</option><option value="US">United States</option><option value="UM">United States Minor Outlying Islands</option><option value="UY">Uruguay</option><option value="UZ">Uzbekistan</option><option value="VU">Vanuatu</option><option value="VE">Venezuela, Bolivarian Republic of</option><option value="VN">Viet Nam</option><option value="VG">Virgin Islands, British</option><option value="VI">Virgin Islands, U.S.</option><option value="WF">Wallis and Futuna</option><option value="EH">Western Sahara</option><option value="YE">Yemen</option><option value="ZM">Zambia</option><option value="ZW">Zimbabwe</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}}</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="address" ng-model="form.address" class="form-control" placeholder="{{phrase.Address}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address2}}</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="address2" ng-model="form.address2" class="form-control" placeholder="{{phrase.Address2}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}}</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}">
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{'has-error': editSettings.systemEmail.$invalid}">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.sysMail}} *</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="systemEmail" ng-model="form.systemEmail" class="form-control" required placeholder="{{phrase.sysMail}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.footer}}</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="footer" ng-model="form.footer" class="form-control" placeholder="{{phrase.footer}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Enable In/Out for employees attendance</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="sAttendanceInOut" value="1" ng-model="form.sAttendanceInOut" required ng-checked='true'>
+                                            Enabled
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="sAttendanceModel" value="0" ng-model="form.sAttendanceInOut" required >
+                                            Disabled
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.attendanceModel}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="attendanceModel" value="subject" ng-model="form.attendanceModel" required ng-checked='true'>
+                                            {{phrase.subBased}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="attendanceModel" value="class" ng-model="form.attendanceModel" required >
+                                            {{phrase.classBased}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.enableSections}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="enableSections" value="1" ng-model="form.enableSections" required>
+                                            {{phrase.Include}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="enableSections" value="0" ng-model="form.enableSections" required >
+                                            {{phrase.exclude}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.allowPublicReg}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="allowPublicReg" value="1" ng-model="form.allowPublicReg" required>
+                                            {{phrase.allowed}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="allowPublicReg" value="0" ng-model="form.allowPublicReg" required >
+                                            {{phrase.notAllowed}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.allowTeaSendMailSms}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="allowTeachersMailSMS" value="none" ng-model="form.allowTeachersMailSMS" required> {{phrase.notAllowed}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="allowTeachersMailSMS" value="mail" ng-model="form.allowTeachersMailSMS" required > {{phrase.email}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="allowTeachersMailSMS" value="sms" ng-model="form.allowTeachersMailSMS" required > {{phrase.sms}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="allowTeachersMailSMS" value="both" ng-model="form.allowTeachersMailSMS" required > {{phrase.mailsms}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row  ">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Timezone}}</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="timezone" ng-model="form.timezone" >
+                                        <option value="{{zone.key}}" ng-repeat="zone in timezone_list track by $index" ng-selected="zone.key==form.timezone">{{zone.value}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Calendar}}</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="gcalendar" ng-model="form.gcalendar" >
+                                        <option value="ethiopic">Ethiopic</option>
+                                        <option value="gregorian">Gregorian</option>
+                                        <option value="islamic">Islamic</option>
+                                        <option value="persian">Persian</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Calendar Offset</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="calendarOffset" ng-model="form.calendarOffset" >
+                                        <option value="-2">-2 Days</option>
+                                        <option value="-1">-1 Days</option>
+                                        <option value="0">No Offset</option>
+                                        <option value="+1">+1 Days</option>
+                                        <option value="+2">+2 Days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.dateFormat}}</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="dateformat" ng-model="form.dateformat" >
+                                        <option value="m/d/Y">MM-DD-YYYY</option>
+                                        <option value="d/m/Y">DD-MM-YYYY</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.studentMail}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="emailIsMandatory" value="1" ng-model="form.emailIsMandatory" required>
+                                            {{phrase.Mandatory}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="emailIsMandatory" value="0" ng-model="form.emailIsMandatory" required >
+                                            {{phrase.notMandatory}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.googleID}} </label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="gTrackId" ng-model="form.gTrackId" class="form-control" placeholder="{{phrase.googleID}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">HTTPS Enabled</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="https_enabled" value="1" ng-model="form.https_enabled" required>
+                                            Enabled
+                                            <small>Don't enable unless you've SSL certifcate enabled in your domain</small>
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="https_enabled" value="0" ng-model="form.https_enabled" required >
+                                            Disabled
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">WYSIWYG Type</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="wysiwyg_type" value="simple" ng-model="form.wysiwyg_type" required>
+                                            Simple
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="wysiwyg_type" value="advanced" ng-model="form.wysiwyg_type" required>
+                                            Advanced
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="modules" ng-show="$root.can('adminTasks.activatedModules')">
+                            <h3>{{phrase.activatedModules}}</h3>
+                            <br/>
+
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.activatedModules}}</label>
+                                <div class="col-sm-9 row">
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="staticpagesAct"> {{phrase.staticPages}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="messagesAct"> {{phrase.Messages}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="mailSmsAct"> {{phrase.mailsms}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="sendNotifAct"> {{phrase.mobileNotifications}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="calendarAct"> {{phrase.Calender}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="eventsAct"> {{phrase.events}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="newsboardAct"> {{phrase.newsboard}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="vacationAct"> {{phrase.Vacation}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="attendanceAct"> {{phrase.Attendance}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="staffAttendanceAct"> {{phrase.staffAttendance}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="bookslibraryAct"> {{phrase.booksLibrary}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="assignmentsAct"> {{phrase.Assignments}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="homeworkAct"> {{phrase.Homework}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="onlineexamsAct"> {{phrase.Onlineexams}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="mediaAct"> {{phrase.media}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="paymentsAct"> {{phrase.Payments}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="expensesAct"> {{phrase.Expenses}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="incomeAct"> {{phrase.Incomes}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="payrollAct"> {{phrase.Payroll}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="pollsAct"> {{phrase.Polls}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="transportAct"> {{phrase.Transport}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="reportsAct"> {{phrase.Reports}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="materialsAct"> {{phrase.studyMaterial}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="classSchAct"> {{phrase.classSch}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="hostelAct"> {{phrase.HostelManage}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="visitorsAct"> {{phrase.visitors}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="phoneCallsAct"> {{phrase.phn_calls}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="postalAct"> {{phrase.postal}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="conMessAct"> {{phrase.con_mess}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="enquiriesAct"> {{phrase.enquiries}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="complainAct"> {{phrase.complaints}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="employeesAct"> {{phrase.employees}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="inventoryAct"> {{phrase.inventory}}</label>
+                                    <label class="col-md-12" style="padding: 10px;"><input type="checkbox" name="activatedModules[]" checklist-model="form.activatedModules" value="certAct"> {{phrase.Certificates}}</label>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="sms" ng-show="$root.can('adminTasks.mailSmsSettings')">
+                            <h3>{{phrase.mailSmsSettings}}</h3>
+                            <br/>
+
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">Due Invoices Notifications</h4>
+                                </div>
+                                <div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Send Due Invoices Via</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="dueInvoicesNotif" ng-model="form.dueInvoicesNotif" >
+                                                <option value="0">{{phrase.None}}</option>
+                                                <option value="mail">{{phrase.email}}</option>
+                                                <option value="sms">{{phrase.sms}}</option>
+                                                <option value="mailsms">{{phrase.mailsms}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Send Due Invoices to</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="dueInvoicesNotifTo" ng-model="form.dueInvoicesNotifTo" >
+                                                <option value="student">{{phrase.students}}</option>
+                                                <option value="parent">{{phrase.parents}}</option>
+                                                <option value="both">{{phrase.studentsParents}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">Exam Notifications</h4>
+                                </div>
+                                <div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">{{phrase.examNotif}}</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="examDetailsNotif" ng-model="form.examDetailsNotif" >
+                                                <option value="0">{{phrase.None}}</option>
+                                                <option value="mail">{{phrase.email}}</option>
+                                                <option value="sms">{{phrase.sms}}</option>
+                                                <option value="mailsms">{{phrase.mailsms}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">{{phrase.sendExamDet}}</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="examDetailsNotifTo" ng-model="form.examDetailsNotifTo" >
+                                                <option value="student">{{phrase.students}}</option>
+                                                <option value="parent">{{phrase.parents}}</option>
+                                                <option value="both">{{phrase.studentsParents}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">Student Absense</h4>
+                                </div>
+                                <div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">{{phrase.sendStudentsAbsendVia}}</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="absentNotif" ng-model="form.absentNotif" >
+                                                <option value="0">{{phrase.None}}</option>
+                                                <option value="mail">{{phrase.email}}</option>
+                                                <option value="sms">{{phrase.sms}}</option>
+                                                <option value="mailsms">{{phrase.mailsms}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">SMS Configuration</h4>
+                                </div>
+                                <div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">{{phrase.smsProvider}} *</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" ng-model="formS.smsProvider" name="smsProvider">
+                                                <option value="nexmo">Nexmo</option>
+                                                <option value="twilio">Twilio</option>
+                                                <option value="infobip">Infobip</option>
+                                                <option value="hoiio">hoiio</option>
+                                                <option value="clickatell">ClickAtell</option>
+                                                <option value="intellisms">IntelliSMS</option>
+                                                <option value="bulksms">Bulksms</option>
+                                                <option value="concepto"> liveair.in </option>
+                                                <option value="msg91">Msg91</option>
+                                                <option value="custom">Custom HTTP Request</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'nexmo'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Nexmo Api Key * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="nexmoApiKey" ng-model="formS.nexmoApiKey" class="form-control" placeholder="Nexmo Api Key">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Nexmo Api Secret * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="nexmoApiSecret" ng-model="formS.nexmoApiSecret" class="form-control" placeholder="Nexmo Api Secret">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Nexmo From ID * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="nexmoFromId" ng-model="formS.nexmoFromId" class="form-control" placeholder="Nexmo From ID">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'twilio'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Twilio account SID * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="twilioSID" ng-model="formS.twilioSID" class="form-control" placeholder="Twilio Account SID">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Twilio auth token * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="twilioToken" ng-model="formS.twilioToken" class="form-control" placeholder="Twilio Auth Token">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Twilio from number * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="twilioFN" ng-model="formS.twilioFN" class="form-control" placeholder="Twilio from number">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'infobip'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Infobip account Username * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="infobipUN" ng-model="formS.infobipUN" class="form-control" placeholder="Infobip account Username">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Infobip account Password * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="infobipPW" ng-model="formS.infobipPW" class="form-control" placeholder="Infobip account Password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Infobip from number/name * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="infobipFROM" ng-model="formS.infobipFROM" class="form-control" placeholder="Infobip from number/name">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'hoiio'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Hoiio App ID * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="hoiioAppId" ng-model="formS.hoiioAppId" class="form-control" placeholder="Hoiio App ID">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Hoiio Access token * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="hoiioAccessToken" ng-model="formS.hoiioAccessToken" class="form-control" placeholder="Hoiio Access Token">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'clickatell'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Clickatell Api Key * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="clickatellApiKey" ng-model="formS.clickatellApiKey" class="form-control" placeholder="Clickatell Api Key">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'intellisms'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Intellisms Username * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="intellismsUserName" ng-model="formS.intellismsUserName" class="form-control" placeholder="Intellisms Username">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Intellisms Password * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="intellismsPassword" ng-model="formS.intellismsPassword" class="form-control" placeholder="Intellisms Password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Intellisms Sender Number * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="intellismsSenderNumber" ng-model="formS.intellismsSenderNumber" class="form-control" placeholder="Intellisms Sender Number">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'bulksms'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Bulksms Username * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="bulksmsUserName" ng-model="formS.bulksmsUserName" class="form-control" placeholder="Bulksms Username">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Intellisms Password * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="bulksmsPassword" ng-model="formS.bulksmsPassword" class="form-control" placeholder="Bulksms Password">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'concepto'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">LiveAir Token * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="conceptoUserName" ng-model="formS.conceptoUserName" class="form-control" placeholder="LiveAir Username">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">LiveAir Sender Id * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="conceptoSenderId" ng-model="formS.conceptoSenderId" class="form-control" placeholder="LiveAir Sender Id">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'msg91'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Msg91 Authkey * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="msg91Authkey" ng-model="formS.msg91Authkey" class="form-control" placeholder="Msg91 Authkey">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Msg91 SenderId * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="msg91SenderId" ng-model="formS.msg91SenderId" class="form-control" placeholder="Msg91 SenderId">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formS.smsProvider == 'custom'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">HTTP API URL * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="customHTTPURL" ng-model="formS.customHTTPURL" class="form-control" placeholder="Custom HTTP API URL">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">HTTP API Parameters * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="customHTTPParams" ng-model="formS.customHTTPParams" class="form-control" placeholder="Custom HTTP API Parameters">
+                                                Add parameters like the follows : param1=value2<b>&#38;</b>param2=value2<b>&#38;</b>param3=value3
+                                                <br/> Set the to parameter to : {to} And Message parameter to {message}
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">HTTP API Method * </label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" ng-model="formS.customHTTPType" name="customHTTPType">
+                                                    <option value="get">GET</option>
+                                                    <option value="post">POST</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">HTTP To Number Format * </label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" ng-model="formS.customHTTPToFormat" name="customHTTPToFormat">
+                                                    <option value="+">Using + Sign</option>
+                                                    <option value="00">Using preceding 00</option>
+                                                    <option value="c">Direct Number (Discard + sign and 00)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Test SMS function * </label>
+                                        <div class="col-sm-9 control-label">
+                                            <a style="color:blue;cursor: pointer;" ng-click="test_sms_function()">Click here to start SMS testing</a>
+                                            <br/>
+                                            <smal>Please save any changed configurations before testing</smal>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">Mail COnfiguration</h4>
+                                </div>
+                                <div class="card-block">
+
+                                    <div class="form-group row" ng-class="{'has-error': addExam.examSubject.$invalid}">
+                                        <label class="pb-2 pl-3 control-label col-form-label">{{phrase.mailDeliverType}} *</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" ng-model="formM.mailProvider" name="mailProvider">
+                                                <option value="mail">Simple PHP Mail function</option>
+                                                <option value="phpmailer">PHP Mailer Class</option>
+                                                <option value="smtp">SMTP</option>
+                                                <option value="ses">Amazon SES</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formM.mailProvider == 'smtp'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">SMTP Server * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="smtpHost" ng-model="formM.smtpHost" class="form-control" placeholder="Sets the SMTP server">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">SMTP Port * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="smtpPort" ng-model="formM.smtpPort" class="form-control" placeholder="Sets the SMTP port">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">SMTP User Name * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="smtpUserName" ng-model="formM.smtpUserName" class="form-control" placeholder="Sets the SMTP server User Name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">SMTP Password * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="smtpPassWord" ng-model="formM.smtpPassWord" class="form-control" placeholder="Sets the SMTP server Password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">SMTP TLS/SSL * </label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" ng-model="formM.smtpTLS" name="smtpTLS">
+                                                    <option value="">None</option>
+                                                    <option value="SSL">SSL</option>
+                                                    <option value="TLS">TLS</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="formM.mailProvider == 'ses'">
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Amazon SES Access key </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="AmazonSESAccessKey" ng-model="formM.AmazonSESAccessKey" class="form-control" placeholder="Sets the Amazon SES Service Access Key">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Amazon SES Secret key * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="AmazonSESSecretKey" ng-model="formM.AmazonSESSecretKey" class="form-control" placeholder="Sets the Amazon SES Service Secret Key">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="pb-2 pl-3 control-label col-form-label">Amazon SES verified e-mail address * </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="AmazonSESVerifiedSender" ng-model="formM.AmazonSESVerifiedSender" class="form-control" placeholder="Sets the SMTP server User Name">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Test Mail function * </label>
+                                        <div class="col-sm-9 control-label">
+                                            <a style="color:blue;cursor: pointer;" ng-click="test_mail_function()">Click here to start Mail testing</a>
+                                            <br/><smal>Please save any changed configurations before testing</smal>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="payments" ng-show="$root.can('adminTasks.paymentsSettings')">
+                            <h3>{{phrase.paymentsSettings}}</h3>
+                            <br/>
+                            <div class="form-group row" ng-class="{'has-error': editSettings.currency_code.$invalid}">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.currencyCode}} *</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="currency_code" ng-model="form.currency_code" class="form-control" required placeholder="{{phrase.currencyCode}}">
+                                    <small>{{phrase.paypalSupported}} AUD, BRL, CAD, CZK, DKK, EUR, HKD, HUF, ILS, JPY, MYR, MXN, NOK, NZD, PHP, PLN, GBP, RUB, SGD, SEK, CHF, TWD, THB, TRY, USD</small>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{'has-error': editSettings.currency_symbol.$invalid}">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.currencySymbol}} *</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="currency_symbol" ng-model="form.currency_symbol" class="form-control" required placeholder="{{phrase.currencySymbol}}">
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{'has-error': editSettings.paymentTax.$invalid}">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.payTax}} % *</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="paymentTax" ng-model="form.paymentTax" class="form-control" required placeholder="{{phrase.payTax}} %">
+                                    <small>{{phrase.setZero}}</small>
+                                </div>
+                            </div>
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">Transport Schedules</h4>
+                                </div>
+                                <div class="card-block">
+                                     <div class="form-group row">
+										<label class="pb-2 pl-3 control-label col-form-label">Transport Fine Amount</label>
+										<div class="col-sm-9">
+											<input type="text" name="fine_tra" ng-model="form.fine_tra" class="form-control" placeholder="Transport Fine ">
+										</div>
+									</div>
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 1 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_1" ng-model="form.invoice_sc_1" id="invoice_sc_1" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_1" id="months_1" ng-model="form.months_1" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 1 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_1" ng-model="form.invoice_sc_due_1" id="invoice_sc_due_1" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+								<div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 2 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_2" ng-model="form.invoice_sc_2" id="invoice_sc_2" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_2" id="months_2" ng-model="form.months_2" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 2 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_2" ng-model="form.invoice_sc_due_2" id="invoice_sc_due_2" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+								<div class="card-block">
+                                   <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 3 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_3" ng-model="form.invoice_sc_3" id="datemask" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_3" id="months_3" ng-model="form.months_3" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 3 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_3" ng-model="form.invoice_sc_due_3" id="invoice_sc_due_3" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+								<div class="card-block">
+
+                                   <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 4 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_4" ng-model="form.invoice_sc_4" id="invoice_sc_4" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_4" id="months_4" ng-model="form.months_4" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 4 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_4" ng-model="form.invoice_sc_due_4" id="invoice_sc_due_4" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+
+								<div class="card-block">
+
+                                  <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 5 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_5" ng-model="form.invoice_sc_5" id="invoice_sc_5" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_5" id="months_5" ng-model="form.months_5" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 5 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_5" ng-model="form.invoice_sc_due_5" id="invoice_sc_due_5" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+								<div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 6 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_6" ng-model="form.invoice_sc_6" id="invoice_sc_6" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_6" id="months_6" ng-model="form.months_6" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 6 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_6" ng-model="form.invoice_sc_due_6" id="invoice_sc_due_6" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+
+								<div class="card-block">
+
+                                   <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 7 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_7" ng-model="form.invoice_sc_7" id="invoice_sc_7" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_7" id="months_7" ng-model="form.months_1" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 7 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_7" ng-model="form.invoice_sc_due_7" id="invoice_sc_due_7" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+
+								<div class="card-block">
+
+                                   <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 8 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_8" ng-model="form.invoice_sc_8" id="invoice_sc_8" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_8" id="months_8" ng-model="form.months_8" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 8 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_8" ng-model="form.invoice_sc_due_8" id="invoice_sc_due_8" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+
+								<div class="card-block">
+                                   <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 9 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_9" ng-model="form.invoice_sc_9" id="invoice_sc_9" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_9" id="months_9" ng-model="form.months_9" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 9 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_9" ng-model="form.invoice_sc_due_9" id="invoice_sc_due_9" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+								<div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 10 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_10" ng-model="form.invoice_sc_10" id="invoice_sc_10" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_10" id="months_10" ng-model="form.months_10" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 10 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_10" ng-model="form.invoice_sc_due_10" id="invoice_sc_due_10" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div><div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 11 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_11" ng-model="form.invoice_sc_11" id="invoice_sc_11" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_11" id="months_11" ng-model="form.months_11" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 11 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_11" ng-model="form.invoice_sc_due_11" id="invoice_sc_due_11" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div><div class="card-block">
+
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 12 Date</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_12" ng-model="form.invoice_sc_12" id="invoice_sc_12" class="form-control datemask" placeholder="Set date">
+                                        </div>
+										<div class="col-sm-3">
+                                            <input type="text" name="months_12" id="months_12" ng-model="form.months_12" class="form-control" required placeholder="Months">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Invoice 12 Due</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" date-picker name="invoice_sc_due_12" ng-model="form.invoice_sc_due_12" id="invoice_sc_due_12" class="form-control datemask" placeholder="Set date">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+							<div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">EazyPay</h4>
+                                </div>
+                                <div class="card-block">
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">EazyPay Enabled *</label>
+                                        <div class="col-sm-9">
+                                            <div class="radio-list">
+                                                <label>
+                                                    <input type="radio" ng-model="form.eazypayEnabled" value="1"> Enabled
+                                                </label>
+                                                <label>
+                                                    <input type="radio" ng-model="form.eazypayEnabled" value="0"> Disabled
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Encryption Key *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="enc_key" ng-model="form.enc_key" class="form-control" placeholder="Your encryption key">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Merchent ID *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="merch_id" ng-model="form.merch_id" class="form-control" placeholder="Your merchent ID">
+                                        </div>
+                                    </div>
+									<div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Return URL *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="returnUrl" ng-model="form.returnUrl" class="form-control" placeholder="Return URL">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+							<div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">Paypal</h4>
+                                </div>
+                                <div class="card-block">
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">Paypal Enabled *</label>
+                                        <div class="col-sm-9">
+                                            <div class="radio-list">
+                                                <label>
+                                                    <input type="radio" ng-model="form.paypalEnabled" value="1"> Enabled
+                                                </label>
+                                                <label>
+                                                    <input type="radio" ng-model="form.paypalEnabled" value="0"> Disabled
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">{{phrase.paymentMail}} *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="paypalPayment" ng-model="form.paypalPayment" class="form-control" placeholder="{{phrase.paymentMail}}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">2Checkout</h4>
+                                </div>
+                                <div class="card-block">
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">2Checkout Enabled *</label>
+                                        <div class="col-sm-9">
+                                            <div class="radio-list">
+                                                <label>
+                                                    <input type="radio" ng-model="form.2coEnabled" value="1"> Enabled
+                                                </label>
+                                                <label>
+                                                    <input type="radio" ng-model="form.2coEnabled" value="0"> Disabled
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">2Checkout SID *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="twocheckoutsid" ng-model="form.twocheckoutsid" class="form-control" placeholder="2Checkout SID">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">2Checkout Hash *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="twocheckoutHash" ng-model="form.twocheckoutHash" class="form-control" placeholder="2Checkout Hash">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card card-outline-info" style="border: 1px solid #009efb; margin:15px;">
+                                <div class="card-header">
+                                    <h4 class="m-b-0 text-white">PayUmoney</h4>
+                                </div>
+                                <div class="card-block">
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">PayUmoney Enabled *</label>
+                                        <div class="col-sm-9">
+                                            <div class="radio-list">
+                                                <label>
+                                                    <input type="radio" ng-model="form.payumoneyEnabled" value="1"> Enabled
+                                                </label>
+                                                <label>
+                                                    <input type="radio" ng-model="form.payumoneyEnabled" value="0"> Disabled
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">PayUmoney Key *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="payumoneyKey" ng-model="form.payumoneyKey" class="form-control" placeholder="PayUmoney Key">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="pb-2 pl-3 control-label col-form-label">PayUmoney Salt *</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="payumoneySalt" ng-model="form.payumoneySalt" class="form-control" placeholder="PayUmoney Salt">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="vacation" ng-show="$root.can('adminTasks.vacationSettings')">
+                            <h3>{{phrase.vacationSettings}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.studentVacationDays}} *</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="studentVacationDays" ng-model="form.studentVacationDays" class="form-control" placeholder="{{phrase.numberOfDaysStVacation}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.teacherVacationDays}} *</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="teacherVacationDays" ng-model="form.teacherVacationDays" class="form-control" placeholder="{{phrase.numberOfDaysTeacherVacation}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.weeksDaysOff}} *</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="daysWeekOff" multiple ng-model="form.daysWeekOff" >
+                                        <option ng-repeat="(key,value) in globalcalendars" value="{{key}}" ng-selected="isDaySelected(form.daysWeekOff,key)">{{value}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.nationalVacDays}} *</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <input type="text" date-picker name="newDayOff" ng-model="newDayOff" id="datemask" class="form-control datemask" placeholder="{{phrase.newDateVacation}}">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <button type="button" class="btn btn-info waves-effect waves-light" ng-click="officialVacationDayAdd()">{{phrase.select}}</button>
+                                        </div>
+                                    </div>
+                                    <br/><Br/>
+                                    <ul>
+                                        <li ng-repeat="date in form.officialVacationDay track by $index">{{date}} - <a ng-click="removeVacationDay(date,$index)">{{phrase.Remove}}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="cms" ng-show="$root.can('adminTasks.frontendCMS')">
+                            <h3>{{phrase.frontendCMS}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Enable CMS</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_active" value="1"> Enabled
+                                        </label>
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_active" value="0"> Disabled
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Default Theme</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="red"> Red
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="lightblue"> Light Blue
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="blue"> Blue
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="green"> Green
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="marsala"> Marsala
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="pink"> Pink
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="violet"> Violet
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="default"> Cyan
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">CMS Active Template</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <input type="text" name="cms_template" ng-model="form.cms_template" class="form-control" placeholder="CMS Active Template">
+                                        <small>Current available templates are : <b>default</b> - <b>modern</b></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="mobile" ng-show="$root.can('adminTasks.mobileSettings')">
+                            <h3>{{phrase.mobileSettings}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Firebase API Key</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="firebase_apikey" ng-model="form.firebase_apikey" class="form-control" placeholder="Firebase API Key">
+                                    <small>Used for PUSH Notifications, Get it ( Server key ) from CLOUD MESSAGING Tab in Firebase Settings </small>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Pull time when messages Inactive (Seconds)</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="pullAppClosed" ng-model="form.pullAppClosed" class="form-control" placeholder="Pull time when app closed (Seconds)">
+                                    <small>1 minute : 60 - 0 to disable</small>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Pull time when messages active (Seconds)</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="pullAppMessagesActive" ng-model="form.pullAppMessagesActive" class="form-control" placeholder="Pull time when messages active (Seconds)">
+                                    <small>1 minute : 60 - 0 to disable</small>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="biometric" ng-show="$root.can('adminTasks.bioItegration')">
+                            <h3>{{phrase.bioItegration}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Local Biometric device IP</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="biometric_device_ip" ng-model="form.biometric_device_ip" class="form-control" placeholder="Local Device IP">
+                                    <small>To get OraSchool Integrated with your biometic device, Please contact our support </small>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Biometric Stats</label>
+                                <div class="col-sm-9">
+
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Device IP</th>
+                                                <th>Status</th>
+                                                <th>Last Update</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-repeat="bio in biometric_device_status">
+                                            <tr>
+                                                <td>{{bio.ip_address}}</td>
+                                                <td>{{bio.status}}</td>
+                                                <td>{{bio.last_update}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="lookFeel" ng-show="$root.can('adminTasks.lookFeel')">
+                            <h3>{{phrase.lookFeel}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Logo}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="siteLogo" value="siteName" ng-model="form.siteLogo" required>
+                                            {{phrase.schoolTitle}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="siteLogo" value="text" ng-model="form.siteLogo" required >
+                                            {{phrase.customText}}
+                                            <input ng-show="form.siteLogo == 'text'" type="text" name="siteLogoAdditional" ng-model="form.siteLogoAdditional" class="form-control">
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="siteLogo" value="image" ng-model="form.siteLogo" required >
+                                            {{phrase.Image}} - ( 200 x 60 px )
+                                            <br/>
+                                            <small>
+                                                Light Theme : assets/images/logo-dark.png <br/>
+                                                Light Theme : assets/images/logo-light.png
+                                            </small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Favicon</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="favicon" value="e" ng-model="form.favicon" required> {{phrase.enabled}}
+                                            <br/>
+                                            <small ng-show="form.favicon == '1'" >Facicon Path : assets/images/favicon.png</small>
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="favicon" value="d" ng-model="form.favicon" required > {{phrase.disabled}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.leftMnuSlimScroll}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="leftmenuScroller" value="e" ng-model="form.leftmenuScroller" required> {{phrase.enabled}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="leftmenuScroller" value="d" ng-model="form.leftmenuScroller" required > {{phrase.disabled}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.theme}}</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="layoutColor" ng-model="form.layoutColor" >
+                                        <option value="default" ng-selected="form.layoutColor == 'default'">Light Default</option>
+                                        <option value="green" ng-selected="form.layoutColor == 'green'">Light Green</option>
+                                        <option value="red" ng-selected="form.layoutColor == 'red'">Light Red</option>
+                                        <option value="blue" ng-selected="form.layoutColor == 'blue'">Light Blue</option>
+                                        <option value="purple" ng-selected="form.layoutColor == 'purple'">Light Purple</option>
+                                        <option value="megna" ng-selected="form.layoutColor == 'megna'">Light Megna</option>
+                                        <option value="default-dark" ng-selected="form.layoutColor == 'default-dark'">Dark Default</option>
+                                        <option value="green-dark" ng-selected="form.layoutColor == 'green-dark'">Dark Green</option>
+                                        <option value="red-dark" ng-selected="form.layoutColor == 'red-dark'">Dark Red</option>
+                                        <option value="blue-dark" ng-selected="form.layoutColor == 'blue-dark'">Dark Blue</option>
+                                        <option value="purple-dark" ng-selected="form.layoutColor == 'purple-dark'">Dark Purple</option>
+                                        <option value="megna-dark" ng-selected="form.layoutColor == 'megna-dark'">Dark Megna</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.allowChangeTheme}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="layoutColorUserChange" value="1" ng-model="form.layoutColorUserChange" required ng-checked='true'>
+                                            {{phrase.allowed}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="layoutColorUserChange" value="0" ng-model="form.layoutColorUserChange" required >
+                                            {{phrase.notAllowed}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.loginPageStyle}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="loginPageStyle" value="r" ng-model="form.loginPageStyle" required> {{phrase.righStyle}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="loginPageStyle" value="c" ng-model="form.loginPageStyle" required > {{phrase.centerStyle}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.forgetPageStyle}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="forgetPwdPageStyle" value="r" ng-model="form.forgetPwdPageStyle" required> {{phrase.righStyle}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="forgetPwdPageStyle" value="c" ng-model="form.forgetPwdPageStyle" required > {{phrase.centerStyle}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.registerPageStyle}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="registerPageStyle" value="r" ng-model="form.registerPageStyle" required> {{phrase.righStyle}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="registerPageStyle" value="c" ng-model="form.registerPageStyle" required > {{phrase.centerStyle}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.authPageBG}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="authPageImage" value="1" ng-model="form.authPageImage" required> {{phrase.enabled}}
+                                            <Br/><small>Background Path : assets/images/login-register.jpg</small>
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="authPageImage" value="0" ng-model="form.authPageImage" required > {{phrase.disabled}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.authPageBGColor}}</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="authPageColor" ng-model="form.authPageColor" class="form-control" placeholder="Authentication pages background color">
+                                    <small>Use hex colors like #c0c0c0</small>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group m-b-0" style="padding-bottom:10px;">
+                            <div class="offset-sm-2 col-sm-9">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editSettings.$invalid">{{phrase.editSettings}}</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row" ng-show="views.terms">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{phrase.schoolTerms}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editTerms" role="form" ng-submit="saveTerms()" novalidate>
+                      <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': attendance.attendanceDay.$invalid}">
+                        <label class="pb-2 pl-3 text-right control-label col-form-label col-form-label">{{phrase.schoolTerms}} </label>
+                        <div class="col-sm-9">
+                          <textarea ck-editor name="fieldValue" class="form-control" ng-model="form.fieldValue" placeholder="{{phrase.schoolTerms}}"></textarea>
+                        </div>
+                      </div>
+                      <div class="form-group m-b-0">
+                          <div class="offset-sm-2 col-sm-9">
+                              <button type="submit" class="btn btn-info waves-effect waves-light m-t-10" ng-disabled="editTerms.$invalid">{{phrase.saveSettings}}</button>
+                          </div>
+                      </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="test_mail_function_modal">
+    <form class="form-horizontal" name="test_mail_function_form" role="form" novalidate>
+        <div class="form-group row" ng-class="{'has-error': test_mail_function_form.sendTestTo.$invalid}">
+            <label class="col-sm-4 control-label">Send the test mail address to *</label>
+            <div class="col-sm-8">
+                <input type="text" name="sendTestTo" ng-model="testmailform.sendTestTo" class="form-control" required placeholder="Type here your mail address">
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': test_mail_function_form.sendMessage.$invalid}">
+            <label class="col-sm-4 control-label">Message *</label>
+            <div class="col-sm-8">
+                <textarea name="sendMessage" class="form-control" ng-model="testmailform.sendMessage" required placeholder="Type here the message"></textarea>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="button" ng-click="test_mail_function_action()" class="btn btn-info waves-effect waves-light" ng-disabled="test_mail_function_form.$invalid">Send Test Mail</button>
+            </div>
+        </div>
+    </form>
+</modal>
+
+<modal visible="test_sms_function_modal">
+    <form class="form-horizontal" name="test_mail_function_form" role="form" novalidate>
+        <div class="form-group row" ng-class="{'has-error': test_mail_function_form.sendTestTo.$invalid}">
+            <label class="col-sm-4 control-label">Send the your mobile number *</label>
+            <div class="col-sm-8">
+                <input type="text" name="sendTestTo" ng-model="testsmsform.sendTestTo" class="form-control" required placeholder="Type here your mobile number">
+            </div>
+        </div>
+        <div class="form-group row" ng-class="{'has-error': test_mail_function_form.sendMessage.$invalid}">
+            <label class="col-sm-4 control-label">Message *</label>
+            <div class="col-sm-8">
+                <textarea name="sendMessage" class="form-control" ng-model="testsmsform.sendMessage" required placeholder="Type here the message"></textarea>
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="button" ng-click="test_sms_function_action()" class="btn btn-info waves-effect waves-light" ng-disabled="test_mail_function_form.$invalid">Send Test SMS</button>
+            </div>
+        </div>
+    </form>
+</modal>

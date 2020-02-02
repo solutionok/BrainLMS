@@ -1,0 +1,269 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.postal}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card" style="margin-bottom: 0">
+			<div class="card-block" id="view-list-block">
+				<div class="row">
+					<div class="col-8">
+						<div class="card-block-input-group card-block-input-item">
+							<div class="input-group input-group-sm search-input">
+								<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+								<span class="input-group-addon"><i class="fa fa-search"></i></span>
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div ng-show="$root.can('postal.Export')" class="pull-right card-block-input-group card-block-input-item">
+							<div class="btn-group no-print">
+								<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+								<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+									<span class="sr-only">{{phrase.toggleDropdown}}</span>
+								</button>
+								<div class="dropdown-menu" role="menu">
+									<a class="dropdown-item" href="index.php/postal/export/excel">{{phrase.ExportExcel}}</a>
+									<a class="dropdown-item" href="index.php/postal/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table id="listTable" class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.refno}}</th>
+								<th>{{phrase.from}}</th>
+								<th>{{phrase.to}}</th>
+								<th style="width:160px;" ng-show="$root.can('postal.edit_postal') || $root.can('postal.del_postal')" >Action</th>
+							</tr>
+							<tr dir-paginate="postal_one in postal | itemsPerPage:10" total-items="totalItems">
+								<td>{{postal_one.refno}}</td>
+								<td>{{postal_one.postal_from}}</td>
+								<td>{{postal_one.postal_to}}</td>
+								<td class="options" ng-show="$root.can('postal.edit_postal') || $root.can('postal.del_postal')">
+                	<!-- <a ng-show="$root.can('postal.Download') && postal_one.attachment != ''" target="_blank" href="{{'index.php/postal/download/'+postal_one.id}}"><button type="button" class="btn btn-warning btn-circle" title="{{phrase.Download}}" ><i class="fa fa-cloud-download"></i></button></a> -->
+                	<button ng-show="$root.can('postal.edit_postal')" ng-click="edit(postal_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('postal.del_postal')" ng-click="remove(postal_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!postal.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.add_postal}}</h4>
+				<div class="table-responsive">
+
+					<form class="form-horizontal" name="postal_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': postal_add_form.refno.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.refno}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="refno" ng-model="form.refno" class="form-control" placeholder="{{phrase.refno}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_add_form.postal_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="postal_type" ng-model="form.postal_type" required>
+									<option value="dispatch">{{phrase.dispatch}}</option>
+									<option value="recieve">{{phrase.recieve}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_add_form.postal_from.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+							<div class="col-sm-10">
+								<textarea name="postal_from" class="form-control" ng-model="form.postal_from" placeholder="{{phrase.from}}" required></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_add_form.postal_to.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+							<div class="col-sm-10">
+								<textarea name="postal_to" class="form-control" ng-model="form.postal_to" placeholder="{{phrase.to}}" required></textarea>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="postal_desc" class="form-control" ng-model="form.postal_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_add_form['postal_time[date]'].$invalid || postal_add_form['postal_time[hour]'].$invalid || postal_add_form['postal_time[min]'].$invalid || postal_add_form['postal_time[ampm]'].$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.time}} *</label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="postal_timeـadd" name="postal_time[date]" ng-model="form.postal_time.date" class="form-control postal_time_add" placeholder="{{phrase.time}}" required>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="postal_time[hour]" ng-model="form.postal_time.hour" required>
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="postal_time[min]" ng-model="form.postal_time.min" required>
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="postal_time[ampm]" ng-model="form.postal_time.ampm" required>
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<input type="file" name="attachment" file-model="form.attachment">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="postal_notes" class="form-control" ng-model="form.postal_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="postal_add_form.$invalid">{{phrase.add_postal}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_postal}}</h4>
+				<div class="table-responsive">
+
+					<form class="form-horizontal" name="postal_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': postal_edit_form.refno.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.refno}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="refno" ng-model="form.refno" class="form-control" placeholder="{{phrase.refno}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_edit_form.postal_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.type}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="postal_type" ng-model="form.postal_type" required>
+									<option value="dispatch">{{phrase.dispatch}}</option>
+									<option value="recieve">{{phrase.recieve}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_edit_form.postal_from.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+							<div class="col-sm-10">
+								<textarea name="postal_from" class="form-control" ng-model="form.postal_from" placeholder="{{phrase.from}}" required></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_edit_form.postal_to.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+							<div class="col-sm-10">
+								<textarea name="postal_to" class="form-control" ng-model="form.postal_to" placeholder="{{phrase.to}}" required></textarea>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea ck-editor name="postal_desc" class="form-control" ng-model="form.postal_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': postal_edit_form['postal_time[date]'].$invalid || postal_edit_form['postal_time[hour]'].$invalid || postal_edit_form['postal_time[min]'].$invalid || postal_edit_form['postal_time[ampm]'].$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.time}} *</label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="postal_timeـadd" name="postal_time[date]" ng-model="form.postal_time.date" class="form-control postal_time_add" placeholder="{{phrase.time}}" required>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="postal_time[hour]" ng-model="form.postal_time.hour" required>
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="postal_time[min]" ng-model="form.postal_time.min" required>
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="postal_time[ampm]" ng-model="form.postal_time.ampm" required>
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Attachment}} </label>
+							<div class="col-sm-10">
+								<a ng-show="form.attachment != ''" href="index.php/postal/download/{{form.id}}">{{phrase.viewFile}}</a><span style="margin-right:10px;" ng-show="form.attachment != ''">, {{phrase.orUpNew}}</span><input type="file" name="attachment" file-model="form.attachment">
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="postal_notes" class="form-control" ng-model="form.postal_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="postal_edit_form.$invalid">{{phrase.edit_postal}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,86 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">Notice Board</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div class="card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm search-input">
+                        <input type="text"  title="{{phrase.minCharLength3}}" name="table_search" ng-model="searchText" ng-change="searchDB()" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <div id="listTable" class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>Title</th>
+                                <th>content</th>
+                                <th>{{phrase.for}}</th>
+                            </tr>
+                            <tr dir-paginate="news in newsboard | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                    <a ng-show="$root.can('newsboard.View')" href="portal#/newsboard/{{news.id}}">{{news.newsTitle}}</a>
+                                    <span ng-show="!$root.can('newsboard.View')">{{news.newsTitle}}</span>
+                                </td>
+                                <td><div ng-bind-html="news.newsText"></div></td>
+                                <td>{{news.newsFor}}</td>
+                            </tr>
+                            <tr ng-show="!newsboard.length"><td class="noTableData" colspan="5">{{phrase.noNews}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.read">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{newsTitle}}</h4>
+                <div class="table-responsive">
+
+                    <div ng-bind-html="newsText"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

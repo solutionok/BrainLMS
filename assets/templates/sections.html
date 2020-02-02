@@ -1,0 +1,113 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.sections}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div class="card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm search-input">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <div id="listTable" class="table-responsive">
+                    <div ng-repeat="(key,value) in sections">
+                        <h4 class="mt-3">{{key}}</h4>
+                        <table class="table table-bordered table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>{{phrase.section}} </th>
+                                    <th ng-show="$root.can('sections.editSection') || $root.can('sections.delSection')">Action</th>
+                                </tr>
+                                <tr ng-repeat="section in value | filter:searchText">
+                                    <td>{{section.sectionName}}</td>
+                                    <td class="options">
+                                        <button ng-show="$root.can('sections.editSection')" ng-click="edit(section.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editSection}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editSection" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editSection.sectionName.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.section}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="sectionName" ng-model="form.sectionName" class="form-control" required placeholder="{{phrase.section}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editSection.classId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId" required>
+                                    <option ng-repeat="(key,value) in classes" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+												<div class="form-group row" ng-class="{'has-error': addSection.classTeacherId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">Class Teacher *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classTeacherId" name="classTeacherId" required>
+                                    <option ng-repeat="(key,value) in teachers" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editSection.$invalid">{{phrase.editSection}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

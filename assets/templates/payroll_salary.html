@@ -1,0 +1,276 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.salaryBase}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addSalaryBase}}</button>
+                <h4 class="card-title">{{phrase.lstSalaryBase}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.title}}</th>
+                                <th>{{phrase.netSalary}}</th>
+                                <th>{{phrase.grossSalary}}</th>
+                                <th style="width:160px;">Action</th>
+                            </tr>
+                            <tr ng-repeat="base in salary_base">
+                                <td>{{base.salary_title}}</td>
+                                <td>{{base.net_salary}}</td>
+                                <td>{{base.gross_salary}}</td>
+                                <td>
+                                    <button ng-click="edit(base.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-click="remove(base,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!salary_base.length"><td class="noTableData" colspan="4">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.addSalaryBase}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="addPayment" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addPayment.salary_title.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.baseTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="salary_title" ng-model="form.salary_title" class="form-control" required placeholder="{{phrase.baseTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addPayment.salary_basic.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.basicSalary}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="salary_basic" ng-model="form.salary_basic" class="form-control" ng-change="recalcTotalAmount()" required placeholder="{{phrase.basicSalary}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addPayment.hour_overtime.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.overtimeSalary}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="hour_overtime" ng-model="form.hour_overtime" class="form-control" required placeholder="{{phrase.overtimeSalary}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.allowences}} * </label>
+                            <div class="col-sm-10">
+                                <a ng-click="addAllowencRow()" style="color:white;margin: 5px;" class="btn pull-right btn-success card-block-input-item">{{phrase.addRow}}</a>
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>{{phrase.title}}</th>
+                                            <th>{{phrase.Amount}}</th>
+                                            <th>{{phrase.Remove}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="row in form.salary_allowence">
+                                            <td>
+                                                <input type="text" ng-model="row.title" class="form-control" required>
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-model="row.amount" class="form-control" ng-change="recalcTotalAmount()" required>
+                                            </td>
+                                            <td>
+                                                <button ng-click="removeAllowenceRow(row,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="!form.salary_allowence.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">Deductions * </label>
+                            <div class="col-sm-10">
+                                <a ng-click="addDeductionRow()" style="color:white;margin: 5px;" class="btn pull-right btn-success card-block-input-item">{{phrase.addRow}}</a>
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>{{phrase.title}}</th>
+                                            <th>{{phrase.Amount}}</th>
+                                            <th>{{phrase.Remove}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="row in form.salary_deduction">
+                                            <td>
+                                                <input type="text" ng-model="row.title" class="form-control" required>
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-model="row.amount" class="form-control" ng-change="recalcTotalAmount()" required>
+                                            </td>
+                                            <td>
+                                                <button ng-click="removeDeductionRow(row,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="!form.salary_deduction.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.summary}}</label>
+                            <div class="col-sm-10">
+                                <table class="table table-hover table-bordered">
+                                    <tr>
+                                        <th>{{phrase.netSalary}}</th>
+                                        <th>{{form.net_salary}}</th>
+                                    </tr>
+                                    <tr>
+                                        <th>{{phrase.grossSalary}}</th>
+                                        <th>{{form.gross_salary}}</th>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addPayment.$invalid">{{phrase.addSalaryBase}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editSalaryBase}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" name="editPayment" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editPayment.salary_title.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.baseTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="salary_title" ng-model="form.salary_title" class="form-control" required placeholder="{{phrase.baseTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editPayment.salary_basic.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.basicSalary}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="salary_basic" ng-model="form.salary_basic" class="form-control" ng-change="recalcTotalAmount()" required placeholder="{{phrase.basicSalary}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editPayment.hour_overtime.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.overtimeSalary}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="hour_overtime" ng-model="form.hour_overtime" class="form-control" required placeholder="{{phrase.overtimeSalary}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.allowences}} * </label>
+                            <div class="col-sm-10">
+                                <a ng-click="addAllowencRow()" style="color:white;margin: 5px;" class="btn pull-right btn-success card-block-input-item">{{phrase.addRow}}</a>
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>{{phrase.title}}</th>
+                                            <th>{{phrase.Amount}}</th>
+                                            <th>{{phrase.Remove}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="row in form.salary_allowence">
+                                            <td>
+                                                <input type="text" ng-model="row.title" class="form-control" required>
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-model="row.amount" class="form-control" ng-change="recalcTotalAmount()" required>
+                                            </td>
+                                            <td>
+                                                <button ng-click="removeAllowenceRow(row,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="!form.salary_allowence.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">Deductions * </label>
+                            <div class="col-sm-10">
+                                <a ng-click="addDeductionRow()" style="color:white;margin: 5px;" class="btn pull-right btn-success card-block-input-item">{{phrase.addRow}}</a>
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>{{phrase.title}}</th>
+                                            <th>{{phrase.Amount}}</th>
+                                            <th>{{phrase.Remove}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="row in form.salary_deduction">
+                                            <td>
+                                                <input type="text" ng-model="row.title" class="form-control" required>
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-model="row.amount" class="form-control" ng-change="recalcTotalAmount()" required>
+                                            </td>
+                                            <td>
+                                                <button ng-click="removeDeductionRow(row,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="!form.salary_deduction.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.summary}}</label>
+                            <div class="col-sm-10">
+                                <table class="table table-hover table-bordered">
+                                    <tr>
+                                        <th>{{phrase.netSalary}}</th>
+                                        <th>{{form.net_salary}}</th>
+                                    </tr>
+                                    <tr>
+                                        <th>{{phrase.grossSalary}}</th>
+                                        <th>{{form.gross_salary}}</th>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editPayment.$invalid">{{phrase.editSalaryBase}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

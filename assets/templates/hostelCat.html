@@ -1,0 +1,145 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.HostelCat}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addHostelCat}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listHostelCat}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.catTitle}}</th>
+                                <th>{{phrase.Hostel}}</th>
+                                <th>{{phrase.fees}}</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr ng-repeat="cat in hostelCat | filter:searchText">
+                                <td>{{cat.catTitle}}</td>
+                                <td>{{hostelList[cat.catTypeId]}}</td>
+                                <td>{{cat.catFees}}</td>
+                                <td>
+                                    <button ng-click="edit(cat.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-click="remove(cat,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!hostelCat.length"><td class="noTableData" colspan="6">{{phrase.noHostelCat}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.addHostelCat}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addHostel" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addHostel.catTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.catTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="catTitle" ng-model="form.catTitle" class="form-control" required placeholder="{{phrase.catTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addHostel.catTypeId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Hostel}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.catTypeId" name="catTypeId" required>
+                                    <option ng-repeat="(key,value) in hostelList" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addHostel.catFees.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.fees}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="catFees" ng-model="form.catFees" class="form-control" required placeholder="{{phrase.fees}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="catNotes" class="form-control" ng-model="form.catNotes" placeholder="{{phrase.Notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addHostel.$invalid">{{phrase.addHostelCat}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editHostelCat}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editHostel" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editHostel.catTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.catTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="catTitle" ng-model="form.catTitle" class="form-control" required placeholder="Category title">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editHostel.catTypeId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Hostel}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.catTypeId" name="catTypeId" required>
+                                    <option ng-repeat="(key,value) in hostelList" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editHostel.catFees.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.fees}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="catFees" ng-model="form.catFees" class="form-control" required placeholder="{{phrase.fees}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="catNotes" class="form-control" ng-model="form.catNotes" placeholder="{{phrase.Notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editHostel.$invalid">{{phrase.editHostelCat}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,444 @@
+<style type="text/css">
+	.listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	.listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	.listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+	.viewList .card {
+		margin-bottom: 15px;
+		border-radius: 10px 0;
+		box-shadow: 1px 1px 5px #CCC;
+	}
+	.viewList .card .card-title {
+		font-size: 20px;
+		margin-bottom: -5px;
+	}
+	.viewList .card-block {
+		padding: 15px;
+	}
+	.btn-circle {
+		width: 32px;
+		height: 32px;
+		padding: 6px;
+	}
+	.hr-optimize {
+		margin-left: -20px;
+		margin-right: -20px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+	}
+	.pdf-view {
+		position: relative;
+    width: 100%;
+    padding: 0;
+    top: -5px;
+    left: 0px;
+    z-index: 500s;
+	}
+	.pdf-view img {
+		width: 100%;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Assignments}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+      	<button ng-show="views.list" ng-click="changeView('add')"
+      		ng-if="dashboardData.role == 'admin' || dashboardData.role == 'teacher'"
+      		class="btn btn-sm btn-success" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-plus"></i> Add
+      	</button>
+      	<button
+      		ng-show="views.upload_file"
+      		ng-click="changeView('list')"
+      		class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-arrow-left"></i> Back
+      	</button>
+    </div>
+</div>
+
+<div class="row viewList" ng-show="views.list">
+	<div class="col-12" ng-if="!loading">
+		<div class="card" ng-repeat="assignment in assignments | filter:searchText">
+      <div class="card-block">
+				  <div class="card-body">
+				    <h5 class="card-title text-dark">
+					    <span
+					    	style="display: inline-block; line-height: 20px; max-width: 90%;"
+					    	class="text-danger">
+					    	{{assignment.AssignTitle}}
+					    </span>
+					    <div id="dropdownMenu2Item" class="dropdown" style="display: inline-block; float: right; margin-top: -4px">
+							  <button class="btn btn-link" data-ripple type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="outline: none;">
+							    <i class="fa fa-ellipsis-v"></i>
+							  </button>
+							  <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+							    <button class="dropdown-item" type="button"
+							    	ng-click="viewAssignment(assignment)">
+							    	<i class="fa fa-eye"></i> View details
+							    </button>
+							    <button class="dropdown-item" type="button"
+							    	ng-show="$root.can('Assignments.viewAnswers')"
+							    	ng-click="listAnswers(assignment.id)">
+							    	<i class="fa fa-check"></i> {{phrase.viewAnswers}}
+							    </button>
+							    <button class="dropdown-item" type="button"
+							    	ng-if="assignment.AssignFile != ''"
+							    	ng-show="$root.can('Assignments.Download')"
+							    	ng-click="showAssignment(assignment)">
+							    	<i class="fa fa-file"></i> Attachments
+							    </button>
+							    <button class="dropdown-item" type="button"
+							    	ng-show="$root.can('Assignments.applyAssAnswer')"
+							    	ng-click="upload(assignment.id)">
+							    	<i class="fa fa-upload"></i> Upload answer
+							    </button>
+							    <button class="dropdown-item" type="button"
+							    	ng-show="$root.can('Assignments.editAssignment')"
+							    	ng-click="edit(assignment.id)">
+							    	<i class="fa fa-pencil"></i> Edit assignment
+							    </button>
+							  </div>
+							</div>
+					  </h5>
+				    <hr>
+				    <div class="card-text">
+			    		<b>Classes: {{assignment.classes}}</b><br>
+			    		<b>Deadline: {{assignment.AssignDeadLine}}</b>
+				    </div>
+				  </div>
+      </div>
+	  </div>
+	  <div ng-if="!assignments.length" class="text-center" style="font-size: 18px"><b>There is no result.</b></div>
+	</div>
+	<div class="col-12" ng-if="loading">
+		loading...
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item btn-sm">Cancel</button>
+                <h4 class="card-title">{{phrase.AddAssignments}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addAssign" role="form" ng-upload="saveAdd(content)" method="post" action="index.php/assignments" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addAssign.AssignTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="AssignTitle" ng-model="form.AssignTitle" class="form-control" required placeholder="{{phrase.AssignmentTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentDescription}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="AssignDescription" class="form-control" ng-model="form.AssignDescription" placeholder="{{phrase.AssignmentDescription}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAssign.AssignDeadLine.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentDeadline}} *</label>
+                            <div class="col-sm-10">
+                                <input date-picker type="text" id="datemask" name="AssignDeadLine" ng-model="form.AssignDeadLine" required class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentFile}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="AssignFile" id="AssignAddFile">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAssign['classId[]'].$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId[]" ng-change="subjectList()" multiple required>
+                                    <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAssign['sectionId[]'].$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                            <label class="pb-2 pl-3 control-label col-form-label">Section *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.sectionId" name="sectionId[]" multiple ng-required="$root.dashboardData.enableSections == '1'">
+                                    <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAssign.subjectId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Subject}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.subjectId" required name="subjectId">
+                                    <option ng-repeat="subjectOne in subject" value="{{subjectOne.id}}">{{subjectOne.subjectTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addAssign.$invalid">{{phrase.AddAssignments}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item btn-sm">Cancel</button>
+                <h4 class="card-title">{{phrase.editAssignment}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editAssign" role="form"  ng-upload="saveEdit(content)" role="form" method="post" action="{{'index.php/assignments/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editAssign.AssignTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="AssignTitle" ng-model="form.AssignTitle" class="form-control" required placeholder="{{phrase.AssignmentTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentDescription}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="AssignDescription" class="form-control" ng-model="form.AssignDescription" placeholder="{{phrase.AssignmentDescription}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAssign.AssignDeadLine.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentDeadline}} *</label>
+                            <div class="col-sm-10">
+                                <input date-picker type="text" id="datemaskEdit" name="AssignDeadLine" ng-model="form.AssignDeadLine" required class="form-control datemask">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.AssignmentFile}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="AssignFile" id="AssignEditFile">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAssign['classId[]'].$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId[]" ng-change="subjectList()" id="editClassId" multiple required>
+                                    <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAssign['sectionId[]'].$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                            <label class="pb-2 pl-3 control-label col-form-label">Section *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.sectionId" name="sectionId[]" multiple ng-required="$root.dashboardData.enableSections == '1'">
+                                    <option ng-repeat="section in form.sections" value="{{section.id}}" ng-selected="isSectionSelected(form.sectionId,section.id)">{{section.sectionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAssign.subjectId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Subject}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.subjectId" required name="subjectId">
+                                    <option ng-repeat="subjectOne in form.subject" value="{{subjectOne.id}}" ng-selected="subjectOne.id == form.subjectId">{{subjectOne.subjectTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editAssign.$invalid">{{phrase.editAssignment}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.upload">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-sm btn-flat pull-right card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.uploadAnswer}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="uploadAnswer" role="form" ng-upload="saveAnswer(content)" method="post" action="{{'index.php/assignments/upload/' + form.assignmentId}}" novalidate>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.userNotes}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="userNotes" class="form-control" ng-model="form.AssignDescription" userNotes="Answers notes"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.answerFile}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="fileName">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="uploadAnswer.$invalid">{{phrase.uploadAnswer}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.answers">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block" id="view-list-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.viewAnswers}}</h4>
+                <div class="table-responsive" ng-if="answers.length">
+                    <table class="table table-bordered table-hover listTable">
+                        <tbody>
+                            <tr>
+                                <th>Std. name</th>
+                                <th>{{phrase.class}}</th>
+                                <th>{{phrase.timeApplied}}</th>
+                                <th>{{phrase.notes}}</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr ng-repeat="answer in answers | filter:searchText">
+                                <td>
+                                    <img alt="{{answer.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+answer.userId}}">
+                                    {{answer.fullName}}
+                                </td>
+                                <td>{{answer.className}}</td>
+                                <td>{{answer.userTime}}</td>
+                                <td>{{answer.userNotes}}</td>
+                                <td class="options">
+                                    <!-- <a target="_blank" href="{{'index.php/assignments/downloadAnswer/'+answer.id}}">
+                                    	<button type="button" class="btn btn-info btn-circle" title="{{phrase.Download}}" >
+                                    		<i class="fa fa-cloud-download"></i>
+                                    	</button>
+                                    </a> -->
+                                </td>
+                            </tr>
+                            <tr ng-show="assignments.length == '0'"><td class="noTableData" colspan="5">{{phrase.noAssignments}}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div ng-if="!answers.length">No related answers</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-if="views.upload_file">
+	<div class="col-12 pdf-view" style="margin-bottom: -10px" ng-if="current_shown_item.dir_images_count > 0">
+		<!-- <div class="csslider1">
+			<input ng-repeat="(key, item) in current_shown_item.dir_images_array" name="cs_anchor1" id="cs_slide1_{{key}}" type="radio" class="cs_anchor slide">
+			<input name="cs_anchor1" id="cs_play1" type="radio" class="cs_anchor" checked="">
+			<input ng-repeat="(key, item) in current_shown_item.dir_images_array" name="cs_anchor1" id="cs_pause1_{{key}}" type="radio" class="cs_anchor slide">
+
+			<ul>
+				<li class="cs_skeleton">
+					<img src="{{current_shown_item.dir_images_array[0]}}" style="width: 100%;">
+				</li>
+				<li class="num{{key}} img slide" ng-repeat="(key, item) in current_shown_item.dir_images_array">
+					<img src="{{item}}">
+				</li>
+			</ul>
+
+			<div class="cs_arrowprev">
+				<label class="num{{key}}"
+					style="border: 1px solid #BBB; background: rgba(255,255,255,.7);"
+					for="cs_slide1_{{key}}" ng-repeat="(key, item) in current_shown_item.dir_images_array"><span><i></i><b></b></span></label>
+			</div>
+			<div class="cs_arrownext">
+				<label class="num{{key}}"
+					style="border: 1px solid #BBB; background: rgba(255,255,255,.7);"
+					for="cs_slide1_{{key}}" ng-repeat="(key, item) in current_shown_item.dir_images_array"><span><i></i><b></b></span></label>
+			</div>
+		</div> -->
+		<img ng-repeat="image_path in current_shown_item.dir_images_array" src="{{image_path}}">
+	</div>
+	<div class="col-12" ng-if="current_shown_item.dir_images_count == 0">
+		No files to display
+	</div>
+</div>
+
+<modal visible="viewAssignmentmodal" style="margin-bottom: 60px">
+		<div>
+	    <label class="control-label col-form-label text-danger"><b>Description</b></label>
+	    <div class="col-form-label">
+	        <div ng-if="current_viewed_item.AssignDescription.length">
+	        	{{ current_viewed_item.AssignDescription }}
+	        </div>
+	        <i ng-if="!current_viewed_item.AssignDescription.length">empty</i>
+	    </div>
+	    <hr class="hr-optimize">
+
+	    <div class="row">
+      	<div class="col-2">
+    			<i class="fa fa-graduation-cap text-danger" text-danger style="margin-top: 22px; font-size: 30px; margin-left: -3px"></i>
+      	</div>
+      	<div class="col-10">
+          <label class="control-label col-form-label text-danger"><b>Classes</b></label><br>
+          <div class="col-form-label">
+			        <div ng-if="current_viewed_item.classes.length">
+			        	{{ current_viewed_item.classes }}
+			        </div>
+			        <i ng-if="!current_viewed_item.classes.length">empty</i>
+			    </div>
+      	</div>
+      </div>
+	    <hr class="hr-optimize">
+
+	    <div class="row">
+      	<div class="col-2">
+    			<i class="fa fa-clock-o text-danger" text-danger style="margin-top: 11px; font-size: 40px;"></i>
+      	</div>
+      	<div class="col-10">
+          <label class="control-label col-form-label text-danger"><b>Deadline</b></label><br>
+          <div class="col-form-label">
+			        <div ng-if="current_viewed_item.AssignDeadLine.length">
+			        	{{ current_viewed_item.AssignDeadLine }}
+			        </div>
+			        <i ng-if="!current_viewed_item.AssignDeadLine.length">empty</i>
+			    </div>
+      	</div>
+      </div>
+
+			<!-- <div ng-show="assignmentsAnswers">
+				<hr class="hr-optimize">
+	    	<label class="control-label col-form-label text-danger"><b>Answers</b></label>
+	      <span ng-repeat="answer in assignmentsAnswers[assignment.id]">
+	          {{answer.fullName}} :
+	          <span ng-show="answer.userTime"> {{phrase.stdAppliedOn}} {{answer.userTime}}</span>
+	          <span ng-show="!answer.userTime"> {{phrase.stdNotApplied}}</span>
+	          <br/>
+	      </span>
+	    </div> -->
+		</div>
+</modal>

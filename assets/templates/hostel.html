@@ -1,0 +1,235 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Hostel}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-show="$root.can('Hostel.AddHostel')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.AddHostel}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.ListHostel}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.HostelTitle}}</th>
+                                <th>{{phrase.Hosteltype}}</th>
+                                <th>{{phrase.Address}}</th>
+                                <th>{{phrase.Manager}}</th>
+                                <th>{{phrase.managerContact}}</th>
+                                <th ng-show="$root.can('Hostel.listSubs') || $root.can('Hostel.EditHostel') || $root.can('Hostel.delHostel')">Action</th>
+                            </tr>
+                            <tr ng-repeat="hostel in hostelList | filter:searchText">
+                                <td>{{hostel.hostelTitle}}</td>
+                                <td>{{hostel.hostelType}}</td>
+                                <td>{{hostel.hostelAddress}}</td>
+                                <td>
+                                    <span class="list_user_item"><img class="user-image img-circle" ng-show="hostel.managerPhoto != ''" style="width:35px; height:35px;" ng-src="{{'https://upload.cutebrains.com/hostel/'+hostel.managerPhoto}}">{{hostel.hostelManager}}<br/></span>
+                                </td>
+                                <td>{{hostel.managerContact}}</td>
+                                <td ng-show="$root.can('Hostel.listSubs') || $root.can('Hostel.EditHostel') || $root.can('Hostel.delHostel')">
+                                    <button ng-show="$root.can('Hostel.listSubs')" ng-click="listSub(hostel.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.listSubs}}" ><i class="fa fa-list"></i></button>
+                                    <button ng-show="$root.can('Hostel.EditHostel')" ng-click="edit(hostel.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Hostel.delHostel')" ng-click="remove(hostel,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!hostelList.length"><td class="noTableData" colspan="6">{{phrase.noHostel}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.AddHostel}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addHostel" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addHostel.hostelTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.HostelTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="hostelTitle" ng-model="form.hostelTitle" class="form-control" required placeholder="{{phrase.HostelTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addHostel.hostelType.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Hosteltype}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.hostelType" name="hostelType" required>
+                                    <option value="Boys">{{phrase.Boys}}</option>
+                                    <option value="Girls">{{phrase.Girls}}</option>
+                                    <option value="Mixed">{{phrase.Mixed}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="hostelAddress" class="form-control" ng-model="form.hostelAddress" placeholder="{{phrase.Address}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Manager}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="hostelManager" ng-model="form.hostelManager" class="form-control" required placeholder="{{phrase.Manager}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" >
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.managerPhoto}} </label>
+                            <div class="col-sm-10">
+                                <input type="file" name="managerPhoto" file-model="form.managerPhoto">
+                            </div>
+                        </div>
+                        <div class="form-group row" >
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.managerContact}} </label>
+                            <div class="col-sm-10">
+                                <textarea name="managerContact" class="form-control" ng-model="form.managerContact" placeholder="{{phrase.managerContact}}" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="hostelNotes" class="form-control" ng-model="form.hostelNotes" placeholder="{{phrase.Notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addHostel.$invalid">{{phrase.AddHostel}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.EditHostel}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editHostel" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editHostel.hostelTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.HostelTitle}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="hostelTitle" ng-model="form.hostelTitle" class="form-control" required placeholder="{{phrase.HostelTitle}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editHostel.hostelType.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Hosteltype}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.hostelType" name="hostelType" required>
+                                    <option value="Boys">{{phrase.Boys}}</option>
+                                    <option value="Girls">{{phrase.Girls}}</option>
+                                    <option value="Mixed">{{phrase.Mixed}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Address}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="hostelAddress" class="form-control" ng-model="form.hostelAddress" placeholder="{{phrase.Address}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Manager}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="hostelManager" ng-model="form.hostelManager" class="form-control" required placeholder="{{phrase.Manager}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" >
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.managerPhoto}} </label>
+                            <div class="col-sm-10">
+                                <input type="file" name="managerPhoto" file-model="form.managerPhoto">
+                            </div>
+                        </div>
+                        <div class="form-group row" >
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.managerContact}} </label>
+                            <div class="col-sm-10">
+                                <textarea name="managerContact" class="form-control" ng-model="form.managerContact" placeholder="{{phrase.managerContact}}" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="hostelNotes" class="form-control" ng-model="form.hostelNotes" placeholder="{{phrase.Notes}}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editHostel.$invalid">{{phrase.EditHostel}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.listSubs">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm btn-danger btn-flat pull-right card-block-input-item">Back</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listSubs}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.role}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>{{phrase.Contact}}</th>
+                            </tr>
+                            <tr ng-repeat="subscriber in hostelSubList | filter:searchText">
+                                <td>
+                                    <img alt="{{subscriber.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+subscriber.id}}">
+                                    {{subscriber.fullName}}
+                                </td>
+                                <td>{{subscriber.username}}</td>
+                                <td>{{subscriber.role}}</td>
+                                <td>{{subscriber.email}}</td>
+                                <td>{{subscriber.phoneNo}} <br/> {{subscriber.mobileNo}}</td>
+                            </tr>
+                            <tr ng-show="!hostelSubList.length"><td class="noTableData" colspan="5">{{phrase.noMatches}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

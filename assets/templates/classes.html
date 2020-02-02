@@ -1,0 +1,145 @@
+<style type="text/css">
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+	#viewList .card {
+		margin-bottom: 15px;
+		border-radius: 10px 0;
+		box-shadow: 1px 1px 5px #CCC;
+	}
+	#viewList .card .card-title {
+		font-size: 18px;
+		margin-bottom: 15px;
+	}
+	#viewList .card-block {
+		padding: 15px;
+	}
+	.btn-circle {
+		width: 32px;
+		height: 32px;
+		padding: 6px;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.classes}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div id="viewList" class="row" ng-show="views.list">
+    <div class="col-12">
+    		<div class="form-inline mb-3 ml-4" ng-if="userRole != 'parent'">
+					<select class="col-4 form-control mr-2" ng-model="filter_classes_input_class" ng-change="getCurrentSubjects()">
+						<option value="0">-All Classes-</option>
+						<option ng-repeat="class in allClasses" value="{{ class.id }}">{{ class.className }}</option>
+					</select>
+					<select class="col-4 form-control mr-2" ng-model="filter_classes_input_subject">
+						<option value="0">-All Sections-</option>
+						<option ng-repeat="id in mainSubjectIds" value="{{ id }}">{{ subject_array[id] }}</option>
+					</select>
+				  <button type="button" class="ml-2 col-2 btn btn-primary" ng-click="filterClassesByClassAndSubject()" style="padding: 9px">
+				  	<i class="fa fa-search"></i>
+				  </button>
+				</div>
+        <div class="card" ng-repeat="class in classes | filter:searchText" ng-if="classes.length">
+            <div class="card-block">
+							  <div class="card-body">
+							    <h6 class="card-title text-info">
+								    {{ class.className }}
+								    <button
+								    	ng-show="$root.can('classes.editClass')" ng-click="edit(class.id)"
+								    	class="btn btn-warning pull-right btn-circle" style="margin-top: -6px;">
+								    	<i class="fa fa-pencil"></i>
+								    </button>
+								  </h6>
+							    <hr>
+							    <div class="card-text">
+							    	<b>Teachers</b>
+							    	<div style="max-height: 52px; overflow-y: scroll;">
+								    	<span class="one-class-teacher" style="font-size: 13px;" ng-repeat="(index, teacherOne) in class.classTeacher">
+									    	<span ng-if="index + 1 != class.classTeacher.length">
+									    		{{ teachers[teacherOne].fullName }} -
+									    	</span>
+									    	<span ng-if="index + 1 == class.classTeacher.length">
+									    		{{ teachers[teacherOne].fullName }}
+									    	</span>
+									    </span>
+							    	</div>
+							    	<b style="margin-top: 10px; display: block;">Subjects</b>
+							    	<div style="max-height: 52px; overflow-y: scroll;">
+								    	<span style="font-size: 13px;" ng-repeat="(index, oneSubject) in class.classSubjects">
+								    			<span ng-if="index + 1 != class.classTeacher.length">
+										    		{{ subject[oneSubject] }} -
+										    	</span>
+										    	<span ng-if="index + 1 == class.classTeacher.length">
+										    		{{ subject[oneSubject] }}
+										    	</span>
+									    </span>
+							    	</div>
+							    	<!-- <div style="margin-top: 5px" ng-if="class.dormitoryName">
+							    		<b>dormitory:</b> {{ class.dormitoryName }}
+							    	</div> -->
+							    </div>
+							  </div>
+            </div>
+        </div>
+        <div class="text-center" ng-if="!classes.length" style="font-size: 18px; color: #999">There's no classes yet.</div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editClass}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editClass" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editClass.classNamee.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.className}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="classNamee" ng-model="form.className" class="form-control" required placeholder="{{phrase.className}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editClass.classTeacher.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.classTeacher}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classTeacher" name="classTeacher" multiple required>
+                                    <option ng-repeat="teacher in teachers" value="{{teacher.id}}">{{teacher.fullName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editClass.classSubjects.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.associatedSubjects}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classSubjects" name="classSubjects" multiple required>
+                                    <option ng-repeat="(key, value) in subject" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.classDorm}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.dormitoryId" name="dormitoryId">
+                                    <option ng-repeat="dormitoryOne in dormitory" value="{{dormitoryOne.id}}">{{dormitoryOne.dormitory}}</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editClass.$invalid">{{phrase.editClass}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,251 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.suppliers}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('suppliers.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/suppliers/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/suppliers/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('suppliers.add_supp')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_supp}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_supp}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.supp_name}}</th>
+								<th>{{phrase.Description}}</th>
+								<th>{{phrase.supp_phone}}</th>
+								<th>{{phrase.supp_mail}}</th>
+								<th>{{phrase.supp_address}}</th>
+								<th>{{phrase.conPerson}}</th>
+								<th>{{phrase.Status}}</th>
+								<th style="width:160px;" ng-show="$root.can('suppliers.edit_supp') || $root.can('suppliers.del_supp')" >Action</th>
+							</tr>
+							<tr dir-paginate="suppliers_one in suppliers | itemsPerPage:10" total-items="totalItems">
+								<td>{{suppliers_one.supp_name}}</td>
+								<td>{{suppliers_one.supp_desc}}</td>
+								<td>{{suppliers_one.supp_phone}}</td>
+								<td>{{suppliers_one.supp_mail}}</td>
+								<td>{{suppliers_one.supp_address}}</td>
+								<td>
+									{{suppliers_one.cont_per_name}}
+									<br/>
+									{{phrase.cont_per_phone}}: {{suppliers_one.cont_per_phone}}
+									<br/>
+									{{phrase.cont_per_mail}}: {{suppliers_one.cont_per_mail}}
+								</td>
+								<td>
+									<span ng-show="suppliers_one.supp_status == 1">{{phrase.Active}}</span>
+                            		<span ng-show="suppliers_one.supp_status == 0">{{phrase.Inactive}}</span>
+								</td>
+								<td ng-show="$root.can('suppliers.edit_supp') || $root.can('suppliers.del_supp')">
+									<button ng-show="$root.can('suppliers.edit_supp')" ng-click="status(suppliers_one.id,$index)" type="button" class="btn btn-info btn-circle" title="{{phrase.Active}}" ><i class="fa fa-check-square-o"></i></button>
+									<button ng-show="$root.can('suppliers.edit_supp')" ng-click="edit(suppliers_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('suppliers.del_supp')" ng-click="remove(suppliers_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!suppliers.length"><td class="noTableData" colspan="10">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.add_supp}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="suppliers_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': suppliers_add_form.supp_name.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_name}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="supp_name" ng-model="form.supp_name" class="form-control" placeholder="{{phrase.supp_name}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea name="supp_desc" class="form-control" ng-model="form.supp_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_phone}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="supp_phone" ng-model="form.supp_phone" class="form-control" placeholder="{{phrase.supp_phone}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_mail}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="supp_mail" ng-model="form.supp_mail" class="form-control" placeholder="{{phrase.supp_mail}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_address}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="supp_address" ng-model="form.supp_address" class="form-control" placeholder="{{phrase.supp_address}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': suppliers_add_form.cont_per_name.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.cont_per_name}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="cont_per_name" ng-model="form.cont_per_name" class="form-control" placeholder="{{phrase.cont_per_name}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.cont_per_phone}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="cont_per_phone" ng-model="form.cont_per_phone" class="form-control" placeholder="{{phrase.cont_per_phone}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.cont_per_mail}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="cont_per_mail" ng-model="form.cont_per_mail" class="form-control" placeholder="{{phrase.cont_per_mail}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': suppliers_add_form.supp_status.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Status}} *</label>
+							<div class="col-sm-10">
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="supp_status" ng-model="form.supp_status" value="1" required> {{phrase.Active}}
+									</label>
+								</div>
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="supp_status" ng-model="form.supp_status" value="0" required> {{phrase.Inactive}}
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="suppliers_add_form.$invalid">{{phrase.add_supp}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_supp}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="suppliers_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': suppliers_edit_form.supp_name.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_name}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="supp_name" ng-model="form.supp_name" class="form-control" placeholder="{{phrase.supp_name}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea name="supp_desc" class="form-control" ng-model="form.supp_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_phone}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="supp_phone" ng-model="form.supp_phone" class="form-control" placeholder="{{phrase.supp_phone}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_mail}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="supp_mail" ng-model="form.supp_mail" class="form-control" placeholder="{{phrase.supp_mail}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.supp_address}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="supp_address" ng-model="form.supp_address" class="form-control" placeholder="{{phrase.supp_address}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': suppliers_edit_form.cont_per_name.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.cont_per_name}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="cont_per_name" ng-model="form.cont_per_name" class="form-control" placeholder="{{phrase.cont_per_name}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.cont_per_phone}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="cont_per_phone" ng-model="form.cont_per_phone" class="form-control" placeholder="{{phrase.cont_per_phone}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.cont_per_mail}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="cont_per_mail" ng-model="form.cont_per_mail" class="form-control" placeholder="{{phrase.cont_per_mail}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': suppliers_edit_form.supp_status.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Status}} *</label>
+							<div class="col-sm-10">
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="supp_status" ng-model="form.supp_status" value="1" required> {{phrase.Active}}
+									</label>
+								</div>
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="supp_status" ng-model="form.supp_status" value="0" required> {{phrase.Inactive}}
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="suppliers_edit_form.$invalid">{{phrase.edit_supp}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,276 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.mailsms}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.send">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div class="form">
+                    <div>
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs tabsItem" role="tablist">
+                            <li class="nav-item" role="presentation"><a showtab="" class="nav-link active" href="#sendNotif" aria-controls="sendNotif" role="tab" data-toggle="tab">{{phrase.mailSMSSend}}</a></li>
+                            <li class="nav-item" role="presentation"><a showtab="" class="nav-link" href="#history" aria-controls="history" role="tab" data-toggle="tab">{{phrase.History}}</a></li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content tabcontent-border">
+                            <div role="tabpanel" class="tab-pane active p-20" id="sendNotif">
+                                <form class="form-horizontal" ng-submit="saveAdd()" name="mailsms" ng-show="sendNewScope == 'form'" novalidate>
+                                    <div class="form-group row" ng-class="{'has-error': mailsms.userType.$invalid}">
+                                        <label class="pl-2 pb-2 control-label col-form-label">{{phrase.typeUsers}} *</label>
+                                        <div class="col-sm-10">
+                                            <div class="radio-list" ng-show="$root.dashboardData.role == 'admin'">
+                                                <label>
+                                                    <input type="radio" name="userType" value="admins" ng-model="form.userType" required >
+                                                    {{phrase.Administrators}}
+                                                </label>
+                                            </div>
+                                            <div class="radio-list" ng-show="$root.dashboardData.role == 'admin'">
+                                                <label>
+                                                    <input type="radio" name="userType" value="teachers" ng-model="form.userType" required >
+                                                    {{phrase.teachers}}
+                                                </label>
+                                            </div>
+                                            <div class="radio-list">
+                                                <label>
+                                                    <input type="radio" name="userType" value="students" ng-model="form.userType" required >
+                                                    {{phrase.students}}
+                                                </label>
+                                            </div>
+                                            <div class="radio-list">
+                                                <label>
+                                                    <input type="radio" name="userType" value="parents" ng-model="form.userType" required >
+                                                    {{phrase.parents}}
+                                                </label>
+                                            </div>
+                                            <div class="radio-list" ng-show="$root.dashboardData.role == 'admin' || $root.dashboardData.role == 'teacher'">
+                                                <label>
+                                                    <input type="radio" name="userType" value="users" ng-model="form.userType" required >
+                                                    {{phrase.specificUsers}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="form.userType == 'students' || form.userType == 'parents'" ng-class="{'has-error': mailsms.classId.$invalid}">
+                                        <label class="pl-2 pb-2 control-label col-form-label">{{phrase.class}} *</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" ng-model="form.classId" name="classId" multiple ng-required="form.userType == 'students' || form.userType == 'parents'" ng-change="subjectList()">
+                                                <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="(form.userType == 'students' || form.userType == 'parents') && $root.dashboardData.enableSections == '1'" ng-class="{'has-error': mailsms.sectionId.$invalid}">
+                                        <label class="pl-2 pb-2 control-label col-form-label">{{phrase.section}} *</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" ng-model="form.sectionId" name="sectionId" multiple ng-required="(form.userType == 'students' || form.userType == 'parents') && $root.dashboardData.enableSections == '1'">
+                                                <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="form.userType == 'users'">
+                                        <label class="pl-2 pb-2 control-label col-form-label">{{phrase.selUsers}} *</label>
+                                        <div class="col-sm-10">
+                                            <button type="button" ng-click="linkUsers('all')" class="btn btn-danger btn-flat">{{phrase.selUsers}}</button>
+                                            <div class="row" ng-repeat="userOne in form.selectedUsers track by $index">
+                                                <div class="col-xs-8"><input type="text" class="form-control" disabled="disabled" ng-model="userOne.student"></div>
+                                                <button type="button" ng-click="removeUser(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{'has-error': mailsms.sendForm.$invalid}">
+                                        <label class="pl-2 pb-2 control-label col-form-label">{{phrase.sendAs}} *</label>
+                                        <div class="col-sm-10">
+                                            <div class="radio-list" ng-show="$root.dashboardData.role == 'admin' || ( $root.dashboardData.role == 'teacher' && ($root.dashboardData.allowTeachersMailSMS == 'mail' || $root.dashboardData.allowTeachersMailSMS == 'both'))">
+                                                <label>
+                                                    <input type="radio" name="sendForm" value="email" ng-model="form.sendForm" required >
+                                                    {{phrase.email}}
+                                                </label>
+                                            </div>
+                                            <div class="radio-list" ng-show="$root.dashboardData.role == 'admin' || ( $root.dashboardData.role == 'teacher' && ($root.dashboardData.allowTeachersMailSMS == 'sms' || $root.dashboardData.allowTeachersMailSMS == 'both'))">
+                                                <label>
+                                                    <input type="radio" name="sendForm" value="sms" ng-model="form.sendForm" required >
+                                                    {{phrase.sms}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="form.sendForm == 'email'">
+                                        <label class="pl-2 pb-2 control-label col-form-label">{{phrase.messageTitle}} *</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" name="messageTitle" ng-model="form.messageTitle" class="form-control" placeholder="{{phrase.messageTitle}}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{'has-error': mailsms.messageContent.$invalid}">
+                                        <label class="pl-2 pb-2 control-label col-form-label">{{phrase.messageContent}} *
+                                            <br/>
+                                            <button type="button" class="btn btn-xs btn-info" ng-click="loadTemplate()">{{phrase.loadFromTemplate}}</button>
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <span ng-show="!form.sendForm">{{phrase.plzSelMessType}}</span>
+                                            <textarea ng-if="form.sendForm == 'email'" ck-editor name="messageContentMail" class="form-control" ng-model="form.messageContentMail" required placeholder="{{phrase.messageContent}}"></textarea>
+                                            <textarea ng-if="form.sendForm == 'sms'" name="messageContentSms" id="messageContentSms" class="form-control" ng-model="form.messageContentSms" required placeholder="{{phrase.messageContent}}"></textarea>
+                                            <span ng-if="form.sendForm == 'sms'" sms-counter id="sms-counter">
+                                                <li>Encoding: <span class="encoding"></span></li>
+                                                <li>Length: <span class="length"></span></li>
+                                                <li>Messages: <span class="messages"></span></li>
+                                                <li>Per Message: <span class="per_message"></span></li>
+                                                <li>Remaining: <span class="remaining"></span></li>
+                                            </span>
+                                            <Br/>
+                                            <table ng-if="form.sendForm == 'email' || form.sendForm == 'sms'" class="table table-bordered table-hover">
+                                                <tbody>
+                                                    <tr>
+                                                        <th colspan="3">{{phrase.allowedVars}}</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{schoolTitle} : {{phrase.schoolTitle}}</td>
+                                                        <td>{schoolEmail} : {{phrase.sysMail}}</td>
+                                                        <td>{fullName} : {{phrase.FullName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{userName} : {{phrase.username}}</td>
+                                                        <td>{email} : {{phrase.email}}</td>
+                                                        <td>{studentRoll} : {{phrase.rollid}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{userrole} : {{phrase.role}}</td>
+                                                        <td>{phoneNo} : {{phrase.phoneNo}}</td>
+                                                        <td>{mobileNo} : {{phrase.mobileNo}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-b-0">
+                                        <div class="">
+                                            <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="mailsms.$invalid">{{phrase.mailSMSSend}}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <span ng-show="sendNewScope == 'success'">
+                                    {{phrase.messQueued}}
+                                </span>
+                            </div>
+                            <div role="tabpanel" class="tab-pane p-20" id="history">
+                                <div class="card-block-input-group card-block-input-item">
+                                    <div class="input-group input-group-sm search-input">
+                                        <input type="text"  name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table id="listTable" class="table table-bordered table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <th>{{phrase.ID}}</th>
+                                                <th>{{phrase.to}}</th>
+                                                <th>{{phrase.typeDate}}</th>
+                                                <th>{{phrase.details}}</th>
+                                                <th>{{phrase.Sender}}</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            <tr dir-paginate="message in messages | filter:searchText | itemsPerPage:10" total-items="totalItems">
+                                                <td>{{message.id}}</td>
+                                                <td>{{message.mailTo}}</td>
+                                                <td>{{message.mailType}} <br/> {{message.messageDate}}</td>
+                                                <td>{{message.messageData}}</td>
+                                                <td>{{message.messageSender}}</td>
+                                                <td class="options">
+                                                    <button ng-click="remove(message,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr ng-show="!messages.length"><td class="noTableData" colspan="5">{{phrase.noMessages}}</td></tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls on-page-change="getSents(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="showModalLink">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink" placeholder="{{phrase.typeNameUserMail}}">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="linkStudentButton()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="userOne in searchResults">
+                            <td>{{userOne.name}} ({{userOne.role}})</td>
+                            <td>{{userOne.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="linkStudentFinish(userOne)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>
+
+<modal visible="showModalLoad">
+    <div class="row">
+        <div class="col-sm-9">
+            <select class="form-control input-sm" name="selectedTemplate" id="selectedTemplate">
+                <option ng-repeat="(key,value) in templateList" value="{{key}}">{{value.templateTitle}}</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <button type="button" ng-click="loadTemplateContent()" class="btn btn-danger">{{phrase.Load}}</button>
+        </div>
+    </div>
+</modal>

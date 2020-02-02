@@ -1,0 +1,116 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.depart}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-show="$root.can('depart.add_depart')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_depart}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_depart}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.depart_title}}</th>
+								<th>{{phrase.depart_desc}}</th>
+								<th style="width:160px;" ng-show="$root.can('depart.edit_depart') || $root.can('depart.del_depart')" >Action</th>
+							</tr>
+							<tr ng-repeat="departments_one in departments | filter:searchText">
+								<td>{{departments_one.depart_title}}</td>
+								<td>{{departments_one.depart_desc}}</td>
+								<td ng-show="$root.can('depart.edit_depart') || $root.can('depart.del_depart')">
+									<button ng-show="$root.can('depart.edit_depart')" ng-click="edit(departments_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('depart.del_depart')" ng-click="remove(departments_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!departments.length"><td class="noTableData" colspan="4">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.add_depart}}</h4>
+				<div class="">
+
+					<form class="form-horizontal" name="departments_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': departments_add_form.depart_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.depart_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="depart_title" ng-model="form.depart_title" class="form-control" placeholder="{{phrase.depart_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.depart_desc}} </label>
+							<div class="col-sm-10">
+								<textarea name="depart_desc" class="form-control" ng-model="form.depart_desc" placeholder="{{phrase.depart_desc}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="departments_add_form.$invalid">{{phrase.add_depart}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_depart}}</h4>
+				<div class="">
+
+					<form class="form-horizontal" name="departments_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': departments_edit_form.depart_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.depart_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="depart_title" ng-model="form.depart_title" class="form-control" placeholder="{{phrase.depart_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.depart_desc}} </label>
+							<div class="col-sm-10">
+								<textarea name="depart_desc" class="form-control" ng-model="form.depart_desc" placeholder="{{phrase.depart_desc}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="departments_edit_form.$invalid">{{phrase.edit_depart}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

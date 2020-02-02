@@ -1,0 +1,218 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Administrators}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <button ng-show="$root.can('Administrators.addAdministrator')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.addAdministrator}}</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.listAdministrators}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.name}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th ng-show="$root.can('Administrators.editAdministrator') || $root.can('Administrators.delAdministrator')">Action</th>
+                            </tr>
+                            <tr ng-repeat="admin in admins | filter:searchText">
+                                <td>
+                                    <img alt="{{admin.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+admin.id}}">
+                                    {{admin.fullName}} <i ng-class="{'color_red':admin.account_active==0,'color_green':admin.account_active==1}" class="fa fa-lightbulb-o"></i>
+                                </td>
+                                <td>
+                                    {{admin.username}}
+                                </td>
+                                <td>{{admin.email}}</td>
+                                <td>
+                                    <button ng-show="$root.can('Administrators.editAdministrator')" ng-click="account_status(admin.id,$index)" type="button" class="btn btn-warning btn-circle" title="{{phrase.toggleStatus}}" ><i class="fa fa-lightbulb-o"></i></button>
+                                    <button ng-show="$root.can('Administrators.editAdministrator')" ng-click="edit(admin.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                    <button ng-show="$root.can('Administrators.delAdministrator')" ng-click="remove(admin,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!admins.length"><td class="noTableData" colspan="5">{{phrase.noAdministrators}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.addAdministrator}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addAdmin" role="form" ng-upload="saveAdd(content)" method="post" action="index.php/admins" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.fullName.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.username.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.username}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" ng-model="form.username" class="form-control" placeholder="{{phrase.username}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.email.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} *</label>
+                            <div class="col-sm-10">
+                                <input type="email" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.password.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.password}} *</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="password" ng-model="form.password" class="form-control" placeholder="{{phrase.password}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="photo">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Communication}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.role_perm.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Permissions}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="role_perm" ng-model="form.role_perm" required>
+                                    <option ng-repeat="role in roles" value="{{role.id}}">{{role.role_title}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addAdmin.$invalid">{{phrase.addAdministrator}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editAdministrator}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editAdmin" role="form" ng-upload="saveEdit(content)" method="post" action="{{'index.php/admins/' + form.id}}" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.fullName.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="fullName" ng-model="form.fullName" class="form-control" required placeholder="{{phrase.FullName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.username.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.username}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" ng-model="form.username" class="form-control" placeholder="{{phrase.username}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editAdmin.email.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} *</label>
+                            <div class="col-sm-10">
+                                <input type="email" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.password}}</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="password" ng-model="form.password" class="form-control" placeholder="{{phrase.password}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Photo}}</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="photo">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Communication}}</label>
+                            <div class="col-sm-10">
+
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="mail" checklist-model="form.comVia"> {{phrase.mail}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="sms" checklist-model="form.comVia"> {{phrase.sms}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="checkbox" name="comVia[]" value="phone" checklist-model="form.comVia"> {{phrase.phone}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': addAdmin.role_perm.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Permissions}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="role_perm" ng-model="form.role_perm" required>
+                                    <option ng-repeat="role in roles" value="{{role.id}}">{{role.role_title}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editAdmin.$invalid">{{phrase.editAdministrator}}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

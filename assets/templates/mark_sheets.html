@@ -1,0 +1,76 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">Mark sheets</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block" id="view-list-block">
+                <div class="table-responsive">
+                  <div class="box col-xs-12" ng-repeat="exam in studentMarksheet">
+                      <div class="box-header">
+                          <h3 class="box-title">{{exam.title}}</h3>
+                      </div>
+                      <div class="box-body table-responsive">
+                          <table id="listTable" class="table table-bordered table-hover">
+                            <tbody>
+                              	<tr>
+                                  <th>{{phrase.Subject}}</th>
+                                  <th ng-repeat="head in exam.examMarksheetColumns">{{head.title}}</th>
+                                  <th>{{phrase.totalMarks}}</th>
+                                  <th>{{phrase.passGrade}}</th>
+                                  <th>{{phrase.finalGrade}}</th>
+                                  <th>{{phrase.Status}}</th>
+                              	</tr>
+                              	<tr ng-repeat="dataOne in exam.data">
+                                  <td>{{dataOne.subjectName}}</td>
+                                  <td ng-repeat="head in exam.examMarksheetColumns">{{dataOne.examMark[head.id]}}</td>
+                                  <td>{{dataOne.totalMarks}}</td>
+                                  <td>{{dataOne.passGrade}}</td>
+                                  <td>{{dataOne.finalGrade}} {{dataOne.grade}} ( {{dataOne.points}} )</td>
+                                  <td>{{dataOne.examState}}</td>
+                              	</tr>
+                          	</tbody>
+                        	</table>
+                          <button class="btn btn-sm btn-success btn-flat">{{phrase.examMarks}} : {{exam.totalMarks}}</button>
+                          <button class="btn btn-sm btn-success btn-flat">{{phrase.AveragePoints}} : {{exam.pointsAvg}}</button>
+                      </div>
+                  		<hr style="margin-bottom: 0">
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.phn_calls}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card" style="margin-bottom: 0">
+			<div class="card-block" id="view-list-block">
+				<div class="row">
+					<div class="col-8">
+						<div class="card-block-input-group card-block-input-item">
+							<div class="input-group input-group-sm search-input">
+								<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+								<span class="input-group-addon"><i class="fa fa-search"></i></span>
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div ng-show="$root.can('phn_calls.Export')" class="pull-right card-block-input-group card-block-input-item">
+							<div class="btn-group no-print">
+								<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+								<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+									<span class="sr-only">{{phrase.toggleDropdown}}</span>
+								</button>
+								<div class="dropdown-menu" role="menu">
+									<a class="dropdown-item" href="index.php/phone_calls/export/excel">{{phrase.ExportExcel}}</a>
+									<a class="dropdown-item" href="index.php/phone_calls/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="table-responsive">
+					<table id="listTable" class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.FullName}}</th>
+								<th>{{phrase.phoneNo}}</th>
+								<th>{{phrase.email}}</th>
+								<th>{{phrase.call_dur}}</th>
+								<th style="width:160px;" ng-show="$root.can('phn_calls.edit_call') || $root.can('phn_calls.del_call')" >Action</th>
+							</tr>
+							<tr dir-paginate="phone_calls_one in phone_calls | itemsPerPage:10" total-items="totalItems">
+								<td>{{phone_calls_one.FullName}}</td>
+								<td>{{phone_calls_one.phoneNo}}</td>
+								<td>{{phone_calls_one.email}}</td>
+								<td>{{phone_calls_one.call_duration}}</td>
+								<td class="options" ng-show="$root.can('phn_calls.edit_call') || $root.can('phn_calls.del_call')">
+									<button ng-show="$root.can('phn_calls.edit_call')" ng-click="edit(phone_calls_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('phn_calls.del_call')" ng-click="remove(phone_calls_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!phone_calls.length"><td class="noTableData" colspan="9">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

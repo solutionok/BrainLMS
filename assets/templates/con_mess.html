@@ -1,0 +1,119 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.con_mess}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('con_mess.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/con_mess/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/con_mess/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_mess}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.mail_subj}}</th>
+								<th>{{phrase.firstName}}</th>
+								<th>{{phrase.lastName}}</th>
+								<th>{{phrase.email}}</th>
+								<th>{{phrase.time}}</th>
+								<th style="width:160px;" ng-show="$root.can('con_mess.del_mess')" >Action</th>
+							</tr>
+							<tr dir-paginate="contact_messages_one in contact_messages | itemsPerPage:10" total-items="totalItems">
+								<td>
+									<a ng-show="$root.can('con_mess.View')" href="portal#/con_mess/{{contact_messages_one.id}}">{{contact_messages_one.mail_subject}}</a>
+									<span ng-show="!$root.can('con_mess.View')">{{contact_messages_one.mail_subject}}</span>
+								</td>
+								<td>{{contact_messages_one.firstName}}</td>
+								<td>{{contact_messages_one.lastName}}</td>
+								<td>{{contact_messages_one.email}}</td>
+								<td>{{contact_messages_one.message_time}}</td>
+								<td ng-show="$root.can('con_mess.del_mess')">
+									<button ng-show="$root.can('con_mess.del_mess')" ng-click="remove(contact_messages_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!contact_messages.length"><td class="noTableData" colspan="7">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.view">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button class="btn no-print pull-right btn-success btn-default" onclick="window.print();"><i class="fa fa-print"></i> {{phrase.Print}}</button>
+				<a href="portal#/con_mess" class="btn btn-danger btn-sm no-print btn-flat pull-right card-block-input-item">Back</a>
+				<h4 class="card-title">{{phrase.con_mess}} : {{form.mail_subject}}</h4>
+				<div class="table-responsive">
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.mail_subj}} </label>
+						<div class="col-sm-10">
+							{{form.mail_subject}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.firstName}} </label>
+						<div class="col-sm-10">
+							{{form.firstName}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.lastName}} </label>
+						<div class="col-sm-10">
+							{{form.lastName}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+						<div class="col-sm-10">
+							{{form.email}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.message}} </label>
+						<div class="col-sm-10">
+							{{form.message}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.time}} </label>
+						<div class="col-sm-10">
+							{{form.message_time}}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

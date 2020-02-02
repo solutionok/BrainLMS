@@ -1,0 +1,627 @@
+<style type="text/css">
+	.img-circle {
+    border: 1px solid rgba(45,45,45,0.1);
+    padding: 2px;
+	}
+	.card .card-title {
+		white-space: normal;
+	}
+	#counts .card-block {
+		padding: 10px;
+	}
+	.main-grid {
+		margin-bottom: 10px;
+		margin-top: 0px;
+	}
+	.main-grid .nav-item {
+		width: 24.5%;
+		text-align: center;
+	}
+	.main-grid .nav-item a {
+		font-size: 25px;
+		cursor: pointer;
+		color: #555;
+    border-bottom: 1px solid transparent !important;
+	}
+	.main-grid .nav-item a.nav-link.active {
+		background: #f2f7f8;
+	}
+	.message-box .message-widget a .user-img {
+		margin: 0;
+	}
+	.message-box .message-widget a {
+		padding: 7px 5px;
+	}
+	#noti .list-group-item .id {
+		position: absolute;
+    right: 5px;
+    top: 5px;
+    color: #FFF;
+    padding: 0px 5px;
+    border-radius: 5px 0;
+	}
+	#counts {
+		margin-top:35px;
+	}
+	.main-grid .nav-link i {
+		margin-top: 3px;
+    display: block;
+    margin-bottom: 15px;
+    max-height: 25px;
+	}
+	.main-grid .nav-link i.mdi {
+		margin-top: -4px
+	}
+	.main-grid .nav-link span {
+		font-size: 11px;
+		position: absolute;
+		bottom: 4px;
+	}
+	#news .item {
+		padding: 5px;
+		border-bottom: 1px dashed #999;
+		margin-bottom: 5px;
+		padding-bottom: 8px;
+	}
+	#news .item:last-child {
+		border-bottom: 0 dashed transparent;
+	}
+	#dashboard {
+		/*margin-top: 20px;*/
+	}
+	#dashboard .card {
+		padding: 12px 2px;
+		background: #00F260;
+		background: -webkit-linear-gradient(to right, #0575E6, #00F260);
+		background: linear-gradient(to right, #0575E6, #00F260);
+		box-shadow: 1px 1px 2px #999;
+	}
+	#dashboard .card a {
+		color: #FFF;
+	}
+	#dashboard .card i {
+		text-shadow: 1px 1px 2px #999;
+		font-weight: bold;
+	}
+	#dashboard .card i.fa {
+		padding-bottom: 12px;
+	}
+	.viewList {
+		padding-bottom: 10px;
+		margin-top: 15px;
+	}
+	.viewList .card {
+		margin-bottom: 15px;
+		border-radius: 10px 0;
+		box-shadow: 1px 1px 5px #CCC;
+	}
+	.viewList .card .card-title {
+		font-size: 20px;
+		margin-bottom: 15px;
+	}
+	.viewList .card-block {
+		padding: 15px;
+	}
+	.btn-circle {
+		width: 32px;
+		height: 32px;
+		padding: 6px;
+	}
+	.gps-map {
+		position: fixed;
+    width: 100%;
+    padding: 0;
+    top: 0;
+    left: 0px;
+    z-index: 9999999;
+    height: 100%;
+	}
+	.listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	.listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	.listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+</style>
+
+<div class="row main-grid" ng-if="$root.dashboardData.role == 'admin'">
+	<div class="col-md-12">
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'dashboard')" href="#"
+		    	ng-class="{'active': views.dashboard}">
+		    	<i class="mdi mdi-home"></i>
+		    	<span style="margin-left: -26px;">Dashboard</span>
+		    </a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'employees')" href="#"
+		    	ng-class="{'active': views.employees}">
+		    	<i class="mdi mdi-clipboard-account"></i>
+		    	<span style="margin-left: -27px;">Employees</span>
+		    </a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'students')" href="#"
+		    	ng-class="{'active': views.students}">
+		    	<i class="mdi mdi-account-box"></i>
+		    	<span style="margin-left: -22px;">Students</span>
+		    </a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="/portal#/events"
+		    	ng-class="{'active': views.events}">
+		    	<i class="mdi mdi-calendar-check"></i>
+		    	<span style="margin-left: -16px;">Events</span>
+		    </a>
+		  </li>
+		</ul>
+	</div>
+</div>
+
+<div class="row main-grid" ng-if="$root.dashboardData.role == 'teacher'">
+	<div class="col-md-12">
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'dashboard')" href="#"
+		    	ng-class="{'active': views.dashboard}">
+		    	<i class="mdi mdi-home"></i>
+		    	<span style="margin-left: -26px;">Dashboard</span>
+		    </a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'students')" href="#"
+		    	ng-class="{'active': views.students}">
+		    	<i class="mdi mdi-account-box"></i>
+		    	<span style="margin-left: -22px;">Students</span>
+		    </a>
+		  </li>
+		  <!-- <li class="nav-item">
+		    <a class="nav-link" href="/portal#/mobileNotif"
+		    	ng-class="{'active': views.mobile_notif}">
+		    	<i class="fa fa-bell"></i>
+		    	<span style="margin-left: -30px;">Notifications</span>
+		    </a>
+		  </li> -->
+		  <li class="nav-item">
+		    <a class="nav-link" href="/portal#/events"
+		    	ng-class="{'active': views.events}">
+		    	<i class="mdi mdi-calendar-check"></i>
+		    	<span style="margin-left: -16px;">Events</span>
+		    </a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="/portal#/newsboard"
+		    	ng-class="{'active': views.newsboard}">
+		    	<i class="mdi mdi-bullhorn" style="font-size: 30px; line-height: 35px;"></i>
+		    	<span style="margin-left: -28px;">Newsboard</span>
+		    </a>
+		  </li>
+		</ul>
+	</div>
+</div>
+
+<div class="row main-grid" ng-if="$root.dashboardData.role == 'parent'">
+	<div class="col-md-12">
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'dashboard')" href="#"
+		    	ng-class="{'active': views.dashboard}">
+		    	<i class="mdi mdi-home"></i>
+		    	<span style="margin-left: -26px;">Dashboard</span>
+		    </a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'students')" href="#"
+		    	ng-class="{'active': views.students}">
+		    	<i class="mdi mdi-account-box"></i>
+		    	<span style="margin-left: -22px;">Students</span>
+		    </a>
+		  </li>
+		  <!-- <li class="nav-item">
+		    <a class="nav-link" href="/portal#/mobileNotif"
+		    	ng-class="{'active': views.mobile_notif}">
+		    	<i class="fa fa-bell"></i>
+		    	<span style="margin-left: -30px;">Notifications</span>
+		    </a>
+		  </li> -->
+		  <li class="nav-item">
+		    <a class="nav-link" href="/portal#/events"
+		    	ng-class="{'active': views.events}">
+		    	<i class="mdi mdi-calendar-check"></i>
+		    	<span style="margin-left: -16px;">Events</span>
+		    </a>
+		  </li>
+		</ul>
+	</div>
+</div>
+
+<div class="row main-grid" ng-if="$root.dashboardData.role == 'student'">
+	<div class="col-md-12">
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+		    <a class="nav-link" ng-click="changeView($event, 'dashboard')" href="#"
+		    	ng-class="{'active': views.dashboard}">
+		    	<i class="mdi mdi-home"></i>
+		    	<span style="margin-left: -26px;">Dashboard</span>
+		    </a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="/portal#/events"
+		    	ng-class="{'active': views.events}">
+		    	<i class="mdi mdi-calendar-check"></i>
+		    	<span style="margin-left: -16px;">Events</span>
+		    </a>
+		  </li>
+		</ul>
+	</div>
+</div>
+
+<!-- ********************************************************** -->
+
+<div ng-show="views.noti" class="row" id="noti">
+	<div class="col-12">
+		<ul class="list-group mb-3">
+		  <li class="list-group-item" ng-repeat="item in dashboardData.dashboard_notifications">
+		  	<div class="id bg-danger">Msg</div>
+		  	<div style="width: 100%">from: {{ item.from.fullName }}</div>
+		  	<div style="width: 100%"><b>{{ item.messageText }}</b></div>
+		  	<div style="width: 100%"><small style="font-size: 12px">{{ item.dateSent }}</small></div>
+		  </li>
+		</ul>
+	</div>
+</div>
+
+<div ng-show="views.leaderboard" class="row" id="leaderboard">
+	<div class="col-12">
+      <div class="card card-outline-primary">
+          <div class="card-block">
+              <h4 class="card-title text-dark"><i class="fa fa-trophy"></i> {{phrase.studentLeaderboard}}</h4>
+              <div class="message-box" scroll-box id="stdLdrBrd" height="255px">
+                  <div class="message-widget message-scroll">
+                      <!-- Message -->
+                      <a href="javascript:void(0)" ng-click="studentProfile( student.id )" ng-repeat="student in dashboardData.studentLeaderBoard">
+                          <div class="user-img"> <img ng-src="{{'index.php/dashboard/profileImage/'+student.id}}" alt="{{student.fullName}}" class="img-circle"> </div>
+                          <div class="mail-contnet">
+                              <h5>{{student.fullName}}</h5> <span class="mail-desc">{{student.isLeaderBoard}}</span>
+                          </div>
+                      </a>
+
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="col-12">
+      <div class="card">
+          <div class="card-block">
+              <h4 class="card-title text-dark"><i class="fa fa-trophy"></i> {{phrase.teacherLeaderboard}}</h4>
+              <div class="message-box" scroll-box id="tchLdrBrd" height="255px">
+                  <div class="message-widget message-scroll">
+                      <!-- Message -->
+                      <a href="javascript:void(0)" ng-click="studentProfile( student.id )" ng-repeat="student in dashboardData.teacherLeaderBoard">
+                          <div class="user-img"> <img ng-src="{{'index.php/dashboard/profileImage/'+student.id}}" alt="{{student.fullName}}" class="img-circle"> </div>
+                          <div class="mail-contnet">
+                              <h5>{{student.fullName}}</h5> <span class="mail-desc">{{student.isLeaderBoard}}</span>
+                          </div>
+                      </a>
+
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div ng-show="views.counts" class="row" id="counts">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-block">
+                <h4 class="card-title text-white">Visitors</h4>
+                <div class="text-right">
+                    <h2 class="font-light m-b-0 text-white"><i class="mdi mdi-sort-variant"></i>
+	                    {{ dashboardData.stats.visitors }}
+	                  </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card card-dark">
+            <div class="card-block">
+                <div id="myCarousel" carousel-init class="carousel slide" data-ride="carousel">
+                    <!-- Carousel items -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active flex-column">
+                            <h4 class="text-white card-title">{{phrase.students}}</h4>
+                            <h3 class="text-white font-light text-right"><i class="ti-user"></i> {{dashboardData.stats.students}}</h3>
+                        </div>
+                        <div class="carousel-item flex-column">
+                            <h4 class="text-white card-title">{{phrase.teachers}}</h4>
+                            <h3 class="text-white font-light text-right"><i class="ti-user"></i> {{dashboardData.stats.teachers}}</h3>
+                        </div>
+                        <div class="carousel-item flex-column">
+                            <h4 class="text-white card-title">{{phrase.parents}}</h4>
+                            <h3 class="text-white font-light text-right"><i class="ti-user"></i> {{dashboardData.stats.parents}}</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-6" ng-show="dashboardData.activatedModules.indexOf('messagesAct') > -1">
+        <div class="card card-dark">
+            <div class="card-block">
+                <h4 class="card-title text-white">{{phrase.Messages}}</h4>
+                <div class="text-right">
+                    <h2 class="font-light m-b-0 text-white"><i class="mdi mdi-message-text-outline"></i>  {{dashboardData.stats.myMessages}}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card card-dark">
+            <div class="card-block">
+                <div id="myCarousel" carousel-init class="carousel slide" data-ride="carousel">
+                    <!-- Carousel items -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active flex-column">
+                            <h4 class="text-white card-title">Pay fees</h4>
+                            <h3 class="text-white font-light text-right">{{dashboardData.currency_symbol}} {{dashboardData.stats.invoices}}</h3>
+                        </div>
+                        <div class="carousel-item flex-column">
+                            <h4 class="text-white card-title">Due pay fees</h4>
+                            <h3 class="text-white font-light text-right">{{dashboardData.currency_symbol}} {{dashboardData.stats.dueInvoices}}<h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card card-dark">
+            <div class="card-block">
+                <h4 class="card-title text-white">Classes</h4>
+                <div class="text-right">
+                    <h2 class="font-light m-b-0 text-white"><i class="mdi mdi-sort-variant"></i>
+	                    {{ dashboardData.stats.classes }}
+	                  </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card card-dark">
+            <div class="card-block">
+                <h4 class="card-title text-white">Employees</h4>
+                <div class="text-right">
+                    <h2 class="font-light m-b-0 text-white"><i class="mdi mdi-sort-variant"></i>
+	                    {{ dashboardData.stats.employees }}
+	                  </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-show="views.dashboard" class="row" id="dashboard">
+	<div class="col-12" style="margin-top: 5px">
+		<div class="row">
+			<div class="col-4" ng-repeat="item in dashboardItemsData" ng-if="item.status">
+				<div class="card justify-content-center align-self-center" data-ripple style="min-height: 100px">
+					<a href="{{ item.link }}">
+						<div class="card-body text-center">
+		          <i class="{{ item.icon }}" style="font-size: 22px;"></i>
+		          <div class="card-title" style="font-size: 12px; margin-bottom: 0">
+		          	<b>{{ item.name }}</b>
+		          </div>
+		        </div>
+		      </a>
+        </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div ng-if="views.employees" class="row viewList">
+	<div class="col-12">
+		<div class="card" dir-paginate="employee in employees | itemsPerPage:10 | filter:searchText" total-items="employee_totalItems">
+        <div class="card-block">
+					  <div class="card-body">
+					    <h5 class="card-title text-dark">
+						    <!-- <i ng-class="{'color_red':employee.account_active==0,'color_green':employee.account_active==1}" class="fa fa-lightbulb-o"></i> -->
+						    {{ employee.fullName }}
+						    <!-- <button ng-show="$root.can('employees.editEmployee')"
+						    	ng-click="employee_account_status(employee.id,$index)" type="button"
+						    	class="btn btn-warning btn-circle pull-right" style="margin-top: -6px;">
+						    	<i class="fa fa-lightbulb-o"></i>
+						    </button> -->
+						  </h5>
+					    <hr>
+					    <p class="card-text">
+                <b>Phone No.:</b>
+                <span ng-if="employee.phoneNo != ''">{{employee.phoneNo}}</span>
+                <span class="text-warning" ng-if="employee.phoneNo == null">empty</span>
+                <br>
+					    	<b>Role:</b> {{employee.role | capitalize}}
+					    </p>
+					  </div>
+        </div>
+    </div>
+    <div ng-if="!employees.length" class="text-center" style="font-size: 18px"><b>There is no employees</b></div>
+    <dir-pagination-controls
+     on-page-change="getEmployeesData(newPageNumber)"
+     template-url="assets/templates/dirPagination.html">
+    </dir-pagination-controls>
+  </div>
+</div>
+
+<div ng-show="views.marksheet" class="row viewList">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('e', 'students')" class="btn btn-sm pull-right btn-danger card-block-input-item">
+	                Back
+	              </button>
+                <h4 class="card-title">MarkSheet</h4>
+                <div class="table-responsive">
+
+                    <div ng-show="noMarksheet" class="box col-xs-12">
+                        <div class="box-header">
+                            <h3 class="box-title">{{phrase.Marksheet}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            {{phrase.studentHaveNoMarks}}
+                        </div>
+                    </div>
+
+                    <div class="box col-xs-12" ng-repeat="exam in studentMarksheet">
+                        <div class="box-header">
+                            <h3 class="box-title">{{exam.title}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover listTable">
+                                <tbody>
+                                <tr>
+                                    <th>{{phrase.Subject}}</th>
+                                    <th ng-repeat="head in exam.examMarksheetColumns">{{head.title}}</th>
+                                    <th>{{phrase.totalMarks}}</th>
+                                    <th>{{phrase.gradeLevels}}</th>
+                                    <th>{{phrase.passGrade}}</th>
+                                    <th>{{phrase.finalGrade}}</th>
+                                    <th>{{phrase.Status}}</th>
+                                    <th>{{phrase.Comments}}</th>
+                                </tr>
+                                <tr ng-repeat="dataOne in exam.data">
+                                    <td>{{dataOne.subjectName}}</td>
+                                    <td ng-repeat="head in exam.examMarksheetColumns">{{dataOne.examMark[head.id]}}</td>
+                                    <td>{{dataOne.totalMarks}}</td>
+                                    <td>{{dataOne.grade}} ( {{dataOne.points}} )</td>
+                                    <td>{{dataOne.passGrade}}</td>
+                                    <td>{{dataOne.finalGrade}}</td>
+                                    <td>{{dataOne.examState}}</td>
+                                    <td>{{dataOne.markComments}}</td>
+                                </tr>
+	                            </tbody>
+	                          </table>
+                            <br/>
+                            <a href="index.php/students/print/marksheet/{{exam.studentId}}/{{exam.examId}}" target="_BLANK"><button class="btn btn-info btn-flat pull-left marginBottom15">{{phrase.Print}}</button></a>
+                            <button class="btn btn-success btn-flat pull-right marginBottom15">{{phrase.examMarks}} : {{exam.totalMarks}}</button>
+                            <button class="btn btn-success btn-flat pull-right marginBottom15">{{phrase.AveragePoints}} : {{exam.pointsAvg}}</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-show="views.students" class="row viewList">
+	<div class="col-12">
+		<div class="form-inline mb-3 ml-4" ng-show="dashboardData.role != 'parent' && students.length">
+			<select class="col-4 form-control mr-2" ng-model="filter_students_input_class" ng-change="getCurrentSections()">
+				<option value="0">-All Classes-</option>
+				<option ng-repeat="class in classes" value="{{ class.id }}">{{ class.className }}</option>
+			</select>
+			<select class="col-4 form-control mr-2" ng-model="filter_students_input_section">
+				<option value="0">-All Sections-</option>
+				<option ng-repeat="section in sections" value="{{ section.id }}">{{ section.sectionName }}</option>
+			</select>
+		  <button type="button" class="ml-2 col-2 btn btn-primary" ng-click="filterStudentsByClassAndSection(1)" style="padding: 9px">
+		  	<i class="fa fa-search"></i>
+		  </button>
+		</div>
+		<div class="card" dir-paginate="student in students | itemsPerPage:10 | filter:searchText" total-items="students_totalItems">
+        <div class="card-block">
+					  <div class="card-body">
+					    <h5 class="card-title text-dark">
+						    <i ng-class="{'color_red':student.account_active==0,'color_green':student.account_active==1}" class="fa fa-lightbulb-o"></i>
+						    {{ student.fullName }}
+						    <div id="dropdownMenu2Item" class="dropdown" style="display: inline-block; float: right; margin-top: -4px">
+								  <button class="btn btn-link" data-ripple type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="outline: none;">
+								    <i class="fa fa-ellipsis-v"></i>
+								  </button>
+								  <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+								    <button class="dropdown-item" type="button"
+								    	ng-class="{'disabled': busTrackInfo.transport_vehicle == null}"
+								    	ng-click="trackBus($event, student.id)">
+								    	<i class="fa fa-bus"></i> Track Bus
+								    </button>
+								    <button class="dropdown-item" type="button"
+								    	ng-show="$root.can('students.Marksheet')"
+              				ng-click="marksheet(student.id)">
+								    	<i class="mdi mdi-grid"></i> MarkSheet
+								    </button>
+								  </div>
+								</div>
+						  </h5>
+					    <hr>
+					    <p class="card-text">
+                <b>Admission No.</b> {{student.admission_number}}<br>
+                <b>Class:</b>
+                <span ng-if="student.studentClass.length">{{student.studentClass}} </span>
+                <span ng-if="!student.studentClass.length"><i class="text-warning">undetected</i></span>
+                -
+                <b>Sec.:</b>
+                <span ng-if="student.studentSection.length">{{student.studentSection}} </span>
+                <span ng-if="!student.studentSection.length"><i class="text-warning">undetected</i></span>
+                <br>
+                <b>Phone No.</b> {{student.phoneNo}}<br>
+                <b>Roll No.</b> {{student.studentRollId}}
+					    </p>
+					  </div>
+        </div>
+    </div>
+    <div ng-if="!students.length" class="text-center" style="font-size: 18px"><b>There is no students</b></div>
+    <dir-pagination-controls
+     on-page-change="getStudentsData(newPageNumber)"
+     template-url="assets/templates/dirPagination.html" >
+    </dir-pagination-controls>
+  </div>
+</div>
+
+<div ng-if="views.bus_track">
+	<div class="gps-map">
+    <iframe
+    	ng-if="busTrackInfo.transport_vehicle != null"
+    	ng-src="{{ trustSrc(gps_iframe_link) }}"
+    	style="width: 100%; height: 100%; border: 0px solid #AAA;">
+    </iframe>
+    <a href="/portal?view=students#/?_rv={{ gbs_random_value }}"
+    	class="resize-btn btn btn-danger"
+    	style="position: fixed; z-index: 999999999; top: 10px; right: 10px; border-radius: 0; box-shadow: 1px 1px 3px #2d2d2d"
+    	>
+    		Back
+    </a>
+  </div>
+</div>
+
+<div ng-show="views.events" class="row" id="news">
+	<div class="col-12">
+		<h4 class="text-dark mt-2 mb-2">News & Events</h4>
+		<div class="item" ng-repeat="event in dashboardData.newsEvents">
+			<div class="row">
+				<div class="col-1">
+					<i class="fa fa-flag-checkered" style="font-size: 22px; margin-top: 3px"></i>
+				</div>
+				<div class="col-10" style="margin-left: 10px">
+					<span style="font-size: 13px;">
+						<i class="fa fa-clock-o"></i> {{ event.start }}
+					</span><br>
+					<b>{{ event.title }}</b><br>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

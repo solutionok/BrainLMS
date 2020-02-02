@@ -1,0 +1,274 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.students}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12 listContent">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div ng-show="$root.can('students.Export')" class="mb-2 pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" href="index.php/students/export">{{phrase.ExportExcel}}</a>
+                            <a class="dropdown-item" href="index.php/students/exportpdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive" style="min-height: 300px;">
+                    <table id="listTable" class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    {{phrase.FullName}}
+                                </th>
+                                <th>
+                                    Numbers
+                                </th>
+                                <th>{{phrase.class}} / {{phrase.sections}}</th>
+                                <th class='no-print' ng-show="$root.can('students.Attendance') || $root.can('students.Marksheet') || $root.can('students.stdLeaderBoard') || $root.can('students.medHistory') || $root.can('students.editStudent') || $root.can('students.delStudent')">Action</th>
+                            </tr>
+                            <tr dir-paginate="student in students | itemsPerPage:10" total-items="totalItems">
+                                <td>
+                                    <a href="" ng-click="studentProfile( student.id )">{{student.fullName}}</a>
+                                    <i ng-show="$root.can('students.editStudent')" ng-class="{'color_red':student.account_active==0,'color_green':student.account_active==1}" class="fa fa-lightbulb-o"></i>
+                                </td>
+                                <td>
+                                    Phone: {{student.phoneNo}}<br>
+                                    Mobile: {{student.mobileNo}}
+                                </td>
+                                <td>{{student.studentClass}} <br/> {{student.studentSection}}</td>
+                                <td class='no-print' ng-show="$root.can('students.Attendance') || $root.can('students.Marksheet') || $root.can('students.stdLeaderBoard') || $root.can('students.medHistory') || $root.can('students.editStudent') || $root.can('students.delStudent')">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a ng-show="$root.can('students.Attendance')" class="dropdown-item" ng-click="attendance(student.id)"><i class="fa fa-eye"></i> {{phrase.Attendance}}</a>
+                                            <a ng-show="$root.can('students.Marksheet')" class="dropdown-item" ng-click="marksheet(student.id)"><i class="fa fa-table"></i> {{phrase.Marksheet}}</a>
+                                            <a ng-show="$root.can('students.stdLeaderBoard') && (student.isLeaderBoard == '' || student.isLeaderBoard == null)" class="dropdown-item" ng-click="leaderBoard(student.id,$index)"><i class="fa fa-trophy"></i> {{phrase.leaderboard}}</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-show="!students.length"><td class="noTableData" colspan="6">{{phrase.noStudents}}</td></tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls on-page-change="getResultsPage(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.marksheet">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.Marksheet}}</h4>
+                <div class="table-responsive">
+
+                    <div ng-show="noMarksheet" class="box col-xs-12">
+                        <div class="box-header">
+                            <h3 class="box-title">{{phrase.Marksheet}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            {{phrase.studentHaveNoMarks}}
+                        </div>
+                    </div>
+
+                    <div class="box col-xs-12" ng-repeat="exam in studentMarksheet">
+                        <div class="box-header">
+                            <h3 class="box-title">{{exam.title}}</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody><tr>
+                                    <th>{{phrase.Subject}}</th>
+                                    <th ng-repeat="head in exam.examMarksheetColumns">{{head.title}}</th>
+                                    <th>{{phrase.totalMarks}}</th>
+                                    <th>{{phrase.gradeLevels}}</th>
+                                    <th>{{phrase.passGrade}}</th>
+                                    <th>{{phrase.finalGrade}}</th>
+                                    <th>{{phrase.Status}}</th>
+                                    <th>{{phrase.Comments}}</th>
+                                </tr>
+                                <tr ng-repeat="dataOne in exam.data">
+                                    <td>{{dataOne.subjectName}}</td>
+                                    <td ng-repeat="head in exam.examMarksheetColumns">{{dataOne.examMark[head.id]}}</td>
+                                    <td>{{dataOne.totalMarks}}</td>
+                                    <td>{{dataOne.grade}} ( {{dataOne.points}} )</td>
+                                    <td>{{dataOne.passGrade}}</td>
+                                    <td>{{dataOne.finalGrade}}</td>
+                                    <td>{{dataOne.examState}}</td>
+                                    <td>{{dataOne.markComments}}</td>
+                                </tr>
+                            </tbody></table>
+                            <br/>
+                            <a href="index.php/students/print/marksheet/{{exam.studentId}}/{{exam.examId}}" target="_BLANK"><button class="btn btn-info btn-flat pull-left marginBottom15">{{phrase.Print}}</button></a>
+                            <button class="btn btn-success btn-flat pull-right marginBottom15">{{phrase.examMarks}} : {{exam.totalMarks}}</button>
+                            <button class="btn btn-success btn-flat pull-right marginBottom15">{{phrase.AveragePoints}} : {{exam.pointsAvg}}</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.grad">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <select class="form-control input-sm pull-right" ng-model="searchText.studentClass" style="width:150px;" >
+                        <option value="">{{phrase.all}}</option>
+                        <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                    </select>
+                    <input type="text" name="table_search" ng-model="searchText" class="form-control input-sm pull-right" style="width: 150px;" placeholder="{{phrase.Search}}">
+                </div>
+                <h4 class="card-title">{{phrase.listGradStd}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.email}}</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr ng-repeat="student in gradStdList | filter:searchText">
+                                <td>{{student.studentRollId}}</td>
+                                <td>
+                                    <img alt="{{student.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+student.id}}">
+                                    <a href="" ng-click="studentProfile( student.id )">{{student.fullName}}</a>
+                                </td>
+                                <td>{{student.username}}</td>
+                                <td>{{student.email}}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"> Action <span class="caret"></span></button>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a class="dropdown-item" ng-click="attendance(student.id)"><i class="fa fa-eye"></i> {{phrase.Attendance}}</a>
+                                            <a class="dropdown-item" ng-click="marksheet(student.id)"><i class="fa fa-table"></i> {{phrase.Marksheet}}</a>
+                                            <a class="dropdown-item" ng-if="userRole == 'admin'" ng-click="medicalRead(student.id)"><i class="fa fa-stethoscope"></i> {{phrase.medHistory}}</a>
+                                            <a class="dropdown-item" ng-if="userRole == 'admin'" ng-click="edit(student.id)"><i class="fa fa-pencil"></i> {{phrase.Edit}}</a>
+                                            <a class="dropdown-item" ng-if="userRole == 'admin'" ng-click="remove(student,$index)"><i class="fa fa-trash-o"></i> {{phrase.Remove}}</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.attendance">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.attendanceStats}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.Date}}</th>
+                                <th ng-show="studentAttendance.attendanceModel=='subject'">{{phrase.Subject}}</th>
+                                <th>{{phrase.Attendance}}</th>
+                            </tr>
+                            <tr ng-repeat="(key,value) in studentAttendance.attendance">
+                                <td>{{value.date}}</td>
+                                <td ng-show="studentAttendance.attendanceModel=='subject'">{{studentAttendance.subjects[value.subjectId]}}</td>
+                                <td>
+                                    <div>
+                                        <span ng-show="value.status =='0'">{{phrase.Absent}}</span>
+                                        <span ng-show="value.status =='1'">{{phrase.Present}}</span>
+                                        <span ng-show="value.status =='2'">{{phrase.Late}}</span>
+                                        <span ng-show="value.status =='3'">{{phrase.LateExecuse}}</span>
+                                        <span ng-show="value.status =='4'">{{phrase.earlyDismissal}}</span>
+                                        <span ng-show="value.status =='9'">{{phrase.acceptedVacation}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<modal visible="showModal"><div ng-bind-html="modalContent"></div></modal>
+<modal visible="showModalLink">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink" placeholder="Type parent name / username / E-mail address">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="linkParentButton()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="parentOne in searchResults">
+                            <td>{{parentOne.name}}</td>
+                            <td>{{parentOne.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="linkParentFinish(parentOne)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>

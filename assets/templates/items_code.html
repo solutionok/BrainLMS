@@ -1,0 +1,175 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.items_code}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('items_code.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/items_code/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/items_code/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('items_code.add_item')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_item}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_items}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.item_title}}</th>
+								<th>{{phrase.Description}}</th>
+								<th>{{phrase.Category}}</th>
+								<th>{{phrase.item_code}}</th>
+								<th>{{phrase.item_pn}}</th>
+								<th style="width:160px;" ng-show="$root.can('items_code.edit_item') || $root.can('items_code.del_item')" >Action</th>
+							</tr>
+							<tr dir-paginate="items_code_one in items_code | itemsPerPage:10" total-items="totalItems">
+								<td>{{items_code_one.item_title}}</td>
+								<td>{{items_code_one.item_desc}}</td>
+								<td>{{inv_cat[items_code_one.item_cat]}}</td>
+								<td>{{items_code_one.item_code}}</td>
+								<td>{{items_code_one.item_pn}}</td>
+								<td ng-show="$root.can('items_code.edit_item') || $root.can('items_code.del_item')">
+									<button ng-show="$root.can('items_code.edit_item')" ng-click="edit(items_code_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('items_code.del_item')" ng-click="remove(items_code_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!items_code.length"><td class="noTableData" colspan="6">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.add_item}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="items_code_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': items_code_add_form.item_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="item_title" ng-model="form.item_title" class="form-control" placeholder="{{phrase.item_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea name="item_desc" class="form-control" ng-model="form.item_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_code_add_form.item_cat.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Category}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_cat" ng-model="form.item_cat" required>
+									<option ng-repeat="(key,item) in inv_cat" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item_code}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="item_code" ng-model="form.item_code" class="form-control" placeholder="{{phrase.item_code}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item_pn}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="item_pn" ng-model="form.item_pn" class="form-control" placeholder="{{phrase.item_pn}}" >
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="items_code_add_form.$invalid">{{phrase.add_item}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_item}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="items_code_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': items_code_edit_form.item_title.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item_title}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="item_title" ng-model="form.item_title" class="form-control" placeholder="{{phrase.item_title}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Description}} </label>
+							<div class="col-sm-10">
+								<textarea name="item_desc" class="form-control" ng-model="form.item_desc" placeholder="{{phrase.Description}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': items_code_edit_form.item_cat.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Category}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="item_cat" ng-model="form.item_cat" required>
+									<option ng-repeat="(key,item) in inv_cat" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item_code}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="item_code" ng-model="form.item_code" class="form-control" placeholder="{{phrase.item_code}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.item_pn}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="item_pn" ng-model="form.item_pn" class="form-control" placeholder="{{phrase.item_pn}}" >
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="items_code_edit_form.$invalid">{{phrase.edit_item}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

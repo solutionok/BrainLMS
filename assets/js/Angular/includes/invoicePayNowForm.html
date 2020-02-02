@@ -1,0 +1,14 @@
+<form
+	class="form-horizontal"
+	ng-show="invoice.paymentStatus != '1'"
+	name="PayOnlineForm" role="form"
+	method="POST" action="{{'index.php/invoices/pay/'+invoice.id}}"
+	ng-submit="invoicePayNowSub($event, invoice.id)" novalidate>
+		<input type="hidden" name="payVia" value="eazypay" ng-model="form.payVia">
+		<div class="form-group m-b-0">
+          <div>
+              <input type="hidden" name="return" value="invoices"/>
+              <button type="submit" class="btn btn-sm btn-info no-print" ng-disabled="PayOnlineForm.$invalid" ><i class="fa fa-inr"></i> Pay Now</button>
+          </div>
+      </div>
+</form>

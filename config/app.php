@@ -108,8 +108,7 @@ return [
     |
     */
 
-    'log' => env('APP_LOG', 'daily'),
-    'log_max_files' => 30,
+    'log' => env('APP_LOG', 'single'),
 
     /*
     |--------------------------------------------------------------------------
@@ -152,11 +151,11 @@ return [
         /*
          * Application Service Providers...
          */
-    //     App\Providers\AppServiceProvider::class,
-    //     App\Providers\AuthServiceProvider::class,
-    //     App\Providers\EventServiceProvider::class,
-				// Barryvdh\Debugbar\ServiceProvider::class,
-    //     App\Providers\RouteServiceProvider::class,
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        App\Providers\EventServiceProvider::class,
+				Barryvdh\Debugbar\ServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
         'Tymon\JWTAuth\Providers\JWTAuthServiceProvider',

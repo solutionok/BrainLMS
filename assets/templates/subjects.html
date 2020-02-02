@@ -1,0 +1,134 @@
+<style type="text/css">
+	#listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	#listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	#listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	#view-list-block {
+		padding: 15px 10px;
+	}
+	#view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-left">
+        <h3 class="text-themecolor m-b-0 m-t-0">
+	        {{phrase.Subjects}}
+	      </h3>
+      	<!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+    <div class="col-12">
+        <div class="card" style="margin-bottom: 0">
+            <div class="card-block" id="view-list-block">
+                <div class="card-block-input-group card-block-input-item">
+                    <div class="input-group input-group-sm search-input">
+                        <input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="listTable" class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>Subj. name</th>
+                                <th>{{phrase.teachers}}</th>
+                                <th>Pass Gr. / Final Gr.</th>
+                                <th ng-show="$root.can('Subjects.editSubject') || $root.can('Subjects.delSubject')">Action</th>
+                            </tr>
+                            <tr ng-repeat="subject in subjects | filter:searchText">
+                                <td>{{subject.subjectTitle}}</td>
+                                <td>
+                                	<div style="max-height: 80px; overflow-y: scroll;">
+                                    <span ng-repeat="(index, teacher) in subject.teacherId" ng-if="userRole != 'parent'">
+                                    	{{index+1}}- {{teachers[teacher].fullName}}<br/>
+                                    </span>
+                                  	<span ng-repeat="class_s in class_schedule" ng-if="userRole == 'parent'">
+                                  		<span ng-if="class_s.subjectId == subject.id && teachers[class_s.teacherId].fullName.length">
+                                  			{{teachers[class_s.teacherId].fullName}}<br>
+                                  		</span>
+                                  	</span>
+                                  </div>
+                                </td>
+                                <td>
+                                    {{subject.passGrade}} / {{subject.finalGrade}}
+                                </td>
+                                <td class="options" ng-show="$root.can('Subjects.editSubject') || $root.can('Subjects.delSubject')">
+                                    <button ng-show="$root.can('Subjects.editSubject')" ng-click="edit(subject.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-show="!subjects.length"><td class="noTableData" colspan="5">{{phrase.noSubjects}}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.edit">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+                <h4 class="card-title">{{phrase.editSubject}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" name="editSubject" role="form" ng-submit="saveEdit()" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': editSubject.subjectTitle.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.subjectName}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="subjectTitle" ng-model="form.subjectTitle" class="form-control" required placeholder="{{phrase.subjectName}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editSubject.teacherId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.teacher}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.teacherId" name="teacherId" multiple required>
+                                    <option ng-repeat="teacher in teachers" value="{{teacher.id}}">{{teacher.fullName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editSubject.passGrade.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.passGrade}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="passGrade" ng-model="form.passGrade" class="form-control" required placeholder="{{phrase.passGrade}}">
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': editSubject.finalGrade.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.finalGrade}} * </label>
+                            <div class="col-sm-10">
+                                <input type="text" name="finalGrade" ng-model="form.finalGrade" class="form-control" required placeholder="{{phrase.finalGrade}}">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editSubject.$invalid">{{phrase.editSubject}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

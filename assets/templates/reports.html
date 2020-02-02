@@ -1,0 +1,1076 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.Reports}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="usersStats()">
+                    <div class="round align-self-center round-success"><i class="fa fa-dashboard"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.UsersStats}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="stdAttendance()">
+                    <div class="round align-self-center round-success"><i class="fa fa-bar-chart"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.studentAttendance}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="changeView('stfAttendance')">
+                    <div class="round align-self-center round-success"><i class="fa fa-check"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.staffAttendance}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="changeView('paymentsReports')">
+                    <div class="round align-self-center round-success"><i class="fa fa-check"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.paymentsReports}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="changeView('payRollReports')">
+                    <div class="round align-self-center round-success"><i class="mdi mdi-bank"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.payrollReports}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="changeView('incomeReports')">
+                    <div class="round align-self-center round-success"><i class="fa fa-money"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.incomeReports}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="changeView('expensesReports')">
+                    <div class="round align-self-center round-success"><i class="fa fa-inr"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.expensesReports}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="changeView('stVacation')">
+                    <div class="round align-self-center round-success"><i class="fa fa-coffee"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.studentVacation}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="changeView('teacherVacation')">
+                    <div class="round align-self-center round-success"><i class="fa fa-coffee"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.teacherVacation}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="marksheetGenerationPrepare()">
+                    <div class="round align-self-center round-success"><i class="fa fa-table"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.marksheetGen}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="biometricUsers()">
+                    <div class="round align-self-center round-success"><i class="mdi mdi-fingerprint"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.bioUsers}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card">
+            <div class="card-block">
+                <div class="d-flex flex-row" style="cursor:pointer;" ng-click="genCertPrep()">
+                    <div class="round align-self-center round-success"><i class="mdi mdi-certificate"></i></div>
+                    <div class="m-l-10 align-self-center">
+                        <h5 class="text-muted m-b-0">{{phrase.gen_cert}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row" ng-show="views.usersStats">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.UsersStats}}</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.user}}</th>
+                                <th>{{phrase.activeUsers}}</th>
+                                <th>{{phrase.inactiveUsers}}</th>
+                                <th>{{phrase.totalUsers}}</th>
+                            </tr>
+                            <tr>
+                                <td>{{phrase.Administrators}}</td>
+                                <td>{{stats.admins.activated}}</td>
+                                <td>{{stats.admins.inactivated}}</td>
+                                <td>{{stats.admins.total}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{phrase.teachers}}</td>
+                                <td>{{stats.teachers.activated}}</td>
+                                <td>{{stats.teachers.inactivated}}</td>
+                                <td>{{stats.teachers.total}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{phrase.students}}</td>
+                                <td>{{stats.students.activated}}</td>
+                                <td>{{stats.students.inactivated}}</td>
+                                <td>{{stats.students.total}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{phrase.parents}}</td>
+                                <td>{{stats.parents.activated}}</td>
+                                <td>{{stats.parents.inactivated}}</td>
+                                <td>{{stats.parents.total}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{phrase.employees}}</td>
+                                <td>{{stats.employee.activated}}</td>
+                                <td>{{stats.employee.inactivated}}</td>
+                                <td>{{stats.employee.total}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row" ng-show="views.stdAttendance">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm btn-danger btn-flat pull-right card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.studentAttendance}}</h4>
+                <div>
+
+                    <form class="form-horizontal" ng-submit="statsAttendance()" name="attendance" novalidate>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId" ng-change="subjectList()">
+                                    <option ng-repeat="(key,value) in attendanceStats.classes" value="{{key}}">{{value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': attendance.sectionId.$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.section}} *</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.sectionId" ng-required="$root.dashboardData.enableSections == '1'" name="sectionId">
+                                    <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-show="attendanceStats.attendanceModel == 'subject'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Subject}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.subjectId" name="subjectId">
+                                    <option ng-repeat="subject in subjects" value="{{subject.id}}">{{subject.subjectTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': attendance.attendanceDayFrom.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="attendanceDayFrom" ng-model="form.attendanceDayFrom" class="form-control datemask" id="datemask1" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': attendance.attendanceDayTo.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="attendanceDayTo" ng-model="form.attendanceDayTo" class="form-control datemask" id="datemask2" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Status}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.status" name="status">
+                                    <option value="All">{{phrase.all}}</option>
+                                    <option value="1">{{phrase.Present}}</option>
+                                    <option value="0">{{phrase.Absent}}</option>
+                                    <option value="2">{{phrase.Late}}</option>
+                                    <option value="3">{{phrase.LateExecuse}}</option>
+                                    <option value="4">{{phrase.earlyDismissal}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="attendance.$invalid">{{phrase.attendanceSearch}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.stdAttendanceReport">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" ng-click="statsAttendanceExport('excel')" target="_BLANK">{{phrase.ExportExcel}}</a>
+                            <a class="dropdown-item" ng-click="statsAttendanceExport('pdf')" target="_BLANK">{{phrase.ExportPDF}}</a>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.attendanceStats}}</h4>
+                <div class="">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.studentName}}</th>
+                                <th ng-show="$root.dashboardData.attendanceModel=='subject'">{{phrase.Subject}}</th>
+                                <th>{{phrase.Attendance}}</th>
+                                <th>{{phrase.notes}}</th>
+                            </tr>
+                            <tr ng-repeat="student in attendanceData">
+                                <td>{{student.studentRollId}}</td>
+                                <td>{{student.date}}</td>
+                                <td><a href="javascript:void(0)" ng-click="studentProfile( student.studentId )">{{student.studentName}}</a></td>
+                                <td ng-show="$root.dashboardData.attendanceModel=='subject'">{{student.studentSubject}}</td>
+                                <td>
+                                    <div>
+                                        <span ng-show="student.status =='0'">{{phrase.Absent}}</span>
+                                        <span ng-show="student.status =='1'">{{phrase.Present}}</span>
+                                        <span ng-show="student.status =='2'">{{phrase.Late}}</span>
+                                        <span ng-show="student.status =='3'">{{phrase.LateExecuse}}</span>
+                                        <span ng-show="student.status =='4'">{{phrase.earlyDismissal}}</span>
+                                    </div>
+                                </td>
+                                <td>{{student.attNotes}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.stfAttendance">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.staffAttendance}}</h4>
+                <div class="">
+
+                    <form class="form-horizontal" ng-submit="staffAttendance()" name="attendance" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': attendance.attendanceDayFrom.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="attendanceDayFrom" ng-model="form.attendanceDayFrom" class="form-control datemask" id="datemask3" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': attendance.attendanceDayTo.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}}</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="attendanceDayTo" ng-model="form.attendanceDayTo" class="form-control datemask" id="datemask4" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Status}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.status" name="status">
+                                    <option value="All">{{phrase.all}}</option>
+                                    <option value="1">{{phrase.Present}}</option>
+                                    <option value="0">{{phrase.Absent}}</option>
+                                    <option value="2">{{phrase.Late}}</option>
+                                    <option value="3">{{phrase.LateExecuse}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="attendance.$invalid">{{phrase.attendanceSearch}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.stfAttendanceReport">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <div class="pull-right card-block-input-group card-block-input-item">
+                    <div class="btn-group no-print">
+                        <button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+                        <button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">{{phrase.toggleDropdown}}</span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" ng-click="staffAttendanceExport('excel')" target="_BLANK">{{phrase.ExportExcel}}</a>
+                            <a class="dropdown-item" ng-click="staffAttendanceExport('pdf')" target="_BLANK">{{phrase.ExportPDF}}</a>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="card-title">{{phrase.attendanceStats}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.Attendance}}</th>
+                                <th ng-show="$root.dashboardData.sAttendanceInOut == '1'">{{phrase.in}}</th>
+                                <th ng-show="$root.dashboardData.sAttendanceInOut == '1'">{{phrase.out}}</th>
+                            </tr>
+                            <tr ng-repeat="student in attendanceData">
+                                <td>{{student.date}}</td>
+                                <td><a href="javascript:void(0)" ng-click="teacherProfile( student.studentId )">{{student.studentName}}</a></td>
+                                <td>
+                                    <div>
+                                        <span ng-show="student.status =='0'">{{phrase.Absent}}</span>
+                                        <span ng-show="student.status =='1'">{{phrase.Present}}</span>
+                                        <span ng-show="student.status =='2'">{{phrase.Late}}</span>
+                                        <span ng-show="student.status =='3'">{{phrase.LateExecuse}}</span>
+                                    </div>
+                                </td>
+                                <td ng-show="$root.dashboardData.sAttendanceInOut == '1'">
+                                    {{student.in_time}}
+                                </td>
+                                <td ng-show="$root.dashboardData.sAttendanceInOut == '1'">
+                                    {{student.out_time}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.stVacation">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.studentVacation}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="getVacation()" name="vacation" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': vacation.fromDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="fromDate" ng-model="form.fromDate" class="form-control datemask" id="datemask5" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': vacation.toDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="toDate" ng-model="form.toDate" class="form-control datemask" id="datemask6" required>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="vacation.$invalid">{{phrase.getVacation}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.teacherVacation">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.teacherVacation}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="gettVacation()" name="tvacation" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': tvacation.fromDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="fromDate" ng-model="form.fromDate" class="form-control datemask" id="datemask7" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': tvacation.toDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="toDate" ng-model="form.toDate" class="form-control datemask" id="datemask8" required>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="tvacation.$invalid">{{phrase.getVacation}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.vacationList">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <a class="no-print" href="javascript:window.print()"><button class="btn pull-right btn-success card-block-input-item no-print">{{phrase.Print}}</button></a>
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item no-print">Back</button>
+                <h4 class="card-title">{{phrase.vacationList}}</h4>
+                <div class="form">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.user}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.Status}}</th>
+                                <th>{{phrase.Remove}}</th>
+                            </tr>
+                            <tr ng-repeat="report in vacationData">
+                                <td>{{report.fullName}}</td>
+                                <td>{{report.vacDate}}</td>
+                                <td>
+                                    <span ng-show="report.acceptedVacation == '1'">{{phrase.acceptedVacation}}</span>
+                                    <span ng-show="report.acceptedVacation == '0'">{{phrase.rejectedVacation}}</span>
+                                </td>
+                                <td><button class="btn btn-info btn-circle" type="button" ng-click="removeVacation(report.id,$index)">{{phrase.Remove}}</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.paymentsReports">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.paymentsReports}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="getPayments()" name="payments" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': payments.fromDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="fromDate" ng-model="form.fromDate" class="form-control datemask" id="datemask9" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': payments.toDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="toDate" ng-model="form.toDate" class="form-control datemask" id="datemask10" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': payments.payment_status.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.Status}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.payment_status" name="payment_status" required>
+                                    <option value="All">{{phrase.all}}</option>
+                                    <option value="1">{{phrase.paid}}</option>
+                                    <option value="2">PARTIALLY PAID</option>
+                                    <option value="0">{{phrase.unpaid}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.dueInvoices}}</label>
+                            <div class="col-sm-10 control-label col-form-label">
+                                <label class="form-check-label"><input type="checkbox" class="form-check-input" ng-model="form.dueInv" value="1"> {{phrase.showDueInvOnly}}</label>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="payments.$invalid">{{phrase.getPaymentReports}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.paymentsResult">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <a class="no-print" href="javascript:window.print()"><button class="btn pull-right btn-success card-block-input-item no-print">{{phrase.Print}}</button></a>
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item no-print no-print">Back</button>
+                <h4 class="card-title">{{phrase.listPayments}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.ID}}</th>
+                                <th>{{phrase.InvTitle}}</th>
+                                <th>{{phrase.dateDueDate}}</th>
+                                <th>{{phrase.student}}</th>
+                                <th width="180">{{phrase.Amount}} <br/> {{phrase.discoutedAmount}} <br/> {{phrase.paidAmount}}</th>
+                                <th>{{phrase.Status}}</th>
+                            </tr>
+                            <tr ng-repeat="invoice in payments">
+                                <td><a class="ahref" ng-click="seeInvoice(invoice.id)">{{invoice.paymentTitle}}</a></td>
+                                <td>{{invoice.paymentDescription}}</td>
+                                <td>{{invoice.paymentDate}}<Br/>{{invoice.dueDate}}</td>
+                                <td>
+                                    <img alt="{{invoice.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+invoice.studentId}}">
+                                    <a href="" ng-click="studentProfile( invoice.studentId )">{{invoice.fullName}}</a>
+                                </td>
+                                <td>{{currency_symbol}} {{invoice.paymentAmount}} <br/> {{currency_symbol}} {{invoice.paymentDiscounted}} <br/> {{currency_symbol}} {{invoice.paidAmount}}</td>
+                                <td>
+                                    <span ng-click="alertPaidData(invoice.id)" ng-show="invoice.paymentStatus == '1'" style='color:green;cursor:pointer;'>{{phrase.paid}}</span>
+                                    <span ng-show="invoice.paymentStatus == '0'" style='color:red;'>{{phrase.unpaid}}</span>
+                                    <span ng-show="invoice.paymentStatus == '2'" style='color:red;'>{{phrase.ppaid}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="!payments.length"><td class="noTableData" colspan="7">{{phrase.noPayments}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.expensesReports">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.expensesReports}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="getExpenses()" name="expenses" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': expenses.fromDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="fromDate" ng-model="form.fromDate" class="form-control datemask" id="datemask20" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': expenses.toDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="toDate" ng-model="form.toDate" class="form-control datemask" id="datemask21" required>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="expenses.$invalid">{{phrase.expensesReports}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.expensesReportsResults">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <a href="javascript:window.print()"><button class="btn pull-right btn-success card-block-input-item no-print">{{phrase.Print}}</button></a>
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item no-print">Back</button>
+                <h4 class="card-title">{{phrase.Expenses}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.expenseTitle}}</th>
+                                <th>{{phrase.Category}}</th>
+                                <th>{{phrase.expenseAmount}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.notes}} </th>
+                            </tr>
+                            <tr ng-repeat="expense in expenses">
+                                <td>{{expense.expenseTitle}}</td>
+                                <td>{{expense.expenses_cat_name}}</td>
+                                <td>{{currency_symbol}} {{expense.expenseAmount}}</td>
+                                <td>{{expense.expenseDate}}</td>
+                                <td>{{expense.expenseNotes}}</td>
+                            </tr>
+                            <tr ng-show="!expenses.length"><td class="noTableData" colspan="7">{{phrase.noPayments}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.incomeReports">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.incomeReports}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="getIncome()" name="income" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': income.fromDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="fromDate" ng-model="form.fromDate" class="form-control datemask" id="datemask22" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': income.toDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="toDate" ng-model="form.toDate" class="form-control datemask" id="datemask23" required>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="income.$invalid">{{phrase.incomeReports}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.incomeReportsResults">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <a href="javascript:window.print()"><button class="btn pull-right btn-success card-block-input-item no-print">{{phrase.Print}}</button></a>
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item no-print">Back</button>
+                <h4 class="card-title">{{phrase.incomeReports}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.incomeTitle}}</th>
+                                <th>{{phrase.Category}}</th>
+                                <th>{{phrase.incomeAmount}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.notes}} </th>
+                            </tr>
+                            <tr ng-repeat="income in incomes">
+                                <td>{{income.incomeTitle}}</td>
+                                <td>{{income.income_cat_name}}</td>
+                                <td>{{currency_symbol}} {{income.incomeAmount}}</td>
+                                <td>{{income.incomeDate}}</td>
+                                <td>{{income.incomeNotes}}</td>
+                            </tr>
+                            <tr ng-show="!incomes.length"><td class="noTableData" colspan="5">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.marksheetGeneration">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.marksheetGen}}</h4>
+                <div class="table-responsive">
+
+                    <form class="form-horizontal" target="_blank" name="marksheetGeneration" method="POST" action="index.php/students/printbulk/marksheet" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': marksheetGeneration.classId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId" required>
+                                    <option ng-repeat="(key,value) in classes" value="{{value.id}}">{{value.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': marksheetGeneration.examId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.examsList}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.examId" name="examId" required>
+                                    <option ng-repeat="(key,value) in exams" value="{{value.id}}">{{value.examTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="marksheetGeneration.$invalid">{{phrase.marksheetGen}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.biometric_users_table">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <a href="javascript:window.print()"><button class="btn pull-right btn-success card-block-input-item no-print">{{phrase.Print}}</button></a>
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item no-print">Back</button>
+                <h4 class="card-title">{{phrase.bioUsers}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.username}}</th>
+                                <th>{{phrase.FullName}}</th>
+                                <th>{{phrase.role}}</th>
+                                <th>{{phrase.bioId}}</th>
+                            </tr>
+                            <tr ng-repeat="user in biometric_users">
+                                <td>{{user.username}}</td>
+                                <td>{{user.fullName}}</td>
+                                <td>{{user.role}}</td>
+                                <td>{{user.biometric_id}}</td>
+                            </tr>
+                            <tr ng-show="!biometric_users.length"><td class="noTableData" colspan="4">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.payRollReports">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.payrollReports}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="getPayroll()" name="income" novalidate>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': income.fromDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.from}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="fromDate" ng-model="form.fromDate" class="form-control datemask" id="datemask24" required>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="z-index: 999999999;" ng-class="{'has-error': income.toDate.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.to}} *</label>
+                            <div class="col-sm-10">
+                                <input type="text" date-picker name="toDate" ng-model="form.toDate" class="form-control datemask" id="datemask25" required>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="income.$invalid">{{phrase.payrollReports}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.payRollReportsResults">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <a href="javascript:window.print()"><button class="btn pull-right btn-success no-print card-block-input-item no-print">{{phrase.Print}}</button></a>
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item no-print no-print">Back</button>
+                <h4 class="card-title">{{phrase.payrollReports}}</h4>
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>{{phrase.user}}</th>
+                                <th>{{phrase.salaryDetails}}</th>
+                                <th>{{phrase.salaryForDate}}</th>
+                                <th>{{phrase.Date}}</th>
+                                <th>{{phrase.Amount}}</th>
+                                <th>{{phrase.method}}</th>
+                                <th>{{phrase.Comments}}</th>
+                            </tr>
+                            <tr ng-repeat="payment in payrollPayment_list">
+                                <td>{{payment.fullName}} [{{payment.username}}] <br/> {{payment.email}}<br/> </td>
+                                <td>
+                                    {{payment.salary_type}}<br/>
+                                    <span ng-show="payment.salary_type == 'monthly'">
+                                        {{phrase.netSalary}} : {{currency_symbol}}{{payment.salary_value}}
+                                        <br/>
+                                        {{phrase.overtime}} : {{payment.hour_count}} x {{currency_symbol}}{{payment.hour_overtime}}
+                                    </span>
+                                    <span ng-show="payment.salary_type == 'hourly'">
+                                        {{phrase.rate}} : {{payment.hour_count}} x {{currency_symbol}}{{payment.salary_value}}
+                                    </span>
+                                </td>
+                                <td>{{payment.pay_month}} / {{payment.pay_year}}</td>
+                                <td>{{payment.pay_date}}</td>
+                                <td>{{currency_symbol}}{{payment.pay_amount}}</td>
+                                <td>{{payment.pay_method}}</td>
+                                <td>{{payment.pay_comments}}</td>
+                            </tr>
+                            <tr ng-show="!payrollPayment_list.length"><td class="noTableData" colspan="6">{{phrase.noDataAvailable}}</td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="views.gen_cert">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-block">
+                <button ng-click="changeView('list')" class="btn btn-sm pull-right btn-danger card-block-input-item">Back</button>
+                <h4 class="card-title">{{phrase.gen_cert}}</h4>
+                <div class="form">
+
+                    <form class="form-horizontal" ng-submit="certGetStdList()" name="genCert" novalidate>
+                        <div class="form-group row" ng-class="{'has-error': genCert.certId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.cert_name}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.certId" name="certId" required>
+                                    <option ng-repeat="cert in certs" value="{{cert.id}}">{{cert.certificate_name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': genCert.classId.$invalid}">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.class}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.classId" name="classId" required ng-change="subjectList()">
+                                    <option ng-repeat="class in classes" value="{{class.id}}">{{class.className}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error': genCert.sectionId.$invalid}" ng-show="$root.dashboardData.enableSections == '1'">
+                            <label class="pb-2 pl-3 control-label col-form-label">{{phrase.section}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="form.sectionId" ng-required="$root.dashboardData.enableSections == '1'" name="sectionId">
+                                    <option ng-repeat="section in sections" value="{{section.id}}">{{section.sectionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="genCert.$invalid">{{phrase.searchUsers}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form class="form-horizontal" novalidate ng-show="certUsersList">
+
+                        <table class="table table-hover table-bordered" style="margin-top: 30px;">
+                            <tbody>
+                                <tr>
+                                    <th>{{phrase.select}}</th>
+                                    <th>{{phrase.user}}</th>
+                                    <th>{{phrase.username}}</th>
+                                    <th>{{phrase.email}}</th>
+                                </tr>
+                                <tr ng-repeat="user in certUsersList">
+                                    <td>
+                                        <input type="checkbox" checklist-model="form.selected_users" checklist-value="user.id">
+                                    </td>
+                                    <td>
+                                        <img alt="{{user.fullName}}" class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+user.id}}">
+                                        <a href="" ng-click="studentProfile( user.id )">{{user.fullName}}</a>
+                                    </td>
+                                    <td>
+                                        {{user.username}}
+                                    </td>
+                                    <td>{{user.email}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="form-group m-b-0">
+                            <div class="col-sm-12">
+                                <button type="submit" ng-click="printCertificate()" class="btn btn-info waves-effect waves-light">{{phrase.gen_cert}}</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+
+                    <div id="printableArea" style="display: none;">
+                        <div ng-repeat="user in printCertInfo.users">
+                            <div style="height: 210mm;width: 297mm;">
+                                <img src="https://upload.cutebrains.com/cert/{{printCertInfo.certificate.certificate_image}}" class="cert-bg" style="height: 210mm;width: 297mm; position: absolute; z-index: 1;" />
+                                <div style="padding-top: {{printCertInfo.margins.content_margin.top}};padding-left: {{printCertInfo.margins.content_margin.left}};padding-right: {{printCertInfo.margins.content_margin.left}};">
+
+                                    <div class="row">
+                                        <div class="col-sm-6 header_left" style="padding-top: {{printCertInfo.margins.header_left.top}}; padding-left: {{printCertInfo.margins.header_left.left}};z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.header_left,user)"></span>
+                                        </div>
+                                        <div class="col-sm-6 header_right text-right" style="padding-top: {{printCertInfo.margins.header_left.top}}; padding-right: {{printCertInfo.margins.header_left.right}};z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.header_right,user)"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12 header_middle text-center" style="padding-top: {{printCertInfo.margins.header_middle.top}}; z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.header_middle,user)"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div id="main_title" class="col-sm-12 main_title text-center" style="padding-top: {{printCertInfo.margins.main_title.top}}; z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.main_title,user)"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12 main_content" style="padding-top: {{printCertInfo.margins.main_content.top}}; z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.main_content,user)"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4 footer_left" style="padding-top: {{printCertInfo.margins.footer_left.top}}; padding-left: {{printCertInfo.margins.footer_left.left}};z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.footer_left,user)"></span>
+                                        </div>
+                                        <div class="col-sm-4 footer_middle text-center" style="padding-top: {{printCertInfo.margins.footer_middle.top}};z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.footer_middle,user)"></span>
+                                        </div>
+                                        <div class="col-sm-4 footer_right text-right" style="padding-top: {{printCertInfo.margins.footer_right.top}}; padding-right: {{printCertInfo.margins.footer_right.right}};z-index: 2;">
+                                            <span ng-bind-html="processvars(printCertInfo.certificate.footer_right,user)"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div style="page-break-before: always;" ng-if="!$last"> </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<modal visible="showModal"><div ng-bind-html="modalContent"></div></modal>

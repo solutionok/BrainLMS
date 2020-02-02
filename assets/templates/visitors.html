@@ -1,0 +1,658 @@
+<div class="row page-titles no-print">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.visitors}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<div ng-show="$root.can('visitors.Export')" class="pull-right card-block-input-group card-block-input-item">
+					<div class="btn-group no-print">
+						<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+						<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only">{{phrase.toggleDropdown}}</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="index.php/visitors/export/excel">{{phrase.ExportExcel}}</a>
+							<a class="dropdown-item" href="index.php/visitors/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+						</div>
+					</div>
+				</div>
+				<button ng-show="$root.can('visitors.add_vis')" ng-click="changeView('add')" class="btn pull-right btn-success card-block-input-item">{{phrase.add_vis}}</button>
+				<div class="pull-right card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<h4 class="card-title">{{phrase.list_vis}}</h4>
+				<div class="table-responsive">
+
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.pass_id}}</th>
+								<th>{{phrase.visitor}}</th>
+								<th>{{phrase.id_pass}}</th>
+								<th>{{phrase.usr_typ}}</th>
+								<th>{{phrase.to_meet}}</th>
+								<th>{{phrase.purpose}}</th>
+								<th>{{phrase.chkin}}</th>
+								<th>{{phrase.chkout}}</th>
+								<th style="width:160px;" ng-show="$root.can('visitors.edit_vis') || $root.can('visitors.del_vis')" >Action</th>
+							</tr>
+							<tr dir-paginate="visitors_one in visitors | itemsPerPage:10" total-items="totalItems">
+								<td>
+									<a ng-show="$root.can('visitors.View')" href="portal#/visitors/{{visitors_one.id}}">{{visitors_one.pass_id}}</a>
+									<span ng-show="!$root.can('visitors.View')">{{visitors_one.pass_id}}</span>
+								</td>
+								<td>
+									{{visitors_one.fullName}}
+									<span ng-show="visitors_one.phoneNo != ''">{{visitors_one.phoneNo}}</span>
+									<span ng-show="visitors_one.email != ''">{{visitors_one.email}}</span>
+								</td>
+								<td>{{visitors_one.id_pass_id}}</td>
+								<td>
+									<span ng-switch="visitors_one.usr_type">
+										<span ng-switch-when="parent">{{phrase.parent}}</span>
+										<span ng-switch-when="company">{{phrase.company}}</span>
+									</span>
+									<span ng-show="visitors_one.usr_type == 'parent'" class="list_user_item" ng-repeat="userOne in visitors_one.student"><img class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+userOne.id}}">{{userOne.user}}<br/></span>
+									<span ng-show="visitors_one.usr_type == 'company'"><br/>{{visitors_one.comp_name}}</span>
+								</td>
+								<td>
+									<span class="list_user_item" ng-repeat="userOne in visitors_one.to_meet"><img class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+userOne.id}}">{{userOne.user}}<br/></span>
+								</td>
+								<td>{{wel_office[visitors_one.purpose]}}</td>
+								<td>{{visitors_one.check_in.date}} {{visitors_one.check_in.hour}}:{{visitors_one.check_in.min}} {{visitors_one.check_in.ampm}}</td>
+								<td>
+									<span ng-show="visitors_one.check_out.date != '' && visitors_one.check_out.hour != '' && visitors_one.check_out.min != '' && visitors_one.check_out.ampm != ''">
+										{{visitors_one.check_out.date}} {{visitors_one.check_out.hour}}:{{visitors_one.check_out.min}} {{visitors_one.check_out.ampm}}
+									</span>
+								</td>
+								<td ng-show="$root.can('visitors.edit_vis') || $root.can('visitors.del_vis')">
+									<button ng-show="$root.can('visitors.edit_vis') && (visitors_one.check_out.date == '' || !visitors_one.check_out.date )" ng-click="check_out(visitors_one.id)" type="button" class="btn btn-success btn-circle" title="{{phrase.chkout}}" ><i class="fa fa-sign-out"></i></button>
+									<button ng-show="$root.can('visitors.edit_vis')" ng-click="edit(visitors_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+									<button ng-show="$root.can('visitors.del_vis')" ng-click="remove(visitors_one,$index)" type="button" class="btn btn-danger btn-circle" title="{{phrase.Remove}}" ><i class="fa fa-trash-o"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!visitors.length"><td class="noTableData" colspan="11">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.add">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.add_vis}}</h4>
+				<div class="table-responsive">
+
+					<form class="form-horizontal" name="visitors_add_form" role="form" ng-submit="saveAdd()" novalidate>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.pass_id.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.pass_id}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="pass_id" ng-model="form.pass_id" class="form-control" placeholder="{{phrase.pass_id}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.fullName.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="fullName" ng-model="form.fullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.phoneNo.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.email.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.id_pass_id.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.id_pass}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="id_pass_id" ng-model="form.id_pass_id" class="form-control" required placeholder="{{phrase.id_pass}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.no_pers.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.no_pers}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="no_pers" ng-model="form.no_pers" class="form-control" placeholder="{{phrase.no_pers}}">
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.usr_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.usr_typ}} *</label>
+							<div class="col-sm-10">
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="usr_type" value="parent" ng-model="form.usr_type" required> {{phrase.parent}}
+									</label>
+								</div>
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="usr_type" value="company" ng-model="form.usr_type" required> {{phrase.company}}
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-show="form.usr_type == 'parent'" ng-class="{'has-error': visitors_add_form.student.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.student}} </label>
+							<div class="col-sm-10">
+								<button type="button" ng-click="openSearchModal_student()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+								<input type="text" name="student_ser" ng-model="form.student_ser" style="display:none;">
+								<div class="row" ng-repeat="userOne in form.student track by $index">
+									<div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="userOne.user"></div>
+									<button type="button" ng-click="removeUserSearch_student(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-show="form.usr_type == 'parent'" ng-class="{'has-error': visitors_add_form.std_relation.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Relation}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="std_relation" ng-model="form.std_relation" class="form-control" placeholder="{{phrase.Relation}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-show="form.usr_type == 'company'" ng-class="{'has-error': visitors_add_form.comp_name.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_name}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="comp_name" ng-model="form.comp_name" class="form-control" placeholder="{{phrase.comp_name}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.to_meet.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.to_meet}} </label>
+							<div class="col-sm-10">
+								<button type="button" ng-click="openSearchModal_to_meet()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+								<input type="text" name="to_meet_ser" ng-model="form.to_meet_ser" style="display:none;">
+								<div class="row" ng-repeat="userOne in form.to_meet track by $index">
+									<div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="userOne.user"></div>
+									<button type="button" ng-click="removeUserSearch_to_meet(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.purpose.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.purpose}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="purpose" ng-model="form.purpose" required>
+									<option ng-repeat="(key,item) in wel_office" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form['check_in[date]'].$invalid || visitors_add_form['check_in[hour]'].$invalid || visitors_add_form['check_in[min]'].$invalid || visitors_add_form['check_in[ampm]'].$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkin}} </label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="check_inـadd" name="check_in[date]" ng-model="form.check_in.date" class="form-control check_in_add" placeholder="{{phrase.chkin}}" >
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_in[hour]" required ng-model="form.check_in.hour" >
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_in[min]" required ng-model="form.check_in.min" >
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_in[ampm]" required ng-model="form.check_in.ampm" >
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.check_out.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkout}} </label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="check_outـadd" name="check_out[date]" ng-model="form.check_out.date" class="form-control check_out_add" placeholder="{{phrase.chkout}}" >
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_out[hour]" ng-model="form.check_out.hour" >
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_out[min]" ng-model="form.check_out.min" >
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_out[ampm]" ng-model="form.check_out.ampm" >
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.docs.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.docs}} </label>
+							<div class="col-sm-10">
+								<input type="file" name="docs" file-model="form.docs">
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_add_form.visit_notes.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="visit_notes" class="form-control" ng-model="form.visit_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="visitors_add_form.$invalid">{{phrase.add_vis}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_vis}}</h4>
+				<div class="table-responsive">
+
+					<form class="form-horizontal" name="visitors_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    	<div class="form-group row" ng-class="{'has-error': visitors_edit_form.pass_id.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.pass_id}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="pass_id" ng-model="form.pass_id" class="form-control" placeholder="{{phrase.pass_id}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.fullName.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="fullName" ng-model="form.fullName" class="form-control" placeholder="{{phrase.FullName}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.phoneNo.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+							<div class="col-sm-10">
+								<input type="text" mobile-number name="phoneNo" ng-model="form.phoneNo" class="form-control" placeholder="{{phrase.phoneNo}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.email.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="email" ng-model="form.email" class="form-control" placeholder="{{phrase.email}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.id_pass_id.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.id_pass}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="id_pass_id" ng-model="form.id_pass_id" class="form-control" required placeholder="{{phrase.id_pass}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.no_pers.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.no_pers}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="no_pers" ng-model="form.no_pers" class="form-control" placeholder="{{phrase.no_pers}}">
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.usr_type.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.usr_typ}} *</label>
+							<div class="col-sm-10">
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="usr_type" value="parent" ng-model="form.usr_type" required> {{phrase.parent}}
+									</label>
+								</div>
+								<div class="radio-list">
+									<label>
+										<input type="radio" name="usr_type" value="company" ng-model="form.usr_type" required> {{phrase.company}}
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-show="form.usr_type == 'parent'" ng-class="{'has-error': visitors_edit_form.student.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.student}} </label>
+							<div class="col-sm-10">
+								<button type="button" ng-click="openSearchModal_student()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+								<input type="text" name="student_ser" ng-model="form.student_ser" style="display:none;">
+								<div class="row" ng-repeat="userOne in form.student track by $index">
+									<div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="userOne.user"></div>
+									<button type="button" ng-click="removeUserSearch_student(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-show="form.usr_type == 'parent'" ng-class="{'has-error': visitors_edit_form.std_relation.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Relation}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="std_relation" ng-model="form.std_relation" class="form-control" placeholder="{{phrase.Relation}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-show="form.usr_type == 'company'" ng-class="{'has-error': visitors_edit_form.comp_name.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_name}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="comp_name" ng-model="form.comp_name" class="form-control" placeholder="{{phrase.comp_name}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.to_meet.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.to_meet}} </label>
+							<div class="col-sm-10">
+								<button type="button" ng-click="openSearchModal_to_meet()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+								<input type="text" name="to_meet_ser" ng-model="form.to_meet_ser" style="display:none;">
+								<div class="row" ng-repeat="userOne in form.to_meet track by $index">
+									<div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="userOne.user"></div>
+									<button type="button" ng-click="removeUserSearch_to_meet(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.purpose.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.purpose}} </label>
+							<div class="col-sm-10">
+								<select class="form-control" name="purpose" ng-model="form.purpose" required>
+									<option ng-repeat="(key,item) in wel_office" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form['check_in[date]'].$invalid || visitors_edit_form['check_in[hour]'].$invalid || visitors_edit_form['check_in[min]'].$invalid || visitors_edit_form['check_in[ampm]'].$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkin}} </label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="check_inـadd" name="check_in[date]" ng-model="form.check_in.date" class="form-control check_in_add" placeholder="{{phrase.chkin}}" >
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_in[hour]" ng-model="form.check_in.hour" >
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_in[min]" ng-model="form.check_in.min" >
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_in[ampm]" ng-model="form.check_in.ampm" >
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.check_out.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkout}} </label>
+							<div class="col-sm-7">
+								<input type="text" date-picker id="check_outـadd" name="check_out[date]" ng-model="form.check_out.date" class="form-control check_out_add" placeholder="{{phrase.chkout}}" >
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_out[hour]" ng-model="form.check_out.hour" >
+									<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_out[min]" ng-model="form.check_out.min" >
+									<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+								</select>
+							</div>
+							<div class="col-sm-1">
+								<select class="form-control" name="check_out[ampm]" ng-model="form.check_out.ampm" >
+									<option value="AM">AM</option><option value="PM">PM</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.docs.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.docs}} </label>
+							<div class="col-sm-10">
+								<a ng-show="form.docs != ''" href="index.php/visitors/download/{{form.id}}">{{phrase.viewFile}}</a><span style="margin-right:10px;" ng-show="form.docs != ''">, {{phrase.orUpNew}}</span><input type="file" name="docs" file-model="form.docs">
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': visitors_edit_form.visit_notes.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="visit_notes" class="form-control" ng-model="form.visit_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="visitors_edit_form.$invalid">{{phrase.edit_vis}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.view">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button class="btn no-print pull-right btn-success btn-default" onclick="window.print();"><i class="fa fa-print"></i> {{phrase.Print}}</button>
+				<a href="portal#/visitors" class="btn btn-sm btn-danger no-print btn-flat pull-right card-block-input-item">Back</a>
+				<h4 class="card-title">{{phrase.visitors}} : {{form.pass_id}}</h4>
+				<div class="table-responsive">
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.pass_id}} </label>
+						<div class="col-sm-10">
+							{{form.pass_id}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} </label>
+						<div class="col-sm-10">
+							{{form.fullName}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.phoneNo}} </label>
+						<div class="col-sm-10">
+							{{form.phoneNo}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.email}} </label>
+						<div class="col-sm-10">
+							{{form.email}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.id_pass}} </label>
+						<div class="col-sm-10">
+							{{form.id_pass_id}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.no_pers}} </label>
+						<div class="col-sm-10">
+							{{form.no_pers}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.usr_typ}} </label>
+						<div class="col-sm-10">
+							<span ng-switch="form.usr_type">
+								<span ng-switch-when="parent">{{phrase.parent}}</span>
+								<span ng-switch-when="company">{{phrase.company}}</span>
+							</span>
+						</div>
+					</div>
+					<div class="form-group row" ng-show="form.usr_type == 'parent'">
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.student}} </label>
+						<div class="col-sm-10">
+							<span style="padding-right:25px;" class="list_user_item" ng-repeat="userOne in form.student"><img class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+userOne.id}}">{{userOne.user}}<br/></span>
+						</div>
+					</div>
+					<div class="form-group row" ng-show="form.usr_type == 'parent'">
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Relation}} </label>
+						<div class="col-sm-10">
+							{{form.std_relation}}
+						</div>
+					</div>
+					<div class="form-group row" ng-show="form.usr_type == 'company'">
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.comp_name}} </label>
+						<div class="col-sm-10">
+							{{form.comp_name}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.to_meet}} </label>
+						<div class="col-sm-10">
+							<span style="padding-right:25px;" class="list_user_item" ng-repeat="userOne in form.to_meet"><img class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+userOne.id}}">{{userOne.user}}<br/></span>
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.purpose}} </label>
+						<div class="col-sm-10">
+							{{wel_office[form.purpose]}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkin}} </label>
+						<div class="col-sm-10">
+							{{form.check_in.date}} {{form.check_in.hour}}:{{form.check_in.min}} {{form.check_in.ampm}}
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkout}} </label>
+						<div class="col-sm-10">
+							<span ng-show="form.check_out.date != '' && form.check_out.hour != '' && form.check_out.min != '' && form.check_out.ampm != ''">{{form.check_out.date}} {{form.check_out.hour}}:{{form.check_out.min}} {{form.check_out.ampm}}</span>
+							<button ng-show="$root.can('visitors.edit_vis') && (form.check_out.date == '' || !form.check_out.date )" ng-click="check_out(form.id)" type="button" class="btn btn-success btn-circle" title="{{phrase.chkout}}" ><i class="fa fa-sign-out"></i></button>
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.docs}} </label>
+						<div class="col-sm-10">
+							<a ng-show="form.docs != ''" href="index.php/visitors/download/{{form.id}}">{{phrase.Download}}</a>
+						</div>
+					</div>
+					<div class="form-group row" >
+						<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+						<div class="col-sm-10">
+							{{form.visit_notes}}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<modal visible="showUsrSearchModal_student">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink_student" placeholder="{{phrase.typeUsrSearch}}">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="searchUserButton_student()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="user in searchResults_student">
+                            <td>{{user.name}}</td>
+                            <td>{{user.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="serachUserFinish_student(user)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>
+
+<modal visible="showUsrSearchModal_to_meet">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink_to_meet" placeholder="{{phrase.typeUsrSearch}}">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="searchUserButton_to_meet()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="user in searchResults_to_meet">
+                            <td>{{user.name}}</td>
+                            <td>{{user.email}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="serachUserFinish_to_meet(user)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>
+
+<modal visible="chkout_modal">
+	<form class="form-horizontal" name="visitors_edit_form" role="form" ng-submit="check_out_apply()" novalidate>
+    	<div class="form-group row">
+			<label class="pb-2 pl-3 control-label col-form-label">{{phrase.pass_id}} *</label>
+			<div class="col-sm-10">
+				{{form.pass_id}}
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="pb-2 pl-3 control-label col-form-label">{{phrase.FullName}} *</label>
+			<div class="col-sm-10">
+				{{form.fullName}}
+			</div>
+		</div>
+		<div class="form-group row" ng-class="{'has-error': visitors_edit_form['check_in[date]'].$invalid || visitors_edit_form['check_in[hour]'].$invalid || visitors_edit_form['check_in[min]'].$invalid || visitors_edit_form['check_in[ampm]'].$invalid}">
+			<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkin}} </label>
+			<div class="col-sm-10">
+				{{form.check_in.date}} {{form.check_in.hour}}:{{form.check_in.min}} {{form.check_in.ampm}}
+			</div>
+		</div>
+		<div class="form-group row" ng-class="{'has-error': visitors_edit_form.check_out.$invalid}">
+			<label class="pb-2 pl-3 control-label col-form-label">{{phrase.chkout}} </label>
+			<div class="col-sm-4">
+				<input type="text" date-picker id="check_outـadd" name="check_out[date]" ng-model="form.check_out.date" class="form-control check_out_add" placeholder="{{phrase.chkout}}" >
+			</div>
+			<div class="col-sm-2">
+				<select class="form-control" name="check_out[hour]" ng-model="form.check_out.hour" >
+					<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+				</select>
+			</div>
+			<div class="col-sm-2">
+				<select class="form-control" name="check_out[min]" ng-model="form.check_out.min" >
+					<option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+				</select>
+			</div>
+			<div class="col-sm-2">
+				<select class="form-control" name="check_out[ampm]" ng-model="form.check_out.ampm" >
+					<option value="AM">AM</option><option value="PM">PM</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group row" ng-class="{'has-error': visitors_edit_form.visit_notes.$invalid}">
+			<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+			<div class="col-sm-10">
+				{{form.visit_notes}}
+			</div>
+		</div>
+		<div class="form-group m-b-0">
+			<div class="offset-sm-2 col-sm-10">
+				<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="visitors_edit_form.$invalid">{{phrase.edit_vis}}</button>
+			</div>
+		</div>
+	</form>
+</modal>

@@ -1,0 +1,253 @@
+<style type="text/css">
+	.listTable tr td {
+		font-size: 13px;
+		padding: 5px;
+		white-space: normal;
+	}
+	.listTable tr th {
+		font-size: 15px;
+		padding: 8px 5px;
+	}
+	.listTable .options .btn-circle {
+		height: 25px;
+		width: 25px;
+		padding: 3px;
+	}
+	.view-list-block {
+		padding: 15px 10px;
+	}
+	.view-list-block .search-input {
+		margin-bottom: 12px
+	}
+	.page-titles h3 {
+		font-size: 22px;
+		text-align: left;
+	}
+</style>
+
+<div class="row page-titles" style="margin-bottom: -5px;">
+    <div class="col-12 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.issue_book}}</h3>
+        <!--a href="/portal#" class="btn btn-sm btn-danger" style="position: absolute; right: 15px; top: 3px;">
+      		<i class="fa fa-home"></i> Home
+      	</a-->
+    </div>
+</div>
+
+<div class="row" ng-show="views.list">
+	<div class="col-12">
+		<div class="card" style="margin-bottom: 0">
+			<div class="card-block view-list-block">
+				<div class="row">
+					<div class="col-8">
+						<div class="card-block-input-group card-block-input-item">
+							<div class="input-group input-group-sm search-input">
+								<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchDB()" class="form-control input-sm">
+								<span class="input-group-addon"><i class="fa fa-search"></i></span>
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div ng-show="$root.can('issue_book.Export')" class="pull-right card-block-input-group card-block-input-item">
+							<div class="btn-group no-print">
+								<button type="button" class="btn btn-success btn-flat">{{phrase.Export}}</button>
+								<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+									<span class="sr-only">{{phrase.toggleDropdown}}</span>
+								</button>
+								<div class="dropdown-menu" role="menu">
+									<a class="dropdown-item" href="index.php/library_issues/export/excel">{{phrase.ExportExcel}}</a>
+									<a class="dropdown-item" href="index.php/library_issues/export/pdf" target="_BLANK">{{phrase.ExportPDF}}</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="listTable table-responsive">
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.user}}</th>
+								<th>{{phrase.bookTitle}}</th>
+								<th>{{phrase.issue_date}}</th>
+								<th>{{phrase.ret_date}}</th>
+								<th ng-show="$root.can('issue_book.edit_issue') || $root.can('issue_book.del_issue')" >Action</th>
+							</tr>
+							<tr dir-paginate="library_issue_one in library_issue | itemsPerPage:10" total-items="totalItems">
+								<td>{{library_issue_one.issue_id}}</td>
+								<td>
+									<span class="list_user_item" ng-repeat="userOne in library_issue_one.user_id"><img class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+userOne.id}}">{{userOne.user}}<br/></span>
+								</td>
+								<td>{{books[library_issue_one.book_id]}}</td>
+								<td>{{library_issue_one.issue_date}}</td>
+								<td>{{library_issue_one.ret_date}}</td>
+								<td ng-show="$root.can('issue_book.edit_issue') || $root.can('issue_book.del_issue')">
+									<button ng-show="$root.can('issue_book.edit_issue')" ng-click="edit(library_issue_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.Edit}}" ><i class="fa fa-pencil"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!library_issue.length"><td class="noTableData" colspan="8">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.edit">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-block">
+				<button ng-click="changeView('list')" class="btn btn-danger btn-flat pull-right card-block-input-item">Cancel</button>
+				<h4 class="card-title">{{phrase.edit_issue}}</h4>
+				<div>
+
+					<form class="form-horizontal" name="library_issue_edit_form" role="form" ng-submit="saveEdit()" novalidate>
+                    						<div class="form-group row" ng-class="{'has-error': library_issue_edit_form.issue_id.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.issue_id}} *</label>
+							<div class="col-sm-10">
+								<input type="text" name="issue_id" ng-model="form.issue_id" class="form-control" placeholder="{{phrase.issue_id}}" required>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': library_issue_edit_form.user_id.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.user}} *</label>
+							<div class="col-sm-10">
+								<button type="button" ng-click="openSearchModal_user_id()" class="btn btn-danger btn-flat">{{phrase.searchUsers}}</button>
+								<input type="text" name="user_id_ser" ng-model="form.user_id_ser" style="display:none;">
+								<div class="row" ng-repeat="userOne in form.user_id track by $index">
+									<div class="col-md-4"><input type="text" class="form-control" disabled="disabled" name="studentP[]" ng-model="userOne.user"></div>
+									<button type="button" ng-click="removeUserSearch_user_id(userOne.id)" class="btn btn-danger btn-circle"><i class="fa fa-trash-o"></i></button></li>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': library_issue_edit_form.book_id.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.bookTitle}} *</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="book_id" ng-model="form.book_id" required>
+									<option ng-repeat="(key,item) in books" value="{{key}}">{{item}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.serial_no}} </label>
+							<div class="col-sm-10">
+								<input type="text" name="serial_num" ng-model="form.serial_num" class="form-control" placeholder="{{phrase.serial_no}}" >
+							</div>
+						</div>
+						<div class="form-group row" ng-class="{'has-error': library_issue_edit_form.issue_date.$invalid}">
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.issue_date}} *</label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="issue_date_edit" name="issue_date" ng-model="form.issue_date" class="form-control issue_date_add" placeholder="{{phrase.issue_date}}" required>
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.ret_date}} </label>
+							<div class="col-sm-10">
+								<input type="text" date-picker id="ret_date_edit" name="ret_date" ng-model="form.ret_date" class="form-control ret_date_add" placeholder="{{phrase.ret_date}}" >
+							</div>
+						</div>
+						<div class="form-group row" >
+							<label class="pb-2 pl-3 control-label col-form-label">{{phrase.Notes}} </label>
+							<div class="col-sm-10">
+								<textarea name="issue_notes" class="form-control" ng-model="form.issue_notes" placeholder="{{phrase.Notes}}" ></textarea>
+							</div>
+						</div>
+						<div class="form-group m-b-0">
+							<div class="offset-sm-2 col-sm-10">
+								<button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="library_issue_edit_form.$invalid">{{phrase.edit_issue}}</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="views.list_issued">
+	<div class="col-12">
+		<div class="card" style="margin-bottom: 0">
+			<div class="card-block view-list-block">
+				<div class="card-block-input-group card-block-input-item">
+					<div class="input-group input-group-sm search-input">
+						<input type="text" name="table_search" ng-model="searchText" placeholder="{{phrase.Search}}" ng-change="searchIssuedDB()" class="form-control input-sm">
+						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+					</div>
+				</div>
+				<div class="listTable table-responsive">
+					<table class="table table-bordered table-hover">
+						<tbody>
+							<tr>
+								<th>{{phrase.user}}</th>
+								<th>{{phrase.bookTitle}}</th>
+								<th>{{phrase.issue_date}}</th>
+								<th>{{phrase.ret_date}}</th>
+								<th ng-show="$root.can('issue_book.book_return')" >Action</th>
+							</tr>
+							<tr dir-paginate="library_issue_one in library_issue | itemsPerPage:10" total-items="totalItems">
+								<td>{{library_issue_one.issue_id}}</td>
+								<td>
+									<span class="list_user_item" ng-repeat="userOne in library_issue_one.user_id"><img class="user-image img-circle" style="width:35px; height:35px;" ng-src="{{'index.php/dashboard/profileImage/'+userOne.id}}">{{userOne.user}}<br/></span>
+								</td>
+								<td>{{library_issue_one.issue_date}}</td>
+								<td>{{library_issue_one.ret_date}}</td>
+								<td class="options">
+									<button ng-click="library_return(library_issue_one.id)" type="button" class="btn btn-info btn-circle" title="{{phrase.book_return}}" ><i class="fa fa-undo"></i></button>
+								</td>
+							</tr>
+							<tr ng-show="!library_issue.length"><td class="noTableData" colspan="8">{{phrase.noDataAvailable}}</td></tr>
+						</tbody>
+					</table>
+					<dir-pagination-controls on-page-change="load_issued_data(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<modal visible="showUsrSearchModal_user_id">
+    <div class="row">
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="searchLink_user_id" placeholder="{{phrase.typeUsrSearch}}">
+        </div>
+        <div class="col-md-2">
+            <button type="button" ng-click="searchUserButton_user_id()" class="btn btn-danger btn-flat">{{phrase.Search}}</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="box-body table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr ng-repeat="user in searchResults_user_id">
+                            <td>{{user.name}}</td>
+                            <td>{{user.email}}</td>
+                            <td>{{user.library_id}}</td>
+                            <td class="no-print">
+                                <button type="button" ng-click="serachUserFinish_user_id(user)" class="btn btn-success btn-flat">{{phrase.select}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</modal>
+
+<modal visible="show_return_modal">
+    <form class="form-horizontal" name="retId" role="form" ng-submit="library_return_now()" role="form" novalidate>
+        <div class="form-group row" ng-class="{'has-error': retId.library_id.$invalid}">
+            <label class="col-sm-4 text-right control-label col-form-label">{{phrase.ret_date}} * </label>
+            <div class="col-sm-8">
+          		<input type="text" date-picker id="ret_date_chg" name="ret_date" ng-model="form.ret_date" class="form-control ret_date_chg" placeholder="{{phrase.ret_date}}" >
+            </div>
+        </div>
+        <div class="form-group m-b-0">
+            <div class="offset-sm-2 col-sm-10">
+                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="retId.$invalid">{{phrase.book_return}}</button>
+            </div>
+        </div>
+    </form>
+</modal>

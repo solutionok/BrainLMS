@@ -1,0 +1,158 @@
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+        <h3 class="text-themecolor m-b-0 m-t-0">{{phrase.CMSSettings}}</h3>
+    </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 no-print">
+        <div class="card">
+            <div class="card-block">
+                <div class="list-group">
+
+                    <a showtab="" class="list-group-item active" href="#cms" aria-controls="cms" role="tab" data-toggle="tab">{{phrase.generalSettings}}</a>
+                    <a showtab="" class="list-group-item" href="#social" aria-controls="social" role="tab" data-toggle="tab">{{phrase.socialLinks}}</a>
+                    <a showtab="" class="list-group-item" href="#footer" aria-controls="footer" role="tab" data-toggle="tab">{{phrase.footer}}</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-block">
+
+                <form class="form-horizontal" name="editTerms" role="form" ng-submit="saveSettings()" novalidate>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="cms">
+                            <h3>{{phrase.generalSettings}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.enableCMS}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_active" value="1"> {{phrase.enabled}}
+                                        </label>
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_active" value="0"> {{phrase.disabled}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.defTheme}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="red"> {{phrase.red}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="blue"> {{phrase.blue}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="lightblue"> {{phrase.blueLight}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="green"> {{phrase.green}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="marsala"> {{phrase.Marsala}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="pink"> {{phrase.Pink}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="violet"> {{phrase.Violet}}
+                                        </label>
+                                    </div>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" ng-model="form.cms_theme" value="default"> {{phrase.Cyan}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.cmsActineTemp}}</label>
+                                <div class="col-sm-9">
+                                    <div class="radio-list">
+                                        <input type="text" name="cms_template" ng-model="form.cms_template" class="form-control" placeholder="{{phrase.cmsActineTemp}}">
+                                        <small>Current available templates are : <b>default</b> - <b>modern</b></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="social">
+                            <h3>{{phrase.socialLinnks}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Facebook</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="cms_facebook" ng-model="form.cms_facebook" class="form-control" placeholder="Facebook">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Google +</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="cms_google" ng-model="form.cms_google" class="form-control" placeholder="Google +">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">Twitter</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="cms_twitter" ng-model="form.cms_twitter" class="form-control" placeholder="Twitter">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="footer">
+                            <h3>{{phrase.footer}}</h3>
+                            <br/>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.leftCopyrights}}</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="cms_footer_left" ng-model="form.cms_footer_left" class="form-control" placeholder="{{phrase.leftCopyrights}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="pb-2 pl-3 control-label col-form-label">{{phrase.rightCopyrights}}</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="cms_footer_right" ng-model="form.cms_footer_right" class="form-control" placeholder="{{phrase.rightCopyrights}}">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group m-b-0" style="padding-bottom:10px;">
+                            <div class="offset-sm-2 col-sm-9">
+                                <button type="submit" class="btn btn-info waves-effect waves-light" ng-disabled="editSettings.$invalid">{{phrase.editSettings}}</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
