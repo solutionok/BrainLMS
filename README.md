@@ -1,7 +1,7 @@
 # BrainLMS
 LMS for collages, schools. Laravel backend API, AngularJS
 
-# Installation
+## Installation
 
 1. set dev_api branch up to backend api
 2. set dev_web branch up to public root scope(www) for web
